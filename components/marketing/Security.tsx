@@ -1,0 +1,25 @@
+export default function Security() {
+  return (
+    <section id="security" className="py-12 sm:py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 items-center">
+        <div className="card p-6 rounded-2xl">
+          <h3 className="text-xl font-semibold">Your security is our priority</h3>
+          <p className="opacity-80 mt-2 text-sm">KoloSquad uses industry‑standard encryption and secure payment partners. Funds are locked until payout conditions are met.</p>
+          <ul className="mt-4 space-y-2 text-sm">
+            <li>• 256‑bit TLS encryption</li>
+            <li>• Escrow‑style protection until goal is reached</li>
+            <li>• Activity logs and email notifications</li>
+          </ul>
+        </div>
+        <div className="card p-6 rounded-2xl">
+          <h4 className="font-medium">Trusted partners</h4>
+          <div className="mt-3 grid grid-cols-3 gap-3 text-sm opacity-70">
+            <div className="h-12 rounded-md bg-[color:var(--muted)] grid place-items-center">Paystack</div>
+            <div className="h-12 rounded-md bg-[color:var(--muted)] grid place-items-center">Supabase</div>
+            <div className="h-12 rounded-md bg-[color:var(--muted)] grid place-items-center">Vercel</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
