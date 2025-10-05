@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function MarketingNavbar() {
   return (
@@ -11,6 +12,7 @@ export default function MarketingNavbar() {
           <a className="opacity-80 hover:opacity-100" href="#faqs">FAQs</a>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle variant="icon" />
           <Link href="/sign-in" className="px-3 py-2 text-sm">Sign in</Link>
           <Link href="/sign-in" className="rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2 text-sm">Create free account</Link>
         </div>
