@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Circle } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function Topbar() {
   return (
@@ -14,6 +15,7 @@ export default function Topbar() {
           />
         </div>
         <div className="hidden sm:flex items-center gap-3">
+          <ThemeToggle variant="icon" />
           <span className="badge-soft inline-flex items-center gap-1"><Circle size={8} fill="currentColor"/> Live</span>
           <button className="rounded-md p-2 hover:bg-[color:var(--muted)]" aria-label="Notifications">
             <Bell size={18} />

@@ -1,15 +1,32 @@
 'use client'
 
+import React from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { 
-  fadeInRight, 
-  staggerContainer, 
-  staggerItem, 
-  buttonHover,
-  float,
-  pulse
-} from "@/lib/motion";
+
+// Inline simple motion variants to avoid external dependency issues
+const fadeInRight = {
+  initial: { opacity: 0, x: 20 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.6 } },
+};
+const staggerContainer = {
+  initial: {},
+  animate: { transition: { staggerChildren: 0.08 } },
+};
+const staggerItem = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+const buttonHover = {
+  hover: { y: -2 },
+  tap: { scale: 0.98 },
+};
+const float = {
+  animate: { y: [0, -10, 0], transition: { duration: 6, repeat: Infinity } },
+};
+const pulse = {
+  animate: { scale: [1, 1.02, 1], transition: { duration: 3, repeat: Infinity } },
+};
 
 export default function Hero() {
   const ref = useRef(null);

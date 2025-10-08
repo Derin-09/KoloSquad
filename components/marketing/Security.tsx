@@ -1,4 +1,13 @@
+import React, { type ComponentType } from "react";
+import { SiPaystack, SiSupabase, SiVercel } from "react-icons/si";
+
 export default function Security() {
+  const partners: { name: string; color: string; Icon: ComponentType<{ size?: number; className?: string }> }[] = [
+    { name: "Paystack", color: "#59C1CC", Icon: SiPaystack },
+    { name: "Supabase", color: "#3ECF8E", Icon: SiSupabase },
+    { name: "Vercel", color: "#000000", Icon: SiVercel },
+  ];
+
   return (
     <section id="security" className="py-12 sm:py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 items-center">
@@ -13,10 +22,13 @@ export default function Security() {
         </div>
         <div className="card p-6 rounded-2xl">
           <h4 className="font-medium">Trusted partners</h4>
-          <div className="mt-3 grid grid-cols-3 gap-3 text-sm opacity-70">
-            <div className="h-12 rounded-md bg-[color:var(--muted)] grid place-items-center">Paystack</div>
-            <div className="h-12 rounded-md bg-[color:var(--muted)] grid place-items-center">Supabase</div>
-            <div className="h-12 rounded-md bg-[color:var(--muted)] grid place-items-center">Vercel</div>
+          <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+            {partners.map((p) => (
+              <div key={p.name} className="h-12 rounded-md bg-[color:var(--muted)] flex items-center justify-center gap-2 px-2">
+                <p.Icon size={18} className="opacity-90" />
+                <span style={{ color: p.color }}>{p.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

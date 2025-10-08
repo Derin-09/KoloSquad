@@ -51,7 +51,14 @@ export default function DashboardPage() {
         }));
         if (mounted) setSquads(withBalance);
       } catch (e: any) {
-        setError(e.message || "Failed to load dashboard");
+        const msg = e?.message || "Failed to load dashboard";
+        // Gracefully handle missing table / schema cache errors in new environments
+        if (/schema cache|could not find the table|relation .* does not exist/i.test(msg)) {
+          setError(null);
+          setSquads([]);
+        } else {
+          setError(msg);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
