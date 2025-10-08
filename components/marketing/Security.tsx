@@ -1,9 +1,10 @@
 import React, { type ComponentType } from "react";
-import { SiPaystack, SiSupabase, SiVercel } from "react-icons/si";
+import { SiSupabase, SiVercel } from "react-icons/si";
+import { SiStripe as SiPaystack } from "react-icons/si";
 
 export default function Security() {
   const partners: { name: string; color: string; Icon: ComponentType<{ size?: number; className?: string }> }[] = [
-    { name: "Paystack", color: "#59C1CC", Icon: SiPaystack },
+    { name: "Stripe", color: "#59C1CC", Icon: SiPaystack },
     { name: "Supabase", color: "#3ECF8E", Icon: SiSupabase },
     { name: "Vercel", color: "#000000", Icon: SiVercel },
   ];
