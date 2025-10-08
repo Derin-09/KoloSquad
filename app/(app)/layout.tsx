@@ -1,8 +1,17 @@
+"use client";
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const isStandaloneAuth = pathname === "/sign-in";
+
+  if (isStandaloneAuth) {
+    return <main className="min-h-dvh p-3 md:p-6 lg:p-8">{children}</main>;
+  }
+
   return (
     <div className="min-h-dvh flex">
       <Sidebar />
