@@ -31,7 +31,7 @@ export function LoginForm() {
       <div>
         <label className="block text-sm font-medium">Email</label>
         <input
-          className="w-full rounded-md border px-3 py-2 ring-2 ring-purple-500 focus:ring-purple-600 outline-none"
+          className="w-full rounded-md border border-purple-500 focus:border-purple-600 outline-none px-3 py-2 transition-colors"
           type="email"
           placeholder="you@example.com"
           value={email}
@@ -42,7 +42,7 @@ export function LoginForm() {
       <div>
         <label className="block text-sm font-medium">Password</label>
         <input
-          className="w-full rounded-md border px-3 py-2 ring-2 ring-purple-500 focus:ring-purple-600 outline-none"
+          className="w-full rounded-md border border-purple-500 focus:border-purple-600 outline-none px-3 py-2 transition-colors"
           type="password"
           placeholder="••••••••"
           value={password}

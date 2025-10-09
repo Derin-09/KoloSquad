@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import Image from "next/image";
 
 // Inline simple motion variants to avoid external dependency issues
 const fadeInRight = {
@@ -49,9 +50,9 @@ export default function Hero() {
         />
       </div>
       
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 grid lg:grid-cols-2 gap-10 items-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
         <motion.div 
-          className="space-y-6"
+          className="space-y-4 sm:space-y-6"
           variants={staggerContainer}
           initial="initial"
           animate={isInView ? "animate" : "initial"}
@@ -64,7 +65,7 @@ export default function Hero() {
           </motion.div>
           
           <motion.h1 
-            className="text-4xl sm:text-5xl font-bold leading-tight"
+            className="text-3xl sm:text-5xl font-bold leading-tight"
             variants={staggerItem}
           >
             The smarter way to save with your squad
@@ -116,7 +117,7 @@ export default function Hero() {
           animate={isInView ? "animate" : "initial"}
         >
           <motion.div 
-            className="card p-6 aspect-[4/3] rounded-2xl grid place-items-center"
+            className="card p-4 sm:p-6 aspect-video sm:aspect-[4/3] rounded-2xl grid place-items-center"
             variants={pulse}
             animate={isInView ? "animate" : "initial"}
             whileHover={{ scale: 1.02 }}
@@ -132,14 +133,14 @@ export default function Hero() {
                 Savings made smarter
               </motion.div>
               <motion.div 
-                className="text-2xl font-semibold"
+                className="text-xl sm:text-2xl font-semibold"
                 initial={{ opacity: 0, y: 10 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 0.7 }}
               >
                 Squad progress • 68%
               </motion.div>
-              <div className="mt-4 h-2 w-72 bg-black/10 dark:bg-white/10 rounded overflow-hidden">
+              <div className="mt-4 h-2 w-56 sm:w-72 bg-black/10 dark:bg-white/10 rounded overflow-hidden">
                 <motion.div 
                   className="h-2 bg-[color:var(--accent)] rounded" 
                   initial={{ width: 0 }}
@@ -149,6 +150,11 @@ export default function Hero() {
               </div>
             </div>
           </motion.div>
+          <div className="mt-6">
+            <div className="relative w-full h-48 sm:h-64 rounded-xl overflow-hidden">
+              <Image src="/image/medium-shot-student-with-smartphone.jpg" alt="Saving is better together" fill className="object-cover" />
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
