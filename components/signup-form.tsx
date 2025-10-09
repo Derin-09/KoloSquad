@@ -11,6 +11,7 @@ export function SignupForm() {
   const [pfp, setPfp] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const appUrl = useMemo(() =>
     (typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000",
@@ -19,6 +20,7 @@ export function SignupForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setNotice(null);
     if (password !== confirm) {
       setError("Passwords do not match");
       return;
@@ -40,15 +42,24 @@ export function SignupForm() {
         }
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { full_name: fullName, avatar_url },
+          // After verifying email, redirect into onboarding
           emailRedirectTo: appUrl + "/onboarding",
         },
       });
       if (error) throw error;
+
+      // If email confirmations are enabled, there will be no session yet.
+      if (!data?.session) {
+        setNotice("We\u2019ve sent a verification link to your email. Please verify to continue.");
+        return;
+      }
+
+      // If your project auto-confirms users, proceed.
       window.location.href = "/onboarding";
     } catch (e: any) {
       setError(e?.message || "Sign up failed");
@@ -82,6 +93,7 @@ export function SignupForm() {
       <button type="submit" disabled={loading} className="w-full rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 hover:brightness-95 transition-colors disabled:opacity-50">
         {loading ? "Creating..." : "Create account"}
       </button>
+      {notice && <p className="text-sm text-green-600">{notice}</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
       <p className="text-sm">Already have an account? <a href="/sign-in" className="underline">Sign in</a></p>
     </form>

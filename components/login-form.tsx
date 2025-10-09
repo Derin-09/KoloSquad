@@ -14,10 +14,18 @@ export function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      // Suggest verification
-      await supabase.auth.resend({ type: "signup", email }).catch(() => {});
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        const msg = (error.message || "").toLowerCase();
+        if (msg.includes("confirm") || msg.includes("not confirmed")) {
+          // Email not confirmed; resend and inform the user.
+          await supabase.auth.resend({ type: "signup", email }).catch(() => {});
+          setError("Please check your email to verify your account. We just sent you a new link.");
+          return;
+        }
+        throw error;
+      }
+      // Success
       window.location.href = "/dashboard";
     } catch (e: any) {
       setError(e?.message || "Sign in failed");
