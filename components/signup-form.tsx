@@ -61,25 +61,25 @@ export function SignupForm() {
     <form onSubmit={onSubmit} className="space-y-3">
       <div>
         <label className="block text-sm font-medium">Full name</label>
-        <input className="w-full rounded-md border border-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none px-3 py-2 transition-colors" placeholder="Jane Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+        <input className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="Jane Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
       </div>
       <div>
         <label className="block text-sm font-medium">Email</label>
-        <input className="w-full rounded-md border border-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none px-3 py-2 transition-colors" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
       <div>
         <label className="block text-sm font-medium">Password</label>
-        <input className="w-full rounded-md border border-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none px-3 py-2 transition-colors" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <input className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
       <div>
         <label className="block text-sm font-medium">Confirm password</label>
-        <input className="w-full rounded-md border border-[color:var(--accent)] focus:border-[color:var(--accent)] outline-none px-3 py-2 transition-colors" type="password" placeholder="••••••••" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+        <input className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" type="password" placeholder="••••••••" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
       </div>
       <div>
         <label className="block text-sm font-medium">Profile picture (optional)</label>
         <input type="file" accept="image/*" onChange={(e) => setPfp(e.target.files?.[0] || null)} />
       </div>
-      <button type="submit" disabled={loading} className="w-full rounded-md bg-purple-600 text-white px-3 py-2 hover:bg-purple-700 transition-colors disabled:opacity-50">
+      <button type="submit" disabled={loading} className="w-full rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 hover:brightness-95 transition-colors disabled:opacity-50">
         {loading ? "Creating..." : "Create account"}
       </button>
       {error && <p className="text-sm text-red-600">{error}</p>}

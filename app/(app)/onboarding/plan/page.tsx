@@ -34,7 +34,7 @@ export default function OnboardingPlan() {
       <h1 className="text-2xl font-bold">Your saving plan</h1>
       <div>
         <label className="block text-sm">Contribution frequency</label>
-        <select value={frequency} onChange={(e) => setFrequency(e.target.value)} className="w-full rounded-md border px-3 py-2">
+        <select value={frequency} onChange={(e) => setFrequency(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors">
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
           <option value="monthly">Monthly</option>
@@ -42,13 +42,13 @@ export default function OnboardingPlan() {
       </div>
       <div>
         <label className="block text-sm">Who are you saving with?</label>
-        <select value={squad} onChange={(e) => setSquad(e.target.value)} className="w-full rounded-md border px-3 py-2">
+        <select value={squad} onChange={(e) => setSquad(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors">
           <option value="friends">Friends</option>
           <option value="family">Family</option>
           <option value="coworkers">Coworkers</option>
         </select>
       </div>
-      <button onClick={finish} className="rounded-md bg-black text-white dark:bg-white dark:text-black px-4 py-3">
+      <button onClick={finish} className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-3 hover:brightness-95">
         Finish
       </button>
     </main>

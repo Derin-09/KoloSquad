@@ -17,7 +17,7 @@ export default function SignInPage() {
         <div className="w-full max-w-md space-y-6">
           <div>
             <a href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
-              <Logo className="h-7" />
+              <Logo className="h-7" variant="dark" />
             </a>
           </div>
           <div>
@@ -26,7 +26,7 @@ export default function SignInPage() {
           </div>
           <LoginForm />
           <div className="text-sm">
-            Don’t have an account? <a className="underline" href="/sign-up">Create one</a>
+            Don&apos;t have an account? <a className="underline" href="/sign-up">Create one</a>
           </div>
         </div>
       </section>

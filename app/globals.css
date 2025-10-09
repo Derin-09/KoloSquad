@@ -10,6 +10,9 @@
   --border: rgba(0,0,0,0.08);
   --accent: #c9b6ff; /* soft purple */
   --accent-foreground: #1d1333;
+  --accent-input: color-mix(in oklab, var(--accent) 35%, white);
+  --accent-input-focus: color-mix(in oklab, var(--accent) 55%, white);
+  --accent-button: color-mix(in oklab, var(--accent) 85%, white);
   --success: #2ecc71;
 }
 
@@ -22,12 +25,15 @@
   --border: rgba(255,255,255,0.12);
   --accent: #b49cff;
   --accent-foreground: #efeaff;
+  --accent-input: color-mix(in oklab, var(--accent) 45%, white);
+  --accent-input-focus: color-mix(in oklab, var(--accent) 65%, white);
+  --accent-button: color-mix(in oklab, var(--accent) 85%, white);
   --success: #2ecc71;
 }
 
 /* System preference (fallback for browsers that don't support manual theme switching) */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light):not(.dark) {
+:root:not(.light):not(.dark) {
     --background: #0b0b0c;
     --foreground: #ededed;
     --surface: #0d0d10;
@@ -35,6 +41,9 @@
     --border: rgba(255,255,255,0.12);
     --accent: #b49cff;
     --accent-foreground: #efeaff;
+    --accent-input: color-mix(in oklab, var(--accent) 45%, white);
+    --accent-input-focus: color-mix(in oklab, var(--accent) 65%, white);
+    --accent-button: color-mix(in oklab, var(--accent) 85%, white);
     --success: #2ecc71;
   }
 }

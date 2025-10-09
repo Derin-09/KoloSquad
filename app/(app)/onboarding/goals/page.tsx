@@ -33,13 +33,13 @@ export default function OnboardingGoals() {
       <h1 className="text-2xl font-bold">What are you saving for?</h1>
       <div>
         <label className="block text-sm">Saving goal</label>
-        <input value={goal} onChange={(e) => setGoal(e.target.value)} className="w-full rounded-md border px-3 py-2" placeholder="E.g. New phone, Travel, Rent" />
+        <input value={goal} onChange={(e) => setGoal(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="E.g. New phone, Travel, Rent" />
       </div>
       <div>
         <label className="block text-sm">Target amount (optional)</label>
-        <input value={target} onChange={(e) => setTarget(e.target.value)} className="w-full rounded-md border px-3 py-2" placeholder="E.g. 200000" />
+        <input value={target} onChange={(e) => setTarget(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="E.g. 200000" />
       </div>
-      <button onClick={next} className="rounded-md bg-black text-white dark:bg-white dark:text-black px-4 py-3">
+      <button onClick={next} className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-3 hover:brightness-95">
         Continue
       </button>
     </main>
