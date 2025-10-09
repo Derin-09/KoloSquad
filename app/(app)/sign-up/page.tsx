@@ -5,12 +5,18 @@ import { SignupForm } from "@/components/signup-form";
 
 export default function SignUpPage() {
   return (
-    <main className="grid min-h-[80vh] grid-cols-1 md:grid-cols-2">
-      <section className="flex items-center justify-center p-6 md:p-10">
+    <main className="relative min-h-screen md:pr-[50vw]">
+      {/* Fixed right-side image panel */}
+      <aside className="hidden md:block fixed inset-y-0 right-0 w-1/2">
+        <Image src="/image/medium-shot-student-with-smartphone.jpg" alt="People saving together" fill className="object-cover" priority />
+      </aside>
+
+      {/* Left content */}
+      <section className="flex min-h-screen items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md space-y-6">
           <div>
-            <a href="/" className="inline-flex items-center gap-2 text-sm opacity-80 hover:opacity-100">
-              <span className="font-semibold">KoloSquad</span>
+            <a href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
+              <Image src="/vector/default-monochrome-black.svg" alt="KoloSquad" width={140} height={28} />
             </a>
           </div>
           <div>
@@ -20,9 +26,6 @@ export default function SignUpPage() {
           <SignupForm />
         </div>
       </section>
-      <aside className="relative hidden md:block">
-        <Image src="/image/medium-shot-student-with-smartphone.jpg" alt="People saving together" fill className="object-cover" priority />
-      </aside>
     </main>
   );
 }

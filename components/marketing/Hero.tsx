@@ -117,17 +117,22 @@ export default function Hero() {
           animate={isInView ? "animate" : "initial"}
         >
           <motion.div 
-            className="card p-4 sm:p-6 aspect-video sm:aspect-[4/3] rounded-2xl grid place-items-center"
+            className="relative overflow-hidden rounded-2xl aspect-video sm:aspect-[4/3]"
             variants={pulse}
             animate={isInView ? "animate" : "initial"}
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="text-center">
+            {/* Background image with dark overlay */}
+            <Image src="/image/side-view-friends-with-smartphone.jpg" alt="Saving together" fill className="object-cover" />
+            <div className="absolute inset-0 bg-black/55" />
+
+            {/* Foreground content */}
+            <div className="relative z-10 p-4 sm:p-6 text-center text-white">
               <motion.div 
-                className="text-sm opacity-70 mb-2"
+                className="text-sm/relaxed opacity-90 mb-2"
                 initial={{ opacity: 0 }}
-                animate={isInView ? { opacity: 0.7 } : { opacity: 0 }}
+                animate={isInView ? { opacity: 0.9 } : { opacity: 0 }}
                 transition={{ delay: 0.5 }}
               >
                 Savings made smarter
@@ -140,7 +145,7 @@ export default function Hero() {
               >
                 Squad progress • 68%
               </motion.div>
-              <div className="mt-4 h-2 w-56 sm:w-72 bg-black/10 dark:bg-white/10 rounded overflow-hidden">
+              <div className="mt-4 h-2 w-56 sm:w-72 bg-white/20 rounded overflow-hidden">
                 <motion.div 
                   className="h-2 bg-[color:var(--accent)] rounded" 
                   initial={{ width: 0 }}
@@ -150,11 +155,6 @@ export default function Hero() {
               </div>
             </div>
           </motion.div>
-          <div className="mt-6">
-            <div className="relative w-full h-48 sm:h-64 rounded-xl overflow-hidden">
-              <Image src="/image/medium-shot-student-with-smartphone.jpg" alt="Saving is better together" fill className="object-cover" />
-            </div>
-          </div>
         </motion.div>
       </div>
     </section>
