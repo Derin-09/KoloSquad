@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { motion } from "framer-motion";
 import { fadeInDown, buttonHover, staggerContainer, staggerItem } from "@/lib/motion";
+import { Logo } from "@/components/Logo";
 
 export default function MarketingNavbar() {
   return (
@@ -21,8 +22,8 @@ export default function MarketingNavbar() {
         animate="animate"
       >
         <motion.div variants={staggerItem}>
-          <Link href="/" className="font-bold hover:text-[color:var(--accent)] transition-colors">
-            KoloSquad
+          <Link href="/" className="inline-flex items-center">
+            <Logo className="h-6" />
           </Link>
         </motion.div>
         

@@ -127,31 +127,33 @@ export default function Hero() {
             <Image src="/image/side-view-friends-with-smartphone.jpg" alt="Saving together" fill className="object-cover" />
             <div className="absolute inset-0 bg-black/55" />
 
-            {/* Foreground content */}
-            <div className="relative z-10 p-4 sm:p-6 text-center text-white">
-              <motion.div 
-                className="text-sm/relaxed opacity-90 mb-2"
-                initial={{ opacity: 0 }}
-                animate={isInView ? { opacity: 0.9 } : { opacity: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                Savings made smarter
-              </motion.div>
-              <motion.div 
-                className="text-xl sm:text-2xl font-semibold"
-                initial={{ opacity: 0, y: 10 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                transition={{ delay: 0.7 }}
-              >
-                Squad progress • 68%
-              </motion.div>
-              <div className="mt-4 h-2 w-56 sm:w-72 bg-white/20 rounded overflow-hidden">
+            {/* Foreground content centered */}
+            <div className="absolute inset-0 z-10 grid place-items-center p-4 sm:p-6 text-white">
+              <div className="text-center max-w-sm mx-auto">
                 <motion.div 
-                  className="h-2 bg-[color:var(--accent)] rounded" 
-                  initial={{ width: 0 }}
-                  animate={isInView ? { width: '68%' } : { width: 0 }}
-                  transition={{ delay: 1, duration: 1.5, ease: "easeOut" }}
-                />
+                  className="text-sm/relaxed opacity-90 mb-2"
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 0.9 } : { opacity: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  Savings made smarter
+                </motion.div>
+                <motion.div 
+                  className="text-xl sm:text-2xl font-semibold"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  Squad progress • 68%
+                </motion.div>
+                <div className="mt-4 h-2 w-56 sm:w-72 bg-white/20 rounded overflow-hidden">
+                  <motion.div 
+                    className="h-2 bg-[color:var(--accent)] rounded" 
+                    initial={{ width: 0 }}
+                    animate={isInView ? { width: '68%' } : { width: 0 }}
+                    transition={{ delay: 1, duration: 1.5, ease: "easeOut" }}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>

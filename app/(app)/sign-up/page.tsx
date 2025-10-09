@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { SignupForm } from "@/components/signup-form";
+import { Logo } from "@/components/Logo";
 
 export default function SignUpPage() {
   return (
@@ -16,7 +17,7 @@ export default function SignUpPage() {
         <div className="w-full max-w-md space-y-6">
           <div>
             <a href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
-              <Image src="/vector/default-monochrome-black.svg" alt="KoloSquad" width={140} height={28} />
+              <Logo className="h-7" />
             </a>
           </div>
           <div>
