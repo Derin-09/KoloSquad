@@ -76,7 +76,7 @@ export default function MarketingNavbar() {
             whileTap="tap"
           >
             <Link 
-              href="/sign-in" 
+              href="/sign-up" 
               className="rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2 text-sm hover:shadow-lg transition-shadow"
             >
               Create free account

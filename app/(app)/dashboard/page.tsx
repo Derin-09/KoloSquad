@@ -35,6 +35,12 @@ export default function DashboardPage() {
           window.location.href = "/sign-in";
           return;
         }
+        // Gate by email verification
+        if (!user.email_confirmed_at) {
+          setError("Please verify your email address to access the dashboard. We can resend the verification email.");
+          setLoading(false);
+          return;
+        }
 
         const { data, error } = await supabase
           .from("squads")
@@ -92,7 +98,25 @@ export default function DashboardPage() {
       </div>
 
       {loading && <p>Loading...</p>}
-      {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
+      {error && (
+        <div className="card p-3">
+          <p className="text-red-600 dark:text-red-400 mb-3">{error}</p>
+          {error.includes("verify your email") && (
+            <button
+              onClick={async () => {
+                try {
+                  const { data: userData } = await supabase.auth.getUser();
+                  const em = userData?.user?.email;
+                  if (em) await supabase.auth.resend({ type: "signup", email: em });
+                } catch {}
+              }}
+              className="rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2"
+            >
+              Resend verification email
+            </button>
+          )}
+        </div>
+      )}
 
       <Card>
         <div className="flex items-center justify-between mb-3">

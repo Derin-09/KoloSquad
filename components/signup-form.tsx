@@ -1,0 +1,89 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
+
+export function SignupForm() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [pfp, setPfp] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const appUrl = useMemo(() =>
+    (typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000",
+  []);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    try {
+      // Cloudinary upload (unsigned) if provided
+      let avatar_url: string | undefined = undefined;
+      if (pfp) {
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+        if (cloudName && uploadPreset) {
+          const form = new FormData();
+          form.append("file", pfp);
+          form.append("upload_preset", uploadPreset);
+          const upRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: form });
+          const upJson = await upRes.json();
+          if (upRes.ok && upJson?.secure_url) avatar_url = upJson.secure_url as string;
+        }
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName, avatar_url },
+          emailRedirectTo: appUrl + "/onboarding",
+        },
+      });
+      if (error) throw error;
+      window.location.href = "/onboarding";
+    } catch (e: any) {
+      setError(e?.message || "Sign up failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-3">
+      <div>
+        <label className="block text-sm font-medium">Full name</label>
+        <input className="w-full rounded-md border px-3 py-2 ring-2 ring-purple-500 focus:ring-purple-600 outline-none" placeholder="Jane Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Email</label>
+        <input className="w-full rounded-md border px-3 py-2 ring-2 ring-purple-500 focus:ring-purple-600 outline-none" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Password</label>
+        <input className="w-full rounded-md border px-3 py-2 ring-2 ring-purple-500 focus:ring-purple-600 outline-none" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Confirm password</label>
+        <input className="w-full rounded-md border px-3 py-2 ring-2 ring-purple-500 focus:ring-purple-600 outline-none" type="password" placeholder="••••••••" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Profile picture (optional)</label>
+        <input type="file" accept="image/*" onChange={(e) => setPfp(e.target.files?.[0] || null)} />
+      </div>
+      <button type="submit" disabled={loading} className="w-full rounded-md bg-purple-600 text-white px-3 py-2 hover:bg-purple-700 transition-colors disabled:opacity-50">
+        {loading ? "Creating..." : "Create account"}
+      </button>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <p className="text-sm">Already have an account? <a href="/sign-in" className="underline">Sign in</a></p>
+    </form>
+  );
+}

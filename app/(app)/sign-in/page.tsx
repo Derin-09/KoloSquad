@@ -6,11 +6,8 @@ import { supabase } from "@/lib/supabase/client";
 
 export default function SignInPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<"phone" | "email">("phone");
-  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState<"input" | "otp" | "sent">("input");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,55 +15,38 @@ export default function SignInPage() {
     (typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000",
   []);
 
-  function normalizePhone(input: string) {
-    let v = input.trim().replace(/\s+/g, "");
-    // Nigeria helper: 0xxxxxxxxxx -> +234xxxxxxxxxx
-    if (/^0\d{10}$/.test(v)) v = "+234" + v.slice(1);
-    return v;
-  }
-
-  async function sendOtp() {
+  async function onEmailSignIn(e: React.FormEvent) {
+    e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      if (mode === "phone") {
-        const p = normalizePhone(phone);
-        const { error } = await supabase.auth.signInWithOtp({
-          phone: p,
-          options: { channel: "sms", shouldCreateUser: true },
-        });
-        if (error) throw error;
-        setStep("otp");
-      } else {
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: { shouldCreateUser: true, emailRedirectTo: appUrl + "/dashboard" },
-        });
-        if (error) throw error;
-        setStep("sent");
-      }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      // Send verification email after sign-in (resend signup verification)
+      await supabase.auth.resend({ type: "signup", email }).catch(() => {});
+
+      router.replace("/dashboard");
     } catch (e: any) {
-      let msg = e?.message || "Failed to send OTP";
-      if (mode === "phone" && /unsupported phone provider/i.test(msg)) {
-        msg = "SMS provider not configured. Use Email sign-in for now or configure Phone provider in Supabase.";
-      }
-      setError(msg);
+      setError(e?.message || "Sign in failed");
     } finally {
       setLoading(false);
     }
   }
 
-  async function verifyOtp() {
-    if (mode !== "phone") return;
+  async function onGoogleSignIn() {
     setError(null);
     setLoading(true);
     try {
-      const p = normalizePhone(phone);
-      const { error, data } = await supabase.auth.verifyOtp({ phone: p, token: code.trim(), type: "sms" });
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: appUrl + "/sign-up" },
+      });
       if (error) throw error;
-      if (data?.session) router.replace("/dashboard");
+      // Redirect happens via OAuth; as fallback, push to sign-up
+      router.push("/sign-up");
     } catch (e: any) {
-      setError(e?.message || "Invalid code");
+      setError(e?.message || "Google sign-in failed");
     } finally {
       setLoading(false);
     }
@@ -76,81 +56,46 @@ export default function SignInPage() {
     <main className="max-w-md mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Sign in</h1>
-        <p className="text-sm text-neutral-600 dark:text-neutral-300">Use your phone (OTP) or email.</p>
+        <p className="text-sm text-neutral-600 dark:text-neutral-300">Welcome back. Sign in to continue.</p>
       </div>
 
-      {/* Toggle */}
-      <div className="grid grid-cols-2 rounded-md border" style={{ borderColor: "var(--border)" }}>
-        <button
-          onClick={() => { setMode("phone"); setStep("input"); setError(null); }}
-          className={`px-3 py-2 text-sm ${mode === "phone" ? "bg-[color:var(--muted)] font-medium" : "opacity-80"}`}
-        >
-          Phone
-        </button>
-        <button
-          onClick={() => { setMode("email"); setStep("input"); setError(null); }}
-          className={`px-3 py-2 text-sm ${mode === "email" ? "bg-[color:var(--muted)] font-medium" : "opacity-80"}`}
-        >
-          Email
-        </button>
-      </div>
-
-      {/* Input step */}
-      {step === "input" && (
-        <div className="space-y-3">
-          {mode === "phone" ? (
-            <>
-              <label className="block text-sm font-medium">Phone number</label>
-              <input
-                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3 py-2"
-                placeholder="e.g. +2348012345678"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <p className="text-xs opacity-70">Tip: 0xxxxxxxxxx will be normalized to +234xxxxxxxxxx.</p>
-            </>
-          ) : (
-            <>
-              <label className="block text-sm font-medium">Email address</label>
-              <input
-                type="email"
-                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3 py-2"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </>
-          )}
-          <button onClick={sendOtp} disabled={loading || (mode === "phone" ? !phone : !email)} className="w-full rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2 disabled:opacity-50">
-            {loading ? "Sending..." : mode === "phone" ? "Send OTP" : "Send sign-in link"}
-          </button>
-        </div>
-      )}
-
-      {/* Phone OTP step */}
-      {mode === "phone" && step === "otp" && (
-        <div className="space-y-3">
-          <label className="block text-sm font-medium">Enter OTP</label>
+      <form onSubmit={onEmailSignIn} className="space-y-3">
+        <div>
+          <label className="block text-sm font-medium">Email address</label>
           <input
-            className="w-full rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3 py-2 tracking-widest"
-            placeholder="6-digit code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
+            type="email"
+            className="w-full rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3 py-2"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
-          <button onClick={verifyOtp} disabled={loading || code.length < 4} className="w-full rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2 disabled:opacity-50">
-            {loading ? "Verifying..." : "Verify & Continue"}
-          </button>
-          <button onClick={() => setStep("input")} className="w-full text-sm underline opacity-70">Change phone</button>
         </div>
-      )}
+        <div>
+          <label className="block text-sm font-medium">Password</label>
+          <input
+            type="password"
+            className="w-full rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3 py-2"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" disabled={loading} className="w-full rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2 disabled:opacity-50">
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
 
-      {/* Email sent step */}
-      {mode === "email" && step === "sent" && (
-        <div className="space-y-3">
-          <p className="text-sm">We sent a sign-in link to <span className="font-medium">{email}</span>. Open it on this device to continue.</p>
-          <button onClick={() => setStep("input")} className="w-full text-sm underline opacity-70">Use a different email</button>
-        </div>
-      )}
+      <div className="text-center text-sm opacity-70">or</div>
+
+      <button onClick={onGoogleSignIn} disabled={loading} className="w-full rounded-md border px-3 py-2 hover:bg-[color:var(--muted)] transition-colors disabled:opacity-50">
+        Continue with Google
+      </button>
+
+      <div className="text-sm">
+        Don’t have an account? <a className="underline" href="/sign-up">Create one</a>
+      </div>
 
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
     </main>

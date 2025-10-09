@@ -4,11 +4,14 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 
-export default function AppLayout({ children }: { children: ReactNode }) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isStandaloneAuth = pathname === "/sign-in";
+  const isStandalone = pathname === "/sign-in"
+    || pathname === "/sign-up"
+    || (pathname?.startsWith("/reset-password") ?? false)
+    || (pathname?.startsWith("/onboarding") ?? false);
 
-  if (isStandaloneAuth) {
+  if (isStandalone) {
     return <main className="min-h-dvh p-3 md:p-6 lg:p-8">{children}</main>;
   }
 
