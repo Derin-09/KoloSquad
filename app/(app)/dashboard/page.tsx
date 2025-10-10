@@ -204,7 +204,16 @@ export default function DashboardPage() {
               <div key={s.id} className="card p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="font-semibold">{s.name}</div>
-                  <span className="text-xs opacity-70">Invite: {s.invite_code}</span>
+                  <div className="text-xs opacity-70 flex items-center gap-2">
+                    <span>Invite: {s.invite_code}</span>
+                    <button
+                      className="underline"
+                      onClick={() => {
+                        const url = `${window.location.origin}/squads/join?code=${encodeURIComponent(s.invite_code)}`;
+                        navigator.clipboard?.writeText(url);
+                      }}
+                    >Copy link</button>
+                  </div>
                 </div>
                 <div className="text-sm flex justify-between">
                   <span>Saved</span>
@@ -218,7 +227,10 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center justify-between mt-2 text-xs opacity-70">
                   <span>{(s.members || []).length} member{(s.members || []).length === 1 ? "" : "s"}</span>
-                  <a href={`/contribute?squadId=${s.id}`} className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1">Contribute</a>
+                  <div className="flex items-center gap-2">
+                    <a href={`/flex?name=${encodeURIComponent(s.name)}&saved=${encodeURIComponent(s.balance)}&target=${encodeURIComponent(s.target_amount || 0)}`} className="underline">Flex card</a>
+                    <a href={`/contribute?squadId=${s.id}`} className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1">Contribute</a>
+                  </div>
                 </div>
               </div>
             ))}

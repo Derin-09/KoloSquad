@@ -25,6 +25,7 @@ export default function SignUpPage() {
             <p className="text-sm text-neutral-600 dark:text-neutral-300">Join KoloSquad and start saving with your squad.</p>
           </div>
           <SignupForm />
+          <div className="text-sm opacity-80">Prefer phone OTP? <a className="underline" href="/onboarding/phone">Use phone verification</a></div>
         </div>
       </section>
     </main>

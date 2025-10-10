@@ -90,9 +90,15 @@ export default function ContributePage() {
           <label className="block text-sm font-medium">Email</label>
           <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" />
         </div>
-        <button onClick={startPayment} disabled={loading || !amount || !email} className="w-full rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 disabled:opacity-50">
-          {loading ? "Redirecting..." : "Pay with Paystack"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={startPayment} disabled={loading || !amount || !email} className="flex-1 rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 disabled:opacity-50">
+            {loading ? "Redirecting..." : "Pay with Paystack"}
+          </button>
+          <a
+            className="rounded-md border px-3 py-2 text-sm"
+            href={`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('KoloSquad contribution reminder')}&body=${encodeURIComponent('Hi, this is your reminder to contribute ₦' + amount + ' to your squad.')}`}
+          >Remind me</a>
+        </div>
       </div>
     </main>
   );

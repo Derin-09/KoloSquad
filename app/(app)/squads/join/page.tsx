@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function JoinSquadPage() {
   const router = useRouter();
+  const params = useSearchParams();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const c = params.get("code");
+    if (c) setCode(c);
+  }, [params]);
 
   async function join() {
     setError(null);
