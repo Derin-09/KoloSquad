@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 type LogoVariant = "auto" | "light" | "dark"; // auto: theme-aware, light: black always, dark: white always
 
@@ -10,38 +11,34 @@ type LogoProps = {
   variant?: LogoVariant;
 };
 
+function getSystemTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 export function Logo({ className = "h-6", title = "KoloSquad", variant = "auto" }: LogoProps) {
-  if (variant === "light") {
-    // Force light version (black) in all themes
-    return (
-      <span className="inline-flex items-center" title={title} aria-label={title}>
-        <img src="/vector/default-monochrome-black.svg" alt={title} className={`block ${className}`} />
-      </span>
-    );
-  }
+  const { theme } = useTheme();
+  const [system, setSystem] = useState<"light" | "dark">(getSystemTheme());
 
-  if (variant === "dark") {
-    // Force dark version (white) in all themes (useful on dark backgrounds in light mode)
-    return (
-      <span className="inline-flex items-center" title={title} aria-label={title}>
-        <img src="/vector/default-monochrome-white.svg" alt={title} className={`block ${className}`} />
-      </span>
-    );
-  }
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => setSystem(mq.matches ? "dark" : "light");
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
+  }, []);
 
-  // auto (theme-aware): black in light mode, white in dark mode
+  const effective = useMemo(() => {
+    if (variant === "light") return "light";
+    if (variant === "dark") return "dark";
+    if (theme === "system") return system;
+    return theme;
+  }, [variant, theme, system]);
+
+  const src = effective === "dark" ? "/vector/default-monochrome-white.svg" : "/vector/default-monochrome-black.svg";
+
   return (
     <span className="inline-flex items-center" title={title} aria-label={title}>
-      <img
-        src="/vector/default-monochrome-black.svg"
-        alt={title}
-        className={`block dark:hidden ${className}`}
-      />
-      <img
-        src="/vector/default-monochrome-white.svg"
-        alt={title}
-        className={`hidden dark:block ${className}`}
-      />
+      <img src={src} alt={title} className={`block ${className}`} />
     </span>
   );
 }

@@ -18,7 +18,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside className="hidden md:flex md:flex-col w-60 shrink-0 gap-2 p-3 sticky top-0 h-dvh">
-      <div className="px-2 py-3"><Logo className="h-6" variant="dark" /></div>
+<div className="px-2 py-3"><Logo className="h-6" variant="auto" /></div>
       <nav className="flex-1 space-y-1">
         {nav.map((n) => {
           const active = pathname?.startsWith(n.href);

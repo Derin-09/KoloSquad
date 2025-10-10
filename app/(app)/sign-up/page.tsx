@@ -17,7 +17,7 @@ export default function SignUpPage() {
         <div className="w-full max-w-md space-y-6">
           <div>
             <a href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
-              <Logo className="h-7" variant="dark" />
+<Logo className="h-7" variant="auto" />
             </a>
           </div>
           <div>

@@ -23,7 +23,7 @@ export default function MarketingNavbar() {
       >
         <motion.div variants={staggerItem}>
           <Link href="/" className="inline-flex items-center">
-            <Logo className="h-6" variant="dark" />
+<Logo className="h-6" variant="auto" />
           </Link>
         </motion.div>
         

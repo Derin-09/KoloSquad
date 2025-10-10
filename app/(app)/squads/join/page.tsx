@@ -1,0 +1,54 @@
+"use client";
+
+import { useState } from "react";
+import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+
+export default function JoinSquadPage() {
+  const router = useRouter();
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function join() {
+    setError(null);
+    setLoading(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("Sign in required");
+      const { data: squad, error: qerr } = await supabase
+        .from("squads")
+        .select("id")
+        .eq("invite_code", code.trim().toUpperCase())
+        .single();
+      if (qerr) throw qerr;
+      await supabase.from("squad_members").upsert({ squad_id: squad.id, user_id: auth.user.id, role: "member" }, { onConflict: "squad_id,user_id" });
+      router.replace("/dashboard");
+    } catch (e: any) {
+      setError(e?.message || "Failed to join squad");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="max-w-md mx-auto space-y-4">
+      <h1 className="text-2xl font-bold">Join Squad</h1>
+      <label className="block text-sm font-medium">Invite code</label>
+      <input
+        className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        placeholder="e.g. 8F2KQZ"
+      />
+      <button
+        onClick={join}
+        disabled={loading || code.trim().length < 4}
+        className="w-full rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 disabled:opacity-50"
+      >
+        {loading ? "Joining..." : "Join"}
+      </button>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+    </main>
+  );
+}
