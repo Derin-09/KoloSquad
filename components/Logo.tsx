@@ -30,8 +30,8 @@ export function Logo({ className = "h-6", title = "KoloSquad", variant = "auto" 
   // auto: render both, hide/show via .dark class on <html>, avoids hydration mismatch
   return (
     <span className="inline-flex items-center" title={title} aria-label={title} suppressHydrationWarning>
-      <img src="/vector/default-monochrome-black.svg" alt={title} className={`block dark:hidden ${className}`} />
-      <img src="/vector/default-monochrome-white.svg" alt={title} className={`hidden dark:block ${className}`} />
+      <img src="/vector/default-monochrome-black.svg" alt={title} className={`logo--light ${className}`} aria-hidden="true" />
+      <img src="/vector/default-monochrome-white.svg" alt={title} className={`logo--dark ${className}`} aria-hidden="true" />
     </span>
   );
 }

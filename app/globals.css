@@ -48,6 +48,12 @@
   }
 }
 
+/* Theme-aware logo visibility */
+.logo--light { display: inline-block; }
+.logo--dark { display: none; }
+html.dark .logo--light { display: none; }
+html.dark .logo--dark { display: inline-block; }
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

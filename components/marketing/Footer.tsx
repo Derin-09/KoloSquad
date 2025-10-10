@@ -24,7 +24,7 @@ export default function MarketingFooter() {
         animate={isInView ? "animate" : "initial"}
       >
         <motion.div variants={staggerItem}>
-          <div className="font-semibold mb-2">KoloSquad</div>
+          <div className="mb-2"><a href="/"><span className="inline-flex items-center"><img src="/vector/default-monochrome-black.svg" className="logo--light h-6" alt="KoloSquad" /><img src="/vector/default-monochrome-white.svg" className="logo--dark h-6" alt="KoloSquad" /></span></a></div>
           <p className="opacity-80">Save together. Flex together.</p>
         </motion.div>
         
