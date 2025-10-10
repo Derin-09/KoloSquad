@@ -44,7 +44,7 @@ export default function DashboardPage() {
 
         const { data, error } = await supabase
           .from("squads")
-          .select("id, name, target_amount, invite_code, contributions:contributions(amount,status)")
+          .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
           .order("created_at", { ascending: false });
         if (error) throw error;
         const withBalance = (data || []).map((s: any) => ({
@@ -54,6 +54,7 @@ export default function DashboardPage() {
           invite_code: s.invite_code,
           balance: (s.contributions || []).reduce((acc: number, c: any) => acc + Number(c.amount || 0), 0),
           contributions: s.contributions || [],
+          members: s.members || [],
         }));
         if (mounted) setSquads(withBalance);
       } catch (e: any) {
@@ -81,6 +82,70 @@ export default function DashboardPage() {
     const totalContribs = squads.reduce((acc, s: any) => acc + (s.contributions?.length || 0), 0);
     return { totalSaved, totalTarget, totalContribs };
   }, [squads]);
+
+  // Realtime updates for contributions and squad membership
+  useEffect(() => {
+    const channel = supabase
+      .channel("dashboard-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "contributions" },
+        () => {
+          // re-fetch lightweight
+          (async () => {
+            try {
+              const { data, error } = await supabase
+                .from("squads")
+                .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
+                .order("created_at", { ascending: false });
+              if (!error) {
+                const withBalance = (data || []).map((s: any) => ({
+                  id: s.id,
+                  name: s.name,
+                  target_amount: Number(s.target_amount || 0),
+                  invite_code: s.invite_code,
+                  balance: (s.contributions || []).reduce((acc: number, c: any) => acc + Number(c.amount || 0), 0),
+                  contributions: s.contributions || [],
+                  members: s.members || [],
+                }));
+                setSquads(withBalance);
+              }
+            } catch {}
+          })();
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "squad_members" },
+        () => {
+          (async () => {
+            try {
+              const { data, error } = await supabase
+                .from("squads")
+                .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
+                .order("created_at", { ascending: false });
+              if (!error) {
+                const withBalance = (data || []).map((s: any) => ({
+                  id: s.id,
+                  name: s.name,
+                  target_amount: Number(s.target_amount || 0),
+                  invite_code: s.invite_code,
+                  balance: (s.contributions || []).reduce((acc: number, c: any) => acc + Number(c.amount || 0), 0),
+                  contributions: s.contributions || [],
+                  members: s.members || [],
+                }));
+                setSquads(withBalance);
+              }
+            } catch {}
+          })();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      try { supabase.removeChannel(channel); } catch {}
+    };
+  }, []);
 
   const weekLabels = ["Mar 1 - 7", "Mar 8 - 14", "Mar 15 - 21", "Mar 22 - 28", "Final wk"];
   const weekData = [25000, 120000, 90000, 140000, 190000];
@@ -150,6 +215,10 @@ export default function DashboardPage() {
                     className="h-2 rounded bg-[color:var(--accent)]"
                     style={{ width: `${Math.min(100, ((s.balance || 0) / Math.max(1, s.target_amount)) * 100)}%` }}
                   />
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs opacity-70">
+                  <span>{(s.members || []).length} member{(s.members || []).length === 1 ? "" : "s"}</span>
+                  <a href={`/contribute?squadId=${s.id}`} className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1">Contribute</a>
                 </div>
               </div>
             ))}

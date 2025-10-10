@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useTheme } from "@/components/providers/ThemeProvider";
+import React from "react";
 
-type LogoVariant = "auto" | "light" | "dark"; // auto: theme-aware, light: black always, dark: white always
+type LogoVariant = "auto" | "light" | "dark"; // auto: theme-aware via CSS, light: black always, dark: white always
 
 type LogoProps = {
   className?: string;
@@ -11,34 +10,28 @@ type LogoProps = {
   variant?: LogoVariant;
 };
 
-function getSystemTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
 export function Logo({ className = "h-6", title = "KoloSquad", variant = "auto" }: LogoProps) {
-  const { theme } = useTheme();
-  const [system, setSystem] = useState<"light" | "dark">(getSystemTheme());
+  if (variant === "light") {
+    return (
+      <span className="inline-flex items-center" title={title} aria-label={title}>
+        <img src="/vector/default-monochrome-black.svg" alt={title} className={`block ${className}`} />
+      </span>
+    );
+  }
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => setSystem(mq.matches ? "dark" : "light");
-    mq.addEventListener?.("change", handler);
-    return () => mq.removeEventListener?.("change", handler);
-  }, []);
+  if (variant === "dark") {
+    return (
+      <span className="inline-flex items-center" title={title} aria-label={title}>
+        <img src="/vector/default-monochrome-white.svg" alt={title} className={`block ${className}`} />
+      </span>
+    );
+  }
 
-  const effective = useMemo(() => {
-    if (variant === "light") return "light";
-    if (variant === "dark") return "dark";
-    if (theme === "system") return system;
-    return theme;
-  }, [variant, theme, system]);
-
-  const src = effective === "dark" ? "/vector/default-monochrome-white.svg" : "/vector/default-monochrome-black.svg";
-
+  // auto: render both, hide/show via .dark class on <html>, avoids hydration mismatch
   return (
-    <span className="inline-flex items-center" title={title} aria-label={title}>
-      <img src={src} alt={title} className={`block ${className}`} />
+    <span className="inline-flex items-center" title={title} aria-label={title} suppressHydrationWarning>
+      <img src="/vector/default-monochrome-black.svg" alt={title} className={`block dark:hidden ${className}`} />
+      <img src="/vector/default-monochrome-white.svg" alt={title} className={`hidden dark:block ${className}`} />
     </span>
   );
 }

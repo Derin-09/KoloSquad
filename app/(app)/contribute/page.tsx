@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
 
 export default function ContributePage() {
   const [amount, setAmount] = useState<number>(1000);
@@ -9,6 +10,7 @@ export default function ContributePage() {
   const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
   const [squadId, setSquadId] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const params = useSearchParams();
   const appUrl = useMemo(() => (typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000", []);
 
   useEffect(() => {
@@ -20,17 +22,19 @@ export default function ContributePage() {
         const { data } = await supabase
           .from("squad_members")
           .select("squads:id(squads(id,name)), squad_id")
-          .limit(20);
+          .limit(50);
         const list: { id: string; name: string }[] = [] as any;
         (data || []).forEach((row: any) => {
           if (row?.squads?.id) list.push({ id: row.squads.id, name: row.squads.name });
           else if (row?.squad_id) list.push({ id: row.squad_id, name: row.squad_id });
         });
         setSquads(list);
-        if (list[0]?.id) setSquadId(list[0].id);
+        const pre = params.get("squadId");
+        if (pre && list.some((s) => s.id === pre)) setSquadId(pre);
+        else if (list[0]?.id) setSquadId(list[0].id);
       } catch {}
     })();
-  }, []);
+  }, [params]);
 
   async function startPayment() {
     setLoading(true);
