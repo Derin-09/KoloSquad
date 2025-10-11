@@ -55,14 +55,14 @@ export default function MarketingNavbar() {
           >
             FAQs
           </motion.a>
-          <motion.a 
+          {/* <motion.a 
             className="opacity-80 hover:opacity-100 transition-opacity" 
             href="/leaderboard"
             whileHover={{ y: -2 }}
             transition={{ duration: 0.2 }}
           >
             Leaderboard
-          </motion.a>
+          </motion.a> */}
         </motion.div>
         
         <motion.div 

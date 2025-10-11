@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Wallet, Banknote, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, Banknote, Settings, Medal } from "lucide-react";
 import { clsx } from "clsx";
 import { Logo } from "@/components/Logo";
 
@@ -11,6 +11,7 @@ const nav = [
   { href: "/squads/new", label: "Squads", icon: Users },
   { href: "/contributions", label: "Contributions", icon: Wallet },
   { href: "/payouts", label: "Payouts", icon: Banknote },
+  { href: "/leaderboard", label: "Leaderboard", icon: Medal },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

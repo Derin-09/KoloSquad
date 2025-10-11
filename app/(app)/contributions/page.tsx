@@ -15,7 +15,7 @@ export default function ContributionsPage() {
           <span className="badge-soft">Last 30 days</span>
         </div>
         <div className="text-sm opacity-70">
-          No contributions yet. When you start contributing to a squad, they&apos;ll show up here.
+          No contributions yet. When you start contributing to a squad, they&apos;ll show up here. <span> <a href="/contribute" className=" text-[color:var(--accent)] hover:brightness-95 text-sm">Contribute</a></span>
         </div>
       </section>
 
