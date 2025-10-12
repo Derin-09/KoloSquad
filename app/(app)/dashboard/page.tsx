@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/Card";
 import { SimpleBars } from "@/components/charts/SimpleBars";
 import { Donut } from "@/components/charts/Donut";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 interface Squad {
   id: string;
@@ -151,6 +152,7 @@ export default function DashboardPage() {
   const weekData = [25000, 120000, 90000, 140000, 190000];
 
   return (
+    <ProtectedRoute>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
@@ -241,5 +243,6 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

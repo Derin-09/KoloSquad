@@ -15,8 +15,8 @@ export default function NewSquadPage() {
   const createSquad = async () => {
     setError(null);
     setLoading(true);
-    console.log('name is ' + name)
-    console.log('User:', (await supabase.auth.getUser()).data.user)
+    // console.log('name is ' + name)
+    // console.log('User:', (await supabase.auth.getUser()).data.user)
     try {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Sign in required");

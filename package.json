@@ -10,9 +10,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2",
+    "@supabase/supabase-js": "^2.75.0",
     "clsx": "^2",
-    "framer-motion": "^12.23.22",
+    "framer-motion": "^12.23.24",
     "html-to-image": "^1",
     "kolosquad": "file:",
     "lucide-react": "^0.460.0",
