@@ -86,7 +86,7 @@ export function ThemeToggle({ variant = 'icon', className = '' }: ThemeTogglePro
     return (
       <div className="relative group">
         <motion.button
-          className={`p-2 rounded-md hover:bg-[color:var(--muted)] transition-colors duration-200 flex items-center gap-2 ${className}`}
+          className={`md:p-2 rounded-md hover:bg-[color:var(--muted)] transition-colors duration-200 flex items-center gap-2 ${className}`}
           title="Toggle theme"
           variants={buttonHover}
           initial="initial"
@@ -117,7 +117,7 @@ export function ThemeToggle({ variant = 'icon', className = '' }: ThemeTogglePro
         >
           <motion.button
             onClick={() => setTheme('light')}
-            className={`w-full px-3 py-2 text-left text-sm hover:bg-[color:var(--muted)] flex items-center gap-2 transition-colors ${theme === 'light' ? 'text-[color:var(--accent)]' : ''}`}
+            className={`w-full px-3 md:py-2 text-left text-sm hover:bg-[color:var(--muted)] flex items-center gap-2 transition-colors ${theme === 'light' ? 'text-[color:var(--accent)]' : ''}`}
             whileHover={{ x: 4 }}
             transition={{ duration: 0.2 }}
           >
@@ -158,7 +158,7 @@ export function ThemeToggle({ variant = 'icon', className = '' }: ThemeTogglePro
   return (
     <motion.button
       onClick={cycleTheme}
-      className={`p-2 rounded-md hover:bg-[color:var(--muted)] transition-colors duration-200 flex items-center justify-center ${className}`}
+      className={`md:p-2 rounded-md hover:bg-[color:var(--muted)] transition-colors duration-200 flex items-center justify-center ${className}`}
       title={`Current theme: ${theme}. Click to cycle themes.`}
       variants={buttonHover}
       initial="initial"

@@ -18,12 +18,43 @@ export default function NewSquadPage() {
     // console.log('name is ' + name)
     // console.log('User:', (await supabase.auth.getUser()).data.user)
     try {
+
+
+
+
+      
+
+        const { data: sessionData } = await supabase.auth.getSession();
+    console.log("SESSION TEST:", sessionData);
+
+    // Check auth user
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log("USER TEST:", user);
+
+    // 🔥 TEST QUERY — directly read from squads
+    const { data: testData, error: testError, status } = await supabase
+      .from("squads")
+      .select("*")
+      .limit(1);
+
+    console.log("TEST QUERY:", { status, testData, testError });
+
+
+
+
+
+
       const { data: auth } = await supabase.auth.getUser();
+      console.log("USER DEBUG:", auth.user);
+      console.log("Supabase url:", process.env.NEXT_PUBLIC_SUPABASE_URL)
+      console.log("Supabase Anon:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
       if (!auth.user) throw new Error("Sign in required");
+      await supabase.auth.getSession();
+
       const invite = Math.random().toString(36).slice(2, 8).toUpperCase();
       const { data, error } = await supabase
         .from("squads")
-        .insert({ name, target_amount: target, invite_code: invite, created_by: auth.user.id })
+        .insert({ name, target_amount: target, invite_code: invite, created_by: (await supabase.auth.getUser()).data.user?.id, created_at: new Date().toISOString() })
         .select("id")
         .single();
       if (error) throw error;

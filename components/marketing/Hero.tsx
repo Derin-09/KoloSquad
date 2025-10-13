@@ -83,7 +83,7 @@ export default function Hero() {
             variants={staggerItem}
           >
             <motion.a 
-              href="#features" 
+              href="/sign-up" 
               className="rounded-md bg-black text-white dark:bg-white dark:text-black px-4 py-3 text-sm hover:shadow-lg transition-shadow"
               variants={buttonHover}
               whileHover="hover"

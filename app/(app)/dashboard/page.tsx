@@ -156,12 +156,14 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <div className="text-sm">Hey, Saver! 👋</div>
+          <div className="text-sm">Hey, Saver!</div>
           <h1 className="text-xl sm:text-2xl font-semibold">You saved ₦{totals.totalSaved.toLocaleString()} this month.</h1>
         </div>
-        <Link href="/squads/new" className="rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2">
+        <div className="flex px-1 md:px-3 py-2 rounded-md text-[color:var(--accent)]/70 md:bg-black md:text-white md:dark:bg-white md:dark:text-black ">
+        <Link href="/squads/new" className="px-3 py-2">
           New Squad
         </Link>
+      </div>
       </div>
 
       {loading && <p>Loading...</p>}

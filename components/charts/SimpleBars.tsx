@@ -12,12 +12,12 @@ export function SimpleBars({
   const max = Math.max(1, ...data);
   return (
     <div className="w-full" style={{ height }}>
-      <div className="h-full flex items-end gap-8 px-4">
+      <div className="h-full flex items-end gap-4 md:gap-8 px-4">
         {data.map((v, i) => {
           const h = (v / max) * (height - 24);
           return (
             <div key={i} className="flex flex-col items-center gap-2">
-              <div className="w-10 rounded-md bg-[color:var(--accent)]/70" style={{ height: h }} />
+              <div className="w-7 md:w-10 rounded-md bg-[color:var(--accent)]/70" style={{ height: h }} />
               {labels?.[i] && (
                 <div className="text-[10px] opacity-70">{labels[i]}</div>
               )}

@@ -22,7 +22,7 @@ import { Logo } from "../Logo";
 
 const mobileNavItems = [
   { text: "Dashboard", logo: LayoutDashboard, link: "/dashboard" },
-  { text: "Squad", logo: Users, link: "/squads" },
+  { text: "Squads", logo: Users, link: "/squads/new" },
   { text: "Contributions", logo: Wallet, link: "/contributions" },
   { text: "Payouts", logo: Banknote, link: "/payouts" },
   { text: "Leaderboard", logo: Medal, link: "/leaderboard" },
@@ -59,9 +59,9 @@ export default function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 bg-[color:var(--background)]/80 backdrop-blur-md border-b border-[color:var(--border)]">
-      <div className="flex items-center justify-between px-4 md:px-6 py-3">
+      <div className="flex items-center justify-between px-4 md:px-6 py-3 md:float-right">
         {/* Left section - brand or trigger */}
-        <div className="flex items-center gap-3">
+        <div className="flex md:hidden items-center gap-3">
             <Logo className="h-6" variant="auto" />
         </div>
 
@@ -76,7 +76,7 @@ export default function Topbar() {
         </div>
 
         {/* Right - controls */}
-        <div className="flex items-center gap-1 md:gap-3">
+        <div className="flex items-center gap-1 md:gap-3 ">
           <ThemeToggle variant="icon" />
           <span className="hidden sm:inline-flex items-center gap-1 text-xs badge-soft">
             <Circle size={8} fill="currentColor" /> Live
@@ -126,9 +126,12 @@ export default function Topbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.35 }}
-            className="fixed inset-0 z-50 bg-[color:var(--background)] md:hidden"
+            className="fixed inset-0 z-50 bg-[color:var(--background)] h-screen md:hidden"
           >
-            <div className="flex justify-end p-4">
+            <div className="flex justify-between items-center p-4">
+              <div className="">
+            <Logo className="h-6" variant="auto" />
+        </div>
               <button
                 onClick={() => setIsClicked(false)}
                 className="p-2 rounded-md hover:bg-[color:var(--muted)] transition"
