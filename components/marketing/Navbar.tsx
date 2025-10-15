@@ -58,7 +58,7 @@ export default function MarketingNavbar() {
         </motion.div>
 
         <motion.div
-          className="flex itms-center md:gap-2"
+          className="flex md:items-center md:gap-2"
           variants={staggerItem}
         >
           <ThemeToggle variant="icon" />

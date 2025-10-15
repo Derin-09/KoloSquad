@@ -68,15 +68,15 @@ export default function SettingsPage() {
         <div className="grid sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm">Full name</label>
-            <input className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            <input className=" w-[70%] md:w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm">Email</label>
-            <input disabled className="w-full rounded-md border border-[color:var(--accent-input)] px-3 py-2 opacity-70" value={email} />
+            <input disabled className="w-[70%] md:w-full rounded-md border border-[color:var(--accent-input)] px-3 py-2 opacity-70" value={email} />
           </div>
           <div>
             <label className="block text-sm">Squad nickname</label>
-            <input className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="e.g. Rent Gang" value={squadNick} onChange={(e) => setSquadNick(e.target.value)} />
+            <input className="w-[70%] md:w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" placeholder="e.g. Rent Gang" value={squadNick} onChange={(e) => setSquadNick(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm">Avatar</label>

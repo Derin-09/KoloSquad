@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { fadeInUp, staggerContainer, staggerItem } from "@/lib/motion";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "../Logo";
 
 export default function MarketingFooter() {
   const ref = useRef(null);
@@ -26,7 +27,12 @@ export default function MarketingFooter() {
         animate={isInView ? "animate" : "initial"}
       >
         <motion.div variants={staggerItem}>
-          <div className="mb-2"><Link href="/"><span className="inline-flex items-center"><Image src="/vector/default-monochrome-black.svg" className="logo--light h-6" alt="KoloSquad" /><Image src="/vector/default-monochrome-white.svg" className="logo--dark h-6" alt="KoloSquad" /></span></Link></div>
+          <div className="mb-2">
+            <Link href="/"><span className="inline-flex items-center">
+              {/* <Image src="/vector/default-monochrome-black.svg" className="logo--light h-6" alt="KoloSquad" />
+              <Image src="/vector/default-monochrome-white.svg" className="logo--dark h-6" alt="KoloSquad" /> */}
+              <Logo />
+              </span></Link></div>
           <p className="opacity-80">Save together. Flex together.</p>
         </motion.div>
         
