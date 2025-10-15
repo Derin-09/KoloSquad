@@ -16,7 +16,7 @@ interface Squad {
   invite_code: string;
   contributions: {length: number}
   members:  {
-        user_id: any;
+        user_id: string;
     }[];
 }
 
