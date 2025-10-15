@@ -15,6 +15,9 @@ interface Squad {
   balance: number;
   invite_code: string;
   contributions: {length: number}
+  members:  {
+        user_id: any;
+    }[];
 }
 
 export default function DashboardPage() {
