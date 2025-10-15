@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React from "react";
 
 type LogoVariant = "auto" | "light" | "dark"; // auto: theme-aware via CSS, light: black always, dark: white always
@@ -14,7 +15,7 @@ export function Logo({ className = "h-6", title = "KoloSquad", variant = "auto" 
   if (variant === "light") {
     return (
       <span className="inline-flex items-center" title={title} aria-label={title}>
-        <img src="/vector/default-monochrome-black.svg" alt={title} className={`block ${className}`} />
+        <Image src="/vector/default-monochrome-black.svg" alt={title} className={`block ${className}`} />
       </span>
     );
   }
@@ -22,7 +23,7 @@ export function Logo({ className = "h-6", title = "KoloSquad", variant = "auto" 
   if (variant === "dark") {
     return (
       <span className="inline-flex items-center" title={title} aria-label={title}>
-        <img src="/vector/default-monochrome-white.svg" alt={title} className={`block ${className}`} />
+        <Image src="/vector/default-monochrome-white.svg" alt={title} className={`block ${className}`} />
       </span>
     );
   }
@@ -30,8 +31,8 @@ export function Logo({ className = "h-6", title = "KoloSquad", variant = "auto" 
   // auto: render both, hide/show via .dark class on <html>, avoids hydration mismatch
   return (
     <span className="inline-flex items-center" title={title} aria-label={title} suppressHydrationWarning>
-      <img src="/vector/default-monochrome-black.svg" alt={title} className={`logo--light ${className}`} aria-hidden="true" />
-      <img src="/vector/default-monochrome-white.svg" alt={title} className={`logo--dark ${className}`} aria-hidden="true" />
+      <Image src="/vector/default-monochrome-black.svg" alt={title} className={`logo--light ${className}`} aria-hidden="true" />
+      <Image src="/vector/default-monochrome-white.svg" alt={title} className={`logo--dark ${className}`} aria-hidden="true" />
     </span>
   );
 }

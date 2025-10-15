@@ -24,8 +24,9 @@ export default function PhoneOnboardingPage() {
       if (error) throw error;
       setMsg("OTP sent. Check your SMS.");
       router.push(`/onboarding/verify?phone=${encodeURIComponent(phone)}`);
-    } catch (e: any) {
-      setErr(e?.message || "Failed to send OTP. Is SMS provider configured?");
+    } catch (e) {
+        const err = e instanceof Error ? e.message :  "Failed to send OTP. Is SMS provider configured?";
+      setErr(err);
     } finally {
       setLoading(false);
     }

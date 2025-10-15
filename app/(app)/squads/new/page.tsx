@@ -60,8 +60,9 @@ export default function NewSquadPage() {
       if (error) throw error;
       await supabase.from("squad_members").insert({ squad_id: data.id, user_id: auth.user.id, role: "owner" });
       router.replace("/dashboard");
-    } catch (e: any) {
-      setError(e.message || "Failed to create squad");
+    } catch (e) {
+        const err = e instanceof Error ? e.message :  "Failed to create squad";
+      setError(err);
     } finally {
       setLoading(false);
     }

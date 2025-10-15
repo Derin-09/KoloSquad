@@ -61,8 +61,9 @@ export function SignupForm() {
 
       // If your project auto-confirms users, proceed.
       window.location.href = "/onboarding";
-    } catch (e: any) {
-      setError(e?.message || "Sign up failed");
+    } catch (e) {
+        const err = e instanceof Error ? e.message :  "Sign up failed";
+      setError(err);
     } finally {
       setLoading(false);
     }

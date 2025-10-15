@@ -29,8 +29,9 @@ export default function VerifyOtpPage() {
       });
       if (error) throw error;
       router.replace("/onboarding/goals");
-    } catch (e: any) {
-      setErr(e?.message || "Invalid code. Try again.");
+    } catch (e) {
+      const err = e instanceof Error ? e.message :  "Invalid code. Try again.";
+      setErr(err);
     } finally {
       setLoading(false);
     }

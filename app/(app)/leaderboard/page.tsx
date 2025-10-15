@@ -3,8 +3,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
+interface Squad {
+  id: string;
+  name: string;
+  target: number
+  saved: number;
+}
+
 export default function LeaderboardPage() {
-  const [squads, setSquads] = useState<any[]>([]);
+  const [squads, setSquads] = useState<Squad[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,11 +21,11 @@ export default function LeaderboardPage() {
           .from("squads")
           .select("id, name, target_amount, contributions:contributions(amount,status)")
           .limit(50);
-        const rows = (data || []).map((s: any) => ({
+        const rows = (data || []).map((s) => ({
           id: s.id,
           name: s.name,
           target: Number(s.target_amount || 0),
-          saved: (s.contributions || []).filter((c: any) => c.status === "success").reduce((a: number, c: any) => a + Number(c.amount || 0), 0),
+          saved: (s.contributions || []).filter((c) => c.status === "success").reduce((a: number, c) => a + Number(c.amount || 0), 0),
         }));
         rows.sort((a, b) => b.saved - a.saved);
         setSquads(rows);

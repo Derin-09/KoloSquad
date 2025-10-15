@@ -27,8 +27,9 @@ export function LoginForm() {
       }
       // Success
       window.location.href = "/dashboard";
-    } catch (e: any) {
-      setError(e?.message || "Sign in failed");
+    } catch (e) {
+        const err = e instanceof Error ? e.message :  "Sign in failed";
+      setError(err);
     } finally {
       setLoading(false);
     }

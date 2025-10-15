@@ -19,6 +19,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Logo } from "../Logo";
+import Image from "next/image";
 
 const mobileNavItems = [
   { text: "Dashboard", logo: LayoutDashboard, link: "/dashboard" },
@@ -95,7 +96,7 @@ export default function Topbar() {
             className="w-8 h-8 rounded-full overflow-hidden border border-[color:var(--border)] hover:opacity-80 transition"
           >
             {avatarUrl ? (
-              <img
+              <Image
                 src={avatarUrl}
                 alt="User avatar"
                 className="w-full h-full object-cover"

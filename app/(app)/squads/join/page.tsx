@@ -30,8 +30,9 @@ export default function JoinSquadPage() {
       if (qerr) throw qerr;
       await supabase.from("squad_members").upsert({ squad_id: squad.id, user_id: auth.user.id, role: "member" }, { onConflict: "squad_id,user_id" });
       router.replace("/dashboard");
-    } catch (e: any) {
-      setError(e?.message || "Failed to join squad");
+    } catch (e) {
+      const err = e instanceof Error ? e.message :  "Failed to join squad";
+      setError(err);
     } finally {
       setLoading(false);
     }

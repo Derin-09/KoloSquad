@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { SignupForm } from "@/components/signup-form";
 import { Logo } from "@/components/Logo";
+import Link from "next/link";
 
 export default function SignUpPage() {
   return (
@@ -16,9 +17,9 @@ export default function SignUpPage() {
       <section className="flex min-h-screen items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md space-y-6">
           <div>
-            <a href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
+            <Link href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
 <Logo className="h-7" variant="auto" />
-            </a>
+            </Link>
           </div>
           <div>
             <h1 className="text-2xl font-bold">Create your free account</h1>

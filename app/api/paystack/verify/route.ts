@@ -64,7 +64,8 @@ export async function GET(req: Request) {
     } catch {}
 
     return NextResponse.json({ status: "success", data: json.data });
-  } catch (e: any) {
-    return NextResponse.json({ message: e?.message || "Verify error" }, { status: 500 });
+  } catch (e) {
+        const err = e instanceof Error ? e.message :  "Verify error";
+    return NextResponse.json({ message: err}, { status: 500 });
   }
 }

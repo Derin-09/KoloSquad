@@ -14,6 +14,7 @@ interface Squad {
   target_amount: number;
   balance: number;
   invite_code: string;
+  contributions: {length: number}
 }
 
 export default function DashboardPage() {
@@ -48,18 +49,19 @@ export default function DashboardPage() {
           .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
           .order("created_at", { ascending: false });
         if (error) throw error;
-        const withBalance = (data || []).map((s: any) => ({
+        const withBalance = (data || []).map((s) => ({
           id: s.id,
           name: s.name,
           target_amount: Number(s.target_amount || 0),
           invite_code: s.invite_code,
-          balance: (s.contributions || []).reduce((acc: number, c: any) => acc + Number(c.amount || 0), 0),
+          balance: (s.contributions || []).reduce((acc: number, c) => acc + Number(c.amount || 0), 0),
           contributions: s.contributions || [],
           members: s.members || [],
         }));
         if (mounted) setSquads(withBalance);
-      } catch (e: any) {
-        const msg = e?.message || "Failed to load dashboard";
+      } catch (e) {
+        const err = e instanceof Error ? e.message :  "Failed to load dashboard";
+        const msg = err
         // Gracefully handle missing table / schema cache errors in new environments
         if (/schema cache|could not find the table|relation .* does not exist/i.test(msg)) {
           setError(null);
@@ -78,9 +80,9 @@ export default function DashboardPage() {
   }, []);
 
   const totals = useMemo(() => {
-    const totalSaved = squads.reduce((acc, s: any) => acc + (s.balance || 0), 0);
+    const totalSaved = squads.reduce((acc, s) => acc + (s.balance || 0), 0);
     const totalTarget = squads.reduce((acc, s) => acc + (s.target_amount || 0), 0);
-    const totalContribs = squads.reduce((acc, s: any) => acc + (s.contributions?.length || 0), 0);
+    const totalContribs = squads.reduce((acc, s) => acc + (s.contributions?.length || 0), 0);
     return { totalSaved, totalTarget, totalContribs };
   }, [squads]);
 
@@ -100,12 +102,12 @@ export default function DashboardPage() {
                 .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
                 .order("created_at", { ascending: false });
               if (!error) {
-                const withBalance = (data || []).map((s: any) => ({
+                const withBalance = (data || []).map((s) => ({
                   id: s.id,
                   name: s.name,
                   target_amount: Number(s.target_amount || 0),
                   invite_code: s.invite_code,
-                  balance: (s.contributions || []).reduce((acc: number, c: any) => acc + Number(c.amount || 0), 0),
+                  balance: (s.contributions || []).reduce((acc: number, c) => acc + Number(c.amount || 0), 0),
                   contributions: s.contributions || [],
                   members: s.members || [],
                 }));
@@ -126,12 +128,12 @@ export default function DashboardPage() {
                 .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
                 .order("created_at", { ascending: false });
               if (!error) {
-                const withBalance = (data || []).map((s: any) => ({
+                const withBalance = (data || []).map((s) => ({
                   id: s.id,
                   name: s.name,
                   target_amount: Number(s.target_amount || 0),
                   invite_code: s.invite_code,
-                  balance: (s.contributions || []).reduce((acc: number, c: any) => acc + Number(c.amount || 0), 0),
+                  balance: (s.contributions || []).reduce((acc: number, c) => acc + Number(c.amount || 0), 0),
                   contributions: s.contributions || [],
                   members: s.members || [],
                 }));

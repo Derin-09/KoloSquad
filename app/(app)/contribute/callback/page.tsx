@@ -28,9 +28,10 @@ export default function ContributionCallbackPage() {
         }
         setStatus("success");
         setMessage("Payment verified! Your contribution has been recorded.");
-      } catch (e: any) {
+      } catch (e) {
+        const err = e instanceof Error ? e.message : "Verification error";
         setStatus("failed");
-        setMessage(e?.message || "Verification error");
+        setMessage(err);
       }
     })();
   }, []);

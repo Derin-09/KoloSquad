@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       sms: `Your KoloSquad code is ${code}. It expires in 5 minutes.`,
       type: "plain",
       channel: "generic",
-    } as any;
+    };
 
     await fetch(TERMII_ENDPOINT, {
       method: "POST",

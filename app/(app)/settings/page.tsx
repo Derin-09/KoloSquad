@@ -19,8 +19,8 @@ export default function SettingsPage() {
         const user = data.user;
         if (!user) return;
         setEmail(user.email || "");
-        setFullName((user.user_metadata as any)?.full_name || "");
-        setSquadNick((user.user_metadata as any)?.squad_nickname || "");
+        setFullName((user.user_metadata)?.full_name || "");
+        setSquadNick((user.user_metadata)?.squad_nickname || "");
       } catch {}
     })();
   }, []);
@@ -46,8 +46,9 @@ export default function SettingsPage() {
       const { error } = await supabase.auth.updateUser({ data: { full_name: fullName, squad_nickname: squadNick, ...(avatar_url ? { avatar_url } : {}) } });
       if (error) throw error;
       setMsg("Profile updated");
-    } catch (e: any) {
-      setErr(e?.message || "Update failed");
+    } catch (e) {
+        const err = e instanceof Error ? e.message :  "Update failed";
+      setErr(err);
     } finally {
       setSaving(false);
     }

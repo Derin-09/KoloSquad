@@ -20,7 +20,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: json?.message || "Failed to initialize" }, { status: 400 });
     }
     return NextResponse.json({ status: "success", data: json.data });
-  } catch (e: any) {
-    return NextResponse.json({ message: e?.message || "Init error" }, { status: 500 });
+  } catch (e) {
+     const err = e instanceof Error ? e.message :  "Init error";
+    return NextResponse.json({ message: err }, { status: 500 });
   }
 }

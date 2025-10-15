@@ -3,8 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
+interface Squad {
+  id: string;
+  name: string;
+  target_amount: number;
+  balance: number;
+  contributions: {amount: number; status: number}[]
+}
+
 export default function PayoutsPage() {
-  const [squads, setSquads] = useState<any[]>([]);
+  const [squads, setSquads] = useState<Squad[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
@@ -15,13 +23,14 @@ export default function PayoutsPage() {
           .from("squads")
           .select("id, name, target_amount, contributions:contributions(amount,status)");
         if (error) throw error;
-        const mapped = (data || []).map((s: any) => ({
+        const mapped = (data || []).map((s) => ({
           ...s,
-          balance: (s.contributions || []).filter((c: any) => c.status === "success").reduce((a: number, c: any) => a + Number(c.amount || 0), 0),
+          balance: (s.contributions || []).filter((c) => c.status === "success").reduce((a: number, c) => a + Number(c.amount || 0), 0),
         }));
         setSquads(mapped);
-      } catch (e: any) {
-        setErr(e?.message || "Failed to load payouts");
+      } catch (e) {
+        const err = e instanceof Error ? e.message :  "Failed to load payouts";
+        setErr(err);
       } finally { setLoading(false); }
     })();
   }, []);

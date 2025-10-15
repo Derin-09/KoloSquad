@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { LoginForm } from "@/components/login-form";
 import { Logo } from "@/components/Logo";
+import Link from "next/link";
 
 export default function SignInPage() {
   return (
@@ -16,9 +17,9 @@ export default function SignInPage() {
       <section className="flex min-h-screen items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md space-y-6">
           <div>
-            <a href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
+            <Link href="/" className="inline-flex items-center gap-2 opacity-90 hover:opacity-100">
 <Logo className="h-7" variant="auto" />
-            </a>
+            </Link>
           </div>
           <div>
             <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -26,7 +27,7 @@ export default function SignInPage() {
           </div>
           <LoginForm />
           <div className="text-sm">
-            Don&apos;t have an account? <a className="underline" href="/sign-up">Create one</a>
+            Don&apos;t have an account? <Link className="underline" href="/sign-up">Create one</Link>
           </div>
         </div>
       </section>
