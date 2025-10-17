@@ -38,6 +38,7 @@ export default function NewSquadPage() {
       .limit(1);
 
     console.log("TEST QUERY:", { status, testData, testError });
+    
 
 
 
@@ -55,14 +56,18 @@ export default function NewSquadPage() {
       const { data, error } = await supabase
         .from("squads")
         .insert({ name, target_amount: target, invite_code: invite, created_by: (await supabase.auth.getUser()).data.user?.id, created_at: new Date().toISOString() })
-        .select("id")
+        // .select("id")
+        .select("*")
         .single();
+        console.log({ data, error });
       if (error) throw error;
+      
       await supabase.from("squad_members").insert({ squad_id: data.id, user_id: auth.user.id, role: "owner" });
       router.replace("/dashboard");
     } catch (e) {
         const err = e instanceof Error ? e.message :  "Failed to create squad";
       setError(err);
+      console.log(e.message)
     } finally {
       setLoading(false);
     }
@@ -104,9 +109,9 @@ export default function NewSquadPage() {
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
 
-      <div className="pt-5">
+      {/* <div className="pt-5">
         <JoinSquadPage />
-      </div>
+      </div> */}
     </main>
   );
 }

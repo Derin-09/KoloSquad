@@ -23,7 +23,7 @@ import Image from "next/image";
 
 const mobileNavItems = [
   { text: "Dashboard", logo: LayoutDashboard, link: "/dashboard" },
-  { text: "Squads", logo: Users, link: "/squads/new" },
+  { text: "Squads", logo: Users, link: "/squads" },
   { text: "Contributions", logo: Wallet, link: "/contributions" },
   { text: "Payouts", logo: Banknote, link: "/payouts" },
   { text: "Leaderboard", logo: Medal, link: "/leaderboard" },

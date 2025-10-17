@@ -8,7 +8,7 @@ import { Logo } from "@/components/Logo";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/squads/new", label: "Squads", icon: Users },
+  { href: "/squads", label: "Squads", icon: Users },
   { href: "/contributions", label: "Contributions", icon: Wallet },
   { href: "/payouts", label: "Payouts", icon: Banknote },
   { href: "/leaderboard", label: "Leaderboard", icon: Medal },

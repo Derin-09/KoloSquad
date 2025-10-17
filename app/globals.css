@@ -105,6 +105,24 @@ body {
   color: var(--accent-input);
   clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(220 10% 40%);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(220 10% 30%);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 @keyframes glitchTop {
   0% { transform: translate(0); }
   20% { transform: translate(-2px, -2px); }
