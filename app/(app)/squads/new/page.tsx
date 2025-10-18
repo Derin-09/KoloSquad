@@ -12,32 +12,66 @@ export default function NewSquadPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
   const createSquad = async () => {
-    setError(null);
-    setLoading(true);
-    // console.log('name is ' + name)
-    // console.log('User:', (await supabase.auth.getUser()).data.user)
-    try {
+  setError(null);
+  setLoading(true);
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Sign in required");
+
+    const invite = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const { data, error } = await supabase
+      .from("squads")
+      .insert({
+        name,
+        target_amount: target,
+        invite_code: invite,
+        created_by: user.id,
+      })
+      .select("*")
+      .single();
+    if (error) throw error;
+
+    await supabase
+      .from("squad_members")
+      .insert({ squad_id: data.id, user_id: user.id, role: "owner" });
+
+    router.replace("/dashboard");
+  } catch (e) {
+    setError(e instanceof Error ? e.message : "Failed to create squad");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  // const createSquad = async () => {
+  //   setError(null);
+  //   setLoading(true);
+  //   // console.log('name is ' + name)
+  //   // console.log('User:', (await supabase.auth.getUser()).data.user)
+  //   try {
 
 
 
 
       
 
-        const { data: sessionData } = await supabase.auth.getSession();
-    console.log("SESSION TEST:", sessionData);
+  //       const { data: sessionData } = await supabase.auth.getSession();
+  //   console.log("SESSION TEST:", sessionData);
 
-    // Check auth user
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log("USER TEST:", user);
+  //   // Check auth user
+  //   const { data: { user } } = await supabase.auth.getUser();
+  //   console.log("USER TEST:", user);
 
-    // 🔥 TEST QUERY — directly read from squads
-    const { data: testData, error: testError, status } = await supabase
-      .from("squads")
-      .select("*")
-      .limit(1);
+  //   // 🔥 TEST QUERY — directly read from squads
+  //   const { data: testData, error: testError, status } = await supabase
+  //     .from("squads")
+  //     .select("*")
+  //     .limit(1);
 
-    console.log("TEST QUERY:", { status, testData, testError });
+  //   console.log("TEST QUERY:", { status, testData, testError });
     
 
 
@@ -45,33 +79,33 @@ export default function NewSquadPage() {
 
 
 
-      const { data: auth } = await supabase.auth.getUser();
-      console.log("USER DEBUG:", auth.user);
-      console.log("Supabase url:", process.env.NEXT_PUBLIC_SUPABASE_URL)
-      console.log("Supabase Anon:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-      if (!auth.user) throw new Error("Sign in required");
-      await supabase.auth.getSession();
+  //     const { data: auth } = await supabase.auth.getUser();
+  //     console.log("USER DEBUG:", auth.user);
+  //     console.log("Supabase url:", process.env.NEXT_PUBLIC_SUPABASE_URL)
+  //     console.log("Supabase Anon:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  //     if (!auth.user) throw new Error("Sign in required");
+  //     await supabase.auth.getSession();
 
-      const invite = Math.random().toString(36).slice(2, 8).toUpperCase();
-      const { data, error } = await supabase
-        .from("squads")
-        .insert({ name, target_amount: target, invite_code: invite, created_by: (await supabase.auth.getUser()).data.user?.id, created_at: new Date().toISOString() })
-        // .select("id")
-        .select("*")
-        .single();
-        console.log({ data, error });
-      if (error) throw error;
+  //     const invite = Math.random().toString(36).slice(2, 8).toUpperCase();
+  //     const { data, error } = await supabase
+  //       .from("squads")
+  //       .insert({ name, target_amount: target, invite_code: invite, created_by: (await supabase.auth.getUser()).data.user?.id, created_at: new Date().toISOString() })
+  //       // .select("id")
+  //       .select("*")
+  //       .single();
+  //       console.log({ data, error });
+  //     if (error) throw error;
       
-      await supabase.from("squad_members").insert({ squad_id: data.id, user_id: auth.user.id, role: "owner" });
-      router.replace("/dashboard");
-    } catch (e) {
-        const err = e instanceof Error ? e.message :  "Failed to create squad";
-      setError(err);
-      console.log(e.message)
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     await supabase.from("squad_members").insert({ squad_id: data.id, user_id: auth.user.id, role: "owner" });
+  //     router.replace("/dashboard");
+  //   } catch (e) {
+  //       const err = e instanceof Error ? e.message :  "Failed to create squad";
+  //     setError(err);
+  //     console.log(e.message)
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <main className="max-w-md mx-auto space-y-4">

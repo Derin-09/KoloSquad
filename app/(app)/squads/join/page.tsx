@@ -17,26 +17,71 @@ export default function JoinSquadPage() {
   }, [params]);
 
   async function join() {
-    setError(null);
-    setLoading(true);
-    try {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) throw new Error("Sign in required");
-      const { data: squad, error: qerr } = await supabase
-        .from("squads")
-        .select("id")
-        .eq("invite_code", code.trim().toUpperCase())
-        .single();
-      if (qerr) throw qerr;
-      await supabase.from("squad_members").upsert({ squad_id: squad.id, user_id: auth.user.id, role: "member" }, { onConflict: "squad_id,user_id" });
-      router.replace("/dashboard");
-    } catch (e) {
-      const err = e instanceof Error ? e.message :  "Failed to join squad";
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
+  setError(null);
+  setLoading(true);
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Sign in required");
+
+    const { data: squad, error: qerr } = await supabase
+      .from("squads")
+      .select("id, invite_code")
+      .eq("invite_code", code.trim().toUpperCase())
+      .maybeSingle(); // handles not found gracefully
+
+    if (qerr) throw qerr;
+    if (!squad) throw new Error("Invalid invite code");
+
+    const { error: insertError } = await supabase.from("squad_members").insert([
+  {
+    squad_id: squad.id,
+    user_id: user.id,
+    role: "member",
+    display_name: user.user_metadata.full_name || user.email || "Anonymous"
   }
+]);
+
+    // await supabase
+    //   .from("squad_members")
+    //   .upsert(
+    //     { squad_id: squad.id, user_id: user.id, role: "member" },
+    //     { onConflict: "squad_id,user_id" }
+    //   );
+    if (insertError) throw insertError;
+
+    router.replace("/dashboard");
+  } catch (e) {
+    const err = e instanceof Error ? e.message : "Failed to join squad";
+    setError(err);
+  } finally {
+    setLoading(false);
+  }
+}
+
+
+  // async function join() {
+  //   setError(null);
+  //   setLoading(true);
+  //   try {
+  //     const { data: auth } = await supabase.auth.getUser();
+  //     if (!auth.user) throw new Error("Sign in required");
+  //     const { data: squad, error: qerr } = await supabase
+  //       .from("squads")
+  //       .select("id")
+  //       .eq("invite_code", code.trim().toUpperCase())
+  //       .single();
+  //     if (qerr) throw qerr;
+  //     console.log("squad", squad);
+
+  //     await supabase.from("squad_members").upsert({ squad_id: squad.id, user_id: auth.user.id, role: "member" }, { onConflict: "squad_id,user_id" });
+  //     router.replace("/dashboard");
+  //   } catch (e) {
+  //     const err = e instanceof Error ? e.message :  "Failed to join squad";
+  //     setError(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   return (
     <main className="max-w-md mx-auto space-y-4">
@@ -59,3 +104,5 @@ export default function JoinSquadPage() {
     </main>
   );
 }
+
+// http://localhost:3000/squads/join?code=N4MHKL

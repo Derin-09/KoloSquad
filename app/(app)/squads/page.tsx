@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/lib/supabase/client";
 import JoinSquadPage from "./join/page";
@@ -15,31 +15,88 @@ export default function SquadsPage() {
   const [loading, setLoading] = useState(true);
 
   // Fetch squads and members when mounted
-  useState(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const { data: squadData } = await supabase
-          .from("squads")
-          .select("id, name, target_amount, invite_code, created_at");
+  // useState(() => {
+  //   (async () => {
+  //     try {
+  //       setLoading(true);
+  //       const { data: squadData } = await supabase
+  //         .from("squads")
+  //         .select("id, name, target_amount, invite_code, created_at");
 
-        const { data: memberData } = await supabase
-          .from("squad_members")
-          .select("id, user_id, squad_id, role, joined_at");
+  //       const { data: memberData } = await supabase
+  //         .from("squad_members")
+  //         .select("id, user_id, squad_id, role, joined_at");
 
-        setSquads(squadData || []);
-        setMembers(memberData || []);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  });
+  //       setSquads(squadData || []);
+  //       setMembers(memberData || []);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // });
+
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { data: squadData, error: squadError } = await supabase
+        .from("squads")
+        .select("id, name, target_amount, invite_code, created_at");
+
+      // const { data: memberData, error: memberError } = await supabase
+      //   .from("squad_members")
+      //   .select("id, user_id, squad_id, role, created_at");
+
+//       const { data: memberData, error: memberError } = await supabase
+//   .from("squad_members")
+//   .select(`
+//     id,
+//     role,
+//     created_at,
+//     squads (name),
+//     user_id
+//   `);
+
+//   const { data: userData } = await supabase
+//   .from("profiles")
+//   .select("id, full_name");
+
+// const userMap = Object.fromEntries(userData.map(u => [u.id, u.full_name]));
+// setMembers(memberData.map(m => ({
+//   ...m,
+//   user_name: userMap[m.user_id] || "Unknown",
+// })));
+
+
+const { data: memberData, error: memberError } = await supabase
+  .from("squad_members")
+  .select("id, display_name, role, created_at, squad_id");
+
+if (memberError) throw memberError;
+
+setMembers(memberData ?? []);
+
+
+      if (squadError) throw squadError;
+      if (memberError) throw memberError;
+
+      setSquads(squadData || []);
+      setMembers(memberData || []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
 
   return (
-    <main className="p-6 space-y-6">
+    <main className="p- md:p-6 space-y-6">
       <h1 className="text-2xl sm:text-3xl font-bold">Your Squads</h1>
 
-      <div className="grid lg:grid-cols-[2fr,1fr] gap-6">
+      <div className="grid lg:grid-cols-[2fr,1fr] gap-2 md:gap-6">
         {/* LEFT SECTION */}
         <section className="space-y-6">
           <div className="rounded-2xl border border-[color:var(--accent-border)] p-4 backdrop-blur-sm bg-[color:var(--accent-bg)]/40">
@@ -76,7 +133,41 @@ export default function SquadsPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-[color:var(--accent-border)] p-4 backdrop-blur-sm bg-[color:var(--accent-bg)]/40">
+          <div className="rounded-2xl border border-[color:var(--accent-border)] p-4 backdrop-blur-sm bg-[color:var(--accent-bg)]/40 overflow-x-auto">
+  <h2 className="text-lg font-semibold mb-3">Members</h2>
+  {loading ? (
+    <p className="text-sm opacity-70">Loading members...</p>
+  ) : members.length > 0 ? (
+    <table className="min-w-full text-sm border-collapse">
+      <thead className="bg-[color:var(--accent-bg)]/60">
+        <tr>
+          <th className="px-3 py-2 text-left font-medium">Name</th>
+          <th className="px-3 py-2 text-left font-medium">Squad</th>
+          <th className="px-3 py-2 text-left font-medium">Role</th>
+          <th className="px-3 py-2 text-left font-medium">Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {members.map((m) => (
+          <tr key={m.id} className="border-t border-[color:var(--accent-border)]">
+            {/* <td className="px-3 py-2 truncate">{m.user_name || "Unknown"}</td> */}
+            <td className="px-3 py-2 truncate">{m.display_name}</td>
+            <td className="px-3 py-2 truncate">{m.squads?.name || "—"}</td>
+            <td className="px-3 py-2 capitalize">{m.role}</td>
+            <td className="px-3 py-2 text-xs opacity-70">
+              {m.created_at ? new Date(m.created_at).toLocaleDateString() : "—"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p className="text-sm opacity-70">No members yet.</p>
+  )}
+</div>
+
+
+          {/* <div className="rounded-2xl border border-[color:var(--accent-border)] p-4 backdrop-blur-sm bg-[color:var(--accent-bg)]/40">
             <h2 className="text-lg font-semibold mb-3">Members</h2>
             {loading ? (
               <p className="text-sm opacity-70">Loading members...</p>
@@ -108,7 +199,7 @@ export default function SquadsPage() {
             ) : (
               <p className="text-sm opacity-70">No members yet.</p>
             )}
-          </div>
+          </div> */}
         </section>
 
         {/* RIGHT SECTION — Create or Join */}

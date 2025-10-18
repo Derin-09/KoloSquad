@@ -155,7 +155,7 @@ export default function DashboardPage() {
 
   const handleCopy = (code: string) => {
     const url = `${window.location.origin}/squads/join?code=${encodeURIComponent(code)}`;
-    navigator.clipboard?.writeText(url);
+    navigator.clipboard?.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                         }`}
                         onClick={() => handleCopy(s.invite_code)}
                       >
-                        {copiedCode === s.invite_code ? "Copied!" : "Copy link"}
+                        {copiedCode === s.invite_code ? "Copied!" : "Copy code"}
                       </button>
                     </div>
                   </div>
