@@ -42,17 +42,64 @@ export default function ContributePage() {
     []
   );
 
-  useEffect(() =>{
-    async function fetchData(){
+  useEffect(() => {
+  async function fetchSquads() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const { data } = await supabase
-           .from("squad_members")
-           .select("squads:id(squads(id,name)), squad_id")
-           .limit(50);
-           console.log(data)
+    const { data, error } = await supabase
+      .from("squad_members")
+      .select(`
+        squad_id,
+        squads ( id, name )
+      `)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error(error);
+      return;
     }
-    fetchData()
-  }, [])
+
+    // Flatten the nested array properly
+    const squads = data.map((m) => m.squads).flat();
+    setSquads(squads);
+  }
+
+  fetchSquads();
+}, []);
+
+
+//   useEffect(() => {
+//   async function fetchSquads() {
+//     const { data: { user } } = await supabase.auth.getUser();
+//     if (!user) return;
+
+//     const { data, error } = await supabase
+//       .from("squad_members")
+//       .select(`
+//         squad_id,
+//         squads ( id, name )
+//       `)
+//       .eq("user_id", user.id);
+
+//     if (error) console.error(error);
+//     else setSquads(data.map((m) => m.squads));
+//   }
+//   fetchSquads();
+// }, []);
+
+
+  // useEffect(() =>{
+  //   async function fetchData(){
+
+  //     const { data } = await supabase
+  //          .from("squad_members")
+  //          .select("squads:id(squads(id,name)), squad_id")
+  //          .limit(50);
+  //          console.log(data)
+  //   }
+  //   fetchData()
+  // }, [])
 
   // useEffect(() => {
   //   (async () => {

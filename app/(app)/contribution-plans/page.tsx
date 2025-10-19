@@ -47,7 +47,8 @@ export default function ContributionPlansPage() {
             </p>
 
             <Link
-              href={`/contributions/${squad.id}/new`}
+            //   href={`/contributions/${squad.id}/new`}
+              href={`/contributions`}
               className="inline-block mt-3 rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-1.5 text-sm hover:brightness-95"
             >
               Create Contribution Plan
