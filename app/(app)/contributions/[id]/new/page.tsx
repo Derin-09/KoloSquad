@@ -14,48 +14,120 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+
   const createPlan = async () => {
-    try {
-      setError(null);
-      setLoading(true);
+  try {
+    setError(null);
+    setLoading(true);
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Sign in required");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Sign in required");
 
-      // insert contribution plan into DB
-      // const { error } = await supabase.from("contributions").insert({
-      //   squad_id: squadId,
-      //   user_id: user.id,
-      //   amount,
-      //   frequency,
-      //   type,
-      //   start_date: startDate,
-      //   end_date: endDate,
-      //   status: "pending",
-      // });
+    const { error: insertError } = await supabase.from("contribution_plans").insert({
+      squad_id: squadId,
+      user_id: user.id,
+      frequency,
+      amount,
+      type,
+      start_date: startDate,
+      end_date: endDate,
+      next_due_date: startDate,
+    });
+
+    if (insertError) throw insertError;
+
+    const { data: totalContributed } = await supabase
+      .from("contributions")
+      .select("amount")
+      .eq("squad_id", squadId);
+
+    const { data: squad } = await supabase
+      .from("squads")
+      .select("target_amount")
+      .eq("id", squadId)
+      .single();
+
+    const progress =
+      (totalContributed?.reduce((sum, c) => sum + Number(c.amount), 0) || 0) /
+      (squad?.target_amount || 1);
+
+    console.log("Current progress:", progress);
+
+    router.replace(`/squads/${squadId}`);
+  } catch (e) {
+    setError(e instanceof Error ? e.message : "Failed to create contribution plan");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
-      const { error } = await supabase.from("contribution_plans").insert({
-  squad_id: squadId,
-  user_id: user.id,
-  frequency,
-  amount,
-  type,
-  start_date: startDate,
-  end_date: endDate,
-  next_due_date: startDate, // first reminder date
-});
+
+//   const createPlan = async () => {
+//     try {
+//       setError(null);
+//       setLoading(true);
+
+//       const { data: { user } } = await supabase.auth.getUser();
+//       if (!user) throw new Error("Sign in required");
+
+//       // insert contribution plan into DB
+//       // const { error } = await supabase.from("contributions").insert({
+//       //   squad_id: squadId,
+//       //   user_id: user.id,
+//       //   amount,
+//       //   frequency,
+//       //   type,
+//       //   start_date: startDate,
+//       //   end_date: endDate,
+//       //   status: "pending",
+//       // });
 
 
-      if (error) throw error;
+//       const { error } = await supabase.from("contribution_plans").insert({
+//   squad_id: squadId,
+//   user_id: user.id,
+//   frequency,
+//   amount,
+//   type,
+//   start_date: startDate,
+//   end_date: endDate,
+//   next_due_date: startDate, // first reminder date
+// });
 
-      router.replace(`/squads/${squadId}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to create contribution plan");
-    } finally {
-      setLoading(false);
-    }
-  };
+// const { data: totalContributed } = await supabase
+//   .from("contributions")
+//   .select("amount")
+//   .eq("squad_id", squadId);
+
+// const { data: squad } = await supabase
+//   .from("squads")
+//   .select("target_amount")
+//   .eq("id", squadId)
+//   .single();
+
+// // const progress =
+// //   totalContributed?.reduce((sum, c) => sum + Number(c.amount), 0) /
+// //   squad.target_amount;
+
+// const progress =
+//   (totalContributed?.reduce((sum, c) => sum + Number(c.amount), 0) || 0) /
+//   (squad?.target_amount || 1);
+
+
+
+//       if (error) throw error;
+
+//       router.replace(`/squads/${squadId}`);
+//     } catch (e) {
+//       setError(e instanceof Error ? e.message : "Failed to create contribution plan");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+  
 
   return (
     <main className="max-w-md mx-auto space-y-4">
