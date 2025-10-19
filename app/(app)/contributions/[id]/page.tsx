@@ -17,8 +17,10 @@ export default function ContributionDetails({ params }: { params: { id: string }
       // Fetch contribution plans
       const { data: plansData, error: plansError } = await supabase
         .from("contribution_plans")
-        .select("id, name, target_amount")
-        .eq("squad_id", squadId);
+        .select("id, amount, frequency, type, start_date, end_date, next_due_date")
+
+        // .select("id, name, target_amount")
+        // .eq("squad_id", squadId);
 
       if (plansError) console.error("Error fetching plans:", plansError);
       else {

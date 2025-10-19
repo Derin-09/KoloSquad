@@ -64,71 +64,6 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
 
 
-//   const createPlan = async () => {
-//     try {
-//       setError(null);
-//       setLoading(true);
-
-//       const { data: { user } } = await supabase.auth.getUser();
-//       if (!user) throw new Error("Sign in required");
-
-//       // insert contribution plan into DB
-//       // const { error } = await supabase.from("contributions").insert({
-//       //   squad_id: squadId,
-//       //   user_id: user.id,
-//       //   amount,
-//       //   frequency,
-//       //   type,
-//       //   start_date: startDate,
-//       //   end_date: endDate,
-//       //   status: "pending",
-//       // });
-
-
-//       const { error } = await supabase.from("contribution_plans").insert({
-//   squad_id: squadId,
-//   user_id: user.id,
-//   frequency,
-//   amount,
-//   type,
-//   start_date: startDate,
-//   end_date: endDate,
-//   next_due_date: startDate, // first reminder date
-// });
-
-// const { data: totalContributed } = await supabase
-//   .from("contributions")
-//   .select("amount")
-//   .eq("squad_id", squadId);
-
-// const { data: squad } = await supabase
-//   .from("squads")
-//   .select("target_amount")
-//   .eq("id", squadId)
-//   .single();
-
-// // const progress =
-// //   totalContributed?.reduce((sum, c) => sum + Number(c.amount), 0) /
-// //   squad.target_amount;
-
-// const progress =
-//   (totalContributed?.reduce((sum, c) => sum + Number(c.amount), 0) || 0) /
-//   (squad?.target_amount || 1);
-
-
-
-//       if (error) throw error;
-
-//       router.replace(`/squads/${squadId}`);
-//     } catch (e) {
-//       setError(e instanceof Error ? e.message : "Failed to create contribution plan");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-  
-
   return (
     <main className="max-w-md mx-auto space-y-4">
       <h1 className="text-2xl font-bold">Create Contribution Plan</h1>
@@ -177,7 +112,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
         type="date"
         value={endDate}
         onChange={(e) => setEndDate(e.target.value)}
-        className="w-full rounded-md border-2 border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
+        className="w-full rounded-md border-2 border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none  px-3 py-2 transition-colors"
       />
 
       <button

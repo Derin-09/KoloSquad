@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import NewSquadPage from "./new/page";
 import JoinSquadPage from "./join/page";
+import Link from "next/link";
 
 export default function SquadsPage() {
   const [squads, setSquads] = useState<any[]>([]);
@@ -28,21 +29,21 @@ export default function SquadsPage() {
 
         {squads.length === 0 ? (
           <p className="text-muted-foreground">
-            You’re not in any squads yet.
+            You&apos;re not in any squads yet.
           </p>
         ) : (
           <div className="space-y-3">
             {squads.map((squad) => (
-              <a
+              <Link
                 key={squad.id}
                 href={`/squads/${squad.id}`}
                 className="block border border-border rounded-xl p-4 hover:bg-muted transition"
               >
-                <p className="font-medium">{squad.name}</p>
+                <p className="font-medium capitalize">{squad.name}</p>
                 <p className="text-sm text-muted-foreground">
                   View contributions →
                 </p>
-              </a>
+              </Link>
             ))}
           </div>
         )}
@@ -71,7 +72,7 @@ export default function SquadsPage() {
             layoutId="underline"
             initial={false}
             animate={{
-              left: activeTab === "create" ? "0%" : "15%",
+              left: activeTab === "create" ? "0%" : "13%",
               width: "10%",
             }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -90,17 +91,6 @@ export default function SquadsPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-4"
               >
-                {/* <h2 className="text-xl font-semibold">Create a new squad</h2>
-                <form className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Squad Name"
-                    className="w-full border rounded-md p-2 bg-background"
-                  />
-                  <button className="bg-purple-500 text-white px-4 py-2 rounded-md">
-                    Create
-                  </button>
-                </form> */}
                 <NewSquadPage/>
               </motion.div>
             ) : (
@@ -112,17 +102,6 @@ export default function SquadsPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-4"
               >
-                {/* <h2 className="text-xl font-semibold">Join an existing squad</h2>
-                <form className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Enter squad code"
-                    className="w-full border rounded-md p-2 bg-background"
-                  />
-                  <button className="bg-purple-500 text-white px-4 py-2 rounded-md">
-                    Join
-                  </button>
-                </form> */}
                 <JoinSquadPage/>
               </motion.div>
             )}
