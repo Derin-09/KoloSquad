@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
+import { Squad } from "@/types/types";
+
+
 
 export default function ContributionPlansPage() {
-  const [squads, setSquads] = useState<any[]>([]);
+  const [squads, setSquads] = useState<Squad[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

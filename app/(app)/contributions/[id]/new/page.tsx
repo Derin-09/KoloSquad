@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { PlanType } from "@/types/types";
+
+
+
 
 export default function NewContributionPlan({ squadId }: { squadId: string }) {
-  const [plan, setPlan] = useState<any>(null);
+  const [plan, setPlan] = useState<PlanType | null>(null);
   const [frequency, setFrequency] = useState("weekly");
   const [amount, setAmount] = useState<number>(1000);
   const [type, setType] = useState("pooled");
@@ -13,6 +17,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(true);
+
 
   const createPlan = async () => {
     try {
@@ -67,13 +72,13 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
           <p>🎯 Amount: ₦{Number(plan.amount).toLocaleString()}</p>
         </div>
         <div>
-          
-                      <a
-                        href={`/contribute?squadId=${squadId}`}
-                        className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
-                      >
-                        Contribute
-                      </a>
+
+          <a
+            href={`/contribute?squadId=${squadId}`}
+            className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+          >
+            Contribute
+          </a>
         </div>
       </div>
     );

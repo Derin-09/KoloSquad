@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { SimpleBars } from "@/components/charts/SimpleBars";
 import { Donut } from "@/components/charts/Donut";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useRouter } from "next/navigation";
 
 interface Squad {
   id: string;
@@ -23,6 +24,8 @@ export default function DashboardPage() {
   const [squads, setSquads] = useState<Squad[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     let mounted = true;
@@ -111,7 +114,7 @@ export default function DashboardPage() {
                 }));
                 setSquads(withBalance);
               }
-            } catch {}
+            } catch { }
           })();
         }
       )
@@ -137,7 +140,7 @@ export default function DashboardPage() {
                 }));
                 setSquads(withBalance);
               }
-            } catch {}
+            } catch { }
           })();
         }
       )
@@ -146,7 +149,7 @@ export default function DashboardPage() {
     return () => {
       try {
         supabase.removeChannel(channel);
-      } catch {}
+      } catch { }
     };
   }, []);
 
@@ -188,7 +191,7 @@ export default function DashboardPage() {
                     const { data: userData } = await supabase.auth.getUser();
                     const em = userData?.user?.email;
                     if (em) await supabase.auth.resend({ type: "signup", email: em });
-                  } catch {}
+                  } catch { }
                 }}
                 className="rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2"
               >
@@ -216,21 +219,22 @@ export default function DashboardPage() {
             />
           </Card>
 
-          {/* <Card>
+          <Card>
             <div className="text-sm font-medium mb-3">Your Squads</div>
             <div className="flex flex-col gap-3 max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-[color:var(--accent)] scrollbar-track-transparent">
               {squads.map((s) => (
-                <div key={s.id} className="card p-3 space-y-2 hover:cursor-pointer" >
-                  <Link href={`/squads/${s.id}`}>
+                <Link key={s.id} href={`/squads/${s.id}`} className="card p-3 space-y-2 hover:cursor-pointer block">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold">{s.name}</div>
                     <div className="text-xs opacity-70 flex items-center gap-2">
                       <span>Invite: {s.invite_code}</span>
                       <button
-                        className={`underline transition-colors duration-200 ${
-                          copiedCode === s.invite_code ? "text-[color:var(--accent)]" : ""
-                        }`}
-                        onClick={() => handleCopy(s.invite_code)}
+                        className={`underline transition-colors duration-200 ${copiedCode === s.invite_code ? "text-[color:var(--accent)]" : ""
+                          }`}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleCopy(s.invite_code)
+                        }}
                       >
                         {copiedCode === s.invite_code ? "Copied!" : "Copy code"}
                       </button>
@@ -269,20 +273,30 @@ export default function DashboardPage() {
                         )}&saved=${encodeURIComponent(
                           s.balance
                         )}&target=${encodeURIComponent(s.target_amount || 0)}`}
-                        className="underline"
+                        className="underline hover:scale-105"
+                        // onClick={(e) => {
+                        //   e.stopPropagation()
+                        // }}
+                        // onClick={(e) => {
+                        //   e.stopPropagation();
+                        //   router.push(`/flex?name=${encodeURIComponent(s.name)}&saved=${s.balance}&target=${s.target_amount}`);
+                        // }}
                       >
                         Flex card
                       </Link>
                       <div
                         // href={`/contribute?squadId=${s.id}`}
                         className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/contribute?squadId=${s.id}`);
+                        }}
                       >
                         Contribute
                       </div>
                     </div>
                   </div>
-                  </Link>
-                </div>
+                </Link>
               ))}
 
               {!loading && squads.length === 0 && (
@@ -291,86 +305,7 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-          </Card> */}
-          <Card>
-  <div className="text-sm font-medium mb-3">Your Squads</div>
-  <div className="flex flex-col gap-3 max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-[color:var(--accent)] scrollbar-track-transparent">
-    {squads.map((s) => (
-      <Link key={s.id} href={`/squads/${s.id}`} className="card p-3 space-y-2 hover:cursor-pointer block">
-        <div className="flex items-center justify-between">
-          <div className="font-semibold">{s.name}</div>
-          <div className="text-xs opacity-70 flex items-center gap-2">
-            <span>Invite: {s.invite_code}</span>
-            <button
-              className={`underline transition-colors duration-200 ${
-                copiedCode === s.invite_code ? "text-[color:var(--accent)]" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleCopy(s.invite_code)
-              }}
-            >
-              {copiedCode === s.invite_code ? "Copied!" : "Copy code"}
-            </button>
-          </div>
-        </div>
-
-        <div className="text-sm flex justify-between">
-          <span>Saved</span>
-          <span>
-            ₦{s.balance.toLocaleString()} / ₦
-            {(s.target_amount || 0).toLocaleString()}
-          </span>
-        </div>
-
-        <div className="h-2 rounded bg-black/10 dark:bg-white/10">
-          <div
-            className="h-2 rounded bg-[color:var(--accent)]"
-            style={{
-              width: `${Math.min(
-                100,
-                ((s.balance || 0) / Math.max(1, s.target_amount)) * 100
-              )}%`,
-            }}
-          />
-        </div>
-
-        <div className="flex items-center justify-between mt-2 text-xs opacity-70">
-          <span>
-            {(s.members || []).length} member
-            {(s.members || []).length === 1 ? "" : "s"}
-          </span>
-          <div className="flex items-center gap-2">
-            <a
-              href={`/flex?name=${encodeURIComponent(
-                s.name
-              )}&saved=${encodeURIComponent(
-                s.balance
-              )}&target=${encodeURIComponent(s.target_amount || 0)}`}
-              className="underline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              Flex card
-            </a>
-            <a
-              href={`/contribute?squadId=${s.id}`}
-              className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
-              onClick={(e) => e.stopPropagation()}
-            >
-              Contribute
-            </a>
-          </div>
-        </div>
-      </Link>
-    ))}
-
-    {!loading && squads.length === 0 && (
-      <div className="text-sm opacity-80">
-        No squads yet. Create your first squad.
-      </div>
-    )}
-  </div>
-</Card>
+          </Card>
 
         </div>
       </div>
