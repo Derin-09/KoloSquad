@@ -1,8 +1,23 @@
 import NewContributionPlan from "./NewContributionClient";
 
-export default function Page({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function Page({ params }: PageProps) {
   return <NewContributionPlan squadId={params.id} />;
 }
+
+
+
+
+// import NewContributionPlan from "./NewContributionClient";
+
+// export default function Page({ params }: { params: { id: string } }) {
+//   return <NewContributionPlan squadId={params.id} />;
+// }
 
 
 
