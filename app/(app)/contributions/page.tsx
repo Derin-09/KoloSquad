@@ -43,7 +43,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <div className="space-y-8">
-      <NewContributionPlan squadId={params.id} />
+      <NewContributionPlan params={{id: params.id}} />
 
       <section>
         <h2 className="text-lg font-semibold mb-4">Contribution History</h2>

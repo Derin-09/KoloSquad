@@ -127,7 +127,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       {/* 💡 New Plan */}
       <section className="pt-2">
         <h2 className="text-xl font-semibold mb-3">Create a Contribution Plan</h2>
-        <NewContributionPlan squadId={squadId} />
+        <NewContributionPlan params={{id: squadId}} />
       </section>
 
       {/* 🧾 Contribution History */}
