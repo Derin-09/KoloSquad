@@ -1,31 +1,14 @@
 import NewContributionPlan from "./NewContributionClient";
 
-type Params = { id: string };
-
 interface PageProps {
-  params: Params; // NOT a promise
+  params: Promise<{ id: string }>; // App Router expects a promise
 }
 
-// Make the page a server component
-export default function Page({ params }: PageProps) {
-  return <NewContributionPlan squadId={params.id} />;
+// Make the page a server component (async)
+export default async function Page({ params }: PageProps) {
+  const resolvedParams = await params; // resolve the promise
+  return <NewContributionPlan squadId={resolvedParams.id} />;
 }
-
-
-
-
-
-// import NewContributionPlan from "./NewContributionClient";
-
-// interface PageProps {
-//   params: {
-//     id: string;
-//   };
-// }
-
-// export default function Page({ params }: PageProps) {
-//   return <NewContributionPlan squadId={params.id} />;
-// }
 
 
 
