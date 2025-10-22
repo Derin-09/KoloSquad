@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { ContributionType, PlanDataType } from "@/types/types";
 
-type PageProps = {
-  params: { id: string }; // <--- NOT Promise
-};
-
-export default function ContributionDetails({ params }: PageProps) {
+export default function ContributionDetails({ params }: { params: { id: string } }) {
   const [plans, setPlans] = useState<PlanDataType[]>([]);
   const [contributions, setContributions] = useState<ContributionType[]>([]);
   const [totalSaved, setTotalSaved] = useState<number>(0);
@@ -23,7 +19,7 @@ export default function ContributionDetails({ params }: PageProps) {
         .select("id, amount, name, target_amount, frequency, type, start_date, end_date, next_due_date")
         .eq("squad_id", squadId);
 
-      if (plansError) console.error("Error fetching plans:", plansError);
+      if (plansError) console.error(plansError);
       else setPlans(plansData || []);
 
       const { data: contribData, error: contribError } = await supabase
@@ -32,7 +28,7 @@ export default function ContributionDetails({ params }: PageProps) {
         .eq("squad_id", squadId)
         .order("created_at", { ascending: false });
 
-      if (contribError) console.error("Error fetching contributions:", contribError);
+      if (contribError) console.error(contribError);
       else {
         setContributions(contribData || []);
         const total = (contribData || [])
@@ -87,6 +83,108 @@ export default function ContributionDetails({ params }: PageProps) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { supabase } from "@/lib/supabase/client";
+// import { ContributionType, PlanDataType } from "@/types/types";
+
+// type PageProps = {
+//   params: { id: string }; // <--- NOT Promise
+// };
+
+// export default function ContributionDetails({ params }: PageProps) {
+//   const [plans, setPlans] = useState<PlanDataType[]>([]);
+//   const [contributions, setContributions] = useState<ContributionType[]>([]);
+//   const [totalSaved, setTotalSaved] = useState<number>(0);
+
+//   useEffect(() => {
+//     async function fetchData() {
+//       const squadId = params.id;
+//       console.log("Fetching data for squad:", squadId);
+
+//       const { data: plansData, error: plansError } = await supabase
+//         .from("contribution_plans")
+//         .select("id, amount, name, target_amount, frequency, type, start_date, end_date, next_due_date")
+//         .eq("squad_id", squadId);
+
+//       if (plansError) console.error("Error fetching plans:", plansError);
+//       else setPlans(plansData || []);
+
+//       const { data: contribData, error: contribError } = await supabase
+//         .from("contributions")
+//         .select("amount, status, created_at")
+//         .eq("squad_id", squadId)
+//         .order("created_at", { ascending: false });
+
+//       if (contribError) console.error("Error fetching contributions:", contribError);
+//       else {
+//         setContributions(contribData || []);
+//         const total = (contribData || [])
+//           .filter((c) => c.status === "success")
+//           .reduce((sum, c) => sum + Number(c.amount || 0), 0);
+//         setTotalSaved(total);
+//       }
+//     }
+
+//     fetchData();
+//   }, [params.id]);
+
+//   return (
+//     <div className="p-6 space-y-6">
+//       <h1 className="text-2xl font-semibold">Squad Contributions</h1>
+
+//       {plans.length > 0 && (
+//         <div className="space-y-4">
+//           {plans.map((plan) => (
+//             <div key={plan.id} className="p-4 border rounded-md">
+//               <p className="font-medium">{plan.name}</p>
+//               <p className="text-sm text-muted-foreground">
+//                 Target: ₦{plan.target_amount?.toLocaleString()}
+//               </p>
+//             </div>
+//           ))}
+//         </div>
+//       )}
+
+//       <div className="pt-8 border-t">
+//         <h2 className="text-xl font-semibold">Total Saved</h2>
+//         <p className="text-lg font-medium">₦{totalSaved.toLocaleString()}</p>
+//       </div>
+
+//       <div className="pt-6">
+//         <h2 className="text-xl font-semibold">Contribution History</h2>
+//         {contributions.length === 0 ? (
+//           <p>No contributions yet.</p>
+//         ) : (
+//           <div className="space-y-3">
+//             {contributions.map((c, i) => (
+//               <div key={i} className="p-3 border rounded-md">
+//                 <p>₦{c.amount}</p>
+//                 <p className="text-sm text-muted-foreground">
+//                   {c.status} — {new Date(c.created_at).toLocaleDateString()}
+//                 </p>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
 
 
 
