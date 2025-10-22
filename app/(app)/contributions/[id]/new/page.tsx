@@ -1,14 +1,31 @@
 import NewContributionPlan from "./NewContributionClient";
 
+type Params = { id: string };
+
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Params; // NOT a promise
 }
 
+// Make the page a server component
 export default function Page({ params }: PageProps) {
   return <NewContributionPlan squadId={params.id} />;
 }
+
+
+
+
+
+// import NewContributionPlan from "./NewContributionClient";
+
+// interface PageProps {
+//   params: {
+//     id: string;
+//   };
+// }
+
+// export default function Page({ params }: PageProps) {
+//   return <NewContributionPlan squadId={params.id} />;
+// }
 
 
 
