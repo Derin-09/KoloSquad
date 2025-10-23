@@ -1,5 +1,5 @@
 // supabase/functions/sendReminders/index.ts
-// @ts-expect-error
+// @ts-expect-error: Deno runtime provides these globals; VS Code can’t resolve them locally
 
 /// <reference lib="deno.ns" />
 /// <reference lib="deno.unstable" />
