@@ -4,6 +4,17 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 
+export const metadata = {
+  title: "KoloSquad",
+  description:
+    "KoloSquad – a savings circle for friends. Create or join squads, contribute together through Paystack, unlock badges, and track progress in real time.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isStandalone = pathname === "/sign-in"
