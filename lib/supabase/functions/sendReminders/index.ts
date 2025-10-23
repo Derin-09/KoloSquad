@@ -1,5 +1,5 @@
 // supabase/functions/sendReminders/index.ts
-// @ts-ignore
+// @ts-expect-error
 
 /// <reference lib="deno.ns" />
 /// <reference lib="deno.unstable" />
