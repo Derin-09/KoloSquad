@@ -3,8 +3,9 @@
 import React, { useEffect, useState, use } from "react";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import NewContributionPlan from "../../contributions/[id]/new/page";
+// import NewContributionPlan from "../../contributions/[id]/new/page";
 import { ContributionType, MemberType, Squad, SquadIdType } from "@/types/types";
+import NewContributionPlan from "../../contributions/[id]/new/NewContributionClient";
 
 
 
@@ -127,7 +128,9 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       {/* 💡 New Plan */}
       <section className="pt-2">
         <h2 className="text-xl font-semibold mb-3">Create a Contribution Plan</h2>
-        <NewContributionPlan params={{id: squadId}} />
+        <NewContributionPlan
+          squadId={squadId} 
+          />
       </section>
 
       {/* 🧾 Contribution History */}

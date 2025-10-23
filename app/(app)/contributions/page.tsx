@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib//supabase/client";
-import NewContributionPlan from "./[id]/new/page";
+import NewContributionPlan from "./[id]/new/NewContributionClient";
+// import NewContributionPlan from "./[id]/new/page";
 // import NewContributionPlan from "./new/page";
 
 interface Contribution {
@@ -43,7 +44,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <div className="space-y-8">
-      <NewContributionPlan params={{id: params.id}} />
+      <NewContributionPlan squadId={ params.id} />
 
       <section>
         <h2 className="text-lg font-semibold mb-4">Contribution History</h2>
