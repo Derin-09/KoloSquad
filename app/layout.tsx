@@ -15,10 +15,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+
+export const metadata = {
   title: "KoloSquad",
-  description: "Save together. Flex together.",
+  description:
+    "KoloSquad – a savings circle for friends. Create or join squads, contribute together through Paystack, unlock badges, and track progress in real time.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
+
 
 export default function RootLayout({
   children,
