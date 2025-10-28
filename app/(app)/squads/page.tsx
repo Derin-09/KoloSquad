@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import NewSquadPage from "./new/page";
 import JoinSquadPage from "./join/page";
 import Link from "next/link";
+import { User } from "lucide-react";
 // import { Squad } from "@/types/types";
 
 interface Squad {
@@ -38,14 +39,19 @@ export default function SquadsPage() {
             You&apos;re not in any squads yet.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:space-y-0 text-[#1d1333]">
             {squads.map((squad) => (
               <Link
                 key={squad.id}
                 href={`/squads/${squad.id}`}
-                className="block border border-border rounded-xl p-4 hover:bg-muted transition"
+                className="block bg-accent rounded-xl p-4 hover:bg-muted transition"
               >
-                <p className="font-medium capitalize">{squad.name}</p>
+                <div className="flex justify-between items-center">
+                <p className="font-medium capitalize text-[18px]">{squad.name}</p>
+                <div className="flex items-center gap-2">
+                  <User size={15}/>
+                </div>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   View contributions →
                 </p>
@@ -57,7 +63,7 @@ export default function SquadsPage() {
 
       {/* Section 2: Create/Join Tabs */}
       <div className="mt-10">
-        <div className="flex gap-6 border-b border-border relative">
+        <div className="flex gap-6 bor\der-b border-border relative">
           {["create", "join"].map((tab) => (
             <button
               key={tab}

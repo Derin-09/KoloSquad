@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
+
+type SquadResult = {
+  id: string;
+  invite_code: string;
+};
+
 export default function JoinSquadPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -23,13 +29,22 @@ export default function JoinSquadPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Sign in required");
 
+    // const { data: squad, error: qerr } = await supabase
+    //   .from("squads")
+    //   .select("id, invite_code")
+    //   // .eq("invite_code", code.trim().toUpperCase())
+    //   .ilike("invite_code", code.trim().toUpperCase())
+    //   .maybeSingle(); // handles not found gracefully
+
     const { data: squad, error: qerr } = await supabase
-      .from("squads")
-      .select("id, invite_code")
-      .eq("invite_code", code.trim().toUpperCase())
-      .maybeSingle(); // handles not found gracefully
+  .rpc("get_squad_by_code", { code: code.trim().toUpperCase() })
+  .single<SquadResult>();
+
+
+      console.log("searching for code:", code.trim().toUpperCase());
 
     if (qerr) throw qerr;
+    console.log('sqyad', squad)
     if (!squad) throw new Error("Invalid invite code");
 
     const { error: insertError } = await supabase.from("squad_members").insert([
@@ -84,7 +99,7 @@ export default function JoinSquadPage() {
   // }
 
   return (
-    <main className="max-w-md mx-auto space-y-4">
+    <main className="max-w-md mx-aut space-y-4">
       <h1 className="text-2xl font-bold">Join Squad</h1>
       <label className="block text-sm font-medium">Invite code</label>
       <input
@@ -105,4 +120,5 @@ export default function JoinSquadPage() {
   );
 }
 
-// http://localhost:3000/squads/join?code=N4MHKL
+
+// E5MGO4

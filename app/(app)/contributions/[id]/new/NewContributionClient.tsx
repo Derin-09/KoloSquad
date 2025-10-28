@@ -52,7 +52,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
   if (!editMode && plan) {
     return (
-      <div className="border border-border rounded-xl p-5 bg-card shadow-sm space-y-3">
+      <div className="borde border-bordr bg-accent rounded-xl p-5 bg-card shadow-sm space-y-3">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold capitalize">Contribution Plan</h3>
           <button
@@ -82,7 +82,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
   }
 
   return (
-    <main className="max-w-md mx-auto space-y-4 border border-border rounded-xl p-5 bg-card shadow-sm">
+    <main className="max-w-md mx-aut space-y-4 borde border-border rounded-xl p-5 bg-card shadow-sm">
       <h1 className="text-xl font-semibold">Create Contribution Plan</h1>
 
       <label className="block text-sm font-medium">Frequency</label>
@@ -112,7 +112,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
         className="w-full rounded-md border border-input px-3 py-2 bg-background"
       >
         <option value="pooled">Pooled Goal (Shared Target)</option>
-        <option value="rotational">Rotational</option>
+        {/* <option value="rotational">Rotational</option> */}
         <option value="personal">Personal</option>
       </select>
 
@@ -135,7 +135,9 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
       <button
         onClick={createPlan}
         disabled={loading}
-        className="w-full bg-primary text-primary-foreground px-3 py-2 rounded-md hover:brightness-95 transition"
+        // className="w-full bg-primary text-primary-foreground px-3 py-2 rounded-md hover:brightness-95 transition"
+        className="w-full rounded-md bg-[color:var(--accent-button)] 
+                   text-[color:var(--accent-foreground)] px-3 py-2 hover:brightness-95 text-sm"
       >
         {loading ? "Creating..." : "Create Plan"}
       </button>
