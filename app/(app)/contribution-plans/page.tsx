@@ -35,14 +35,14 @@ export default function ContributionPlansPage() {
     return <p className="text-center mt-10">No squads yet. Create one first.</p>;
 
   return (
-    <main className="max-w-3xl mx-auto space-y-6">
+    <main className="max-w-5xl mx-auo space-y-6">
       <h1 className="text-2xl font-bold">Your Squads</h1>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {squads.map((squad) => (
           <div
             key={squad.id}
-            className="rounded-lg border border-[color:var(--accent-input)] p-4"
+            className="rounded-lg bg-accent text-[#1d1333] p-4"
           >
             <h2 className="text-lg font-semibold">{squad.name}</h2>
             <p className="text-sm text-muted-foreground">
@@ -52,7 +52,7 @@ export default function ContributionPlansPage() {
             <Link
             //   href={`/contributions/${squad.id}/new`}
               href={`/contributions`}
-              className="inline-block mt-3 rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-1.5 text-sm hover:brightness-95"
+              className="inline-block mt-3 rounded-md text-[#1d1333] bg-[#F8F9FD] shadow-md hover:scale-105 active:shadow-none active:mt-2 px-3 py-1.5 text-sm hover:brightness-95"
             >
               Create Contribution Plan
             </Link>

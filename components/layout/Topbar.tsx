@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bell,
   Circle,
@@ -12,6 +12,7 @@ import {
   Banknote,
   Settings,
   Medal,
+  ChevronRight,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { supabase } from "@/lib/supabase/client";
@@ -36,6 +37,25 @@ export default function Topbar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const segments = pathname?.split("/").filter(Boolean) || []
+
+  const segmentLabels: Record<string, string> = {
+    // payroll: "Payroll",
+    // adhoc: "Adhoc Payroll",
+    // dashboard: "Dashboard",
+    // requestLeave: "Request Leave",
+    // myRequests: "My Requests",
+    // leaveBalance: 'Leave Balance',
+    // leaveApproval: 'Leave Approvals',
+    // loan: "Loan",
+  }
+
+  const breadcrumbs =
+    segments.length === 0
+      ? ["Dashboard"]
+      : segments.map((seg) => segmentLabels[seg] || seg)
+
+  const currentPage = breadcrumbs[breadcrumbs.length - 1] || "Dashboard"
 
   // Fetch avatar on mount + refresh when auth state changes
   useEffect(() => {
@@ -60,63 +80,76 @@ export default function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 bg-[color:var(--background)]/80 backdrop-blur-md border-b border-[color:var(--border)]">
-      <div className="flex items-center justify-between px-4 md:px-6 py-3 md:float-right">
+      <div className="flex items-center justify-between px-4 md:px-6 py-3 md:float-riht w-full">
         {/* Left section - brand or trigger */}
         <div className="flex md:hidden items-center gap-3">
-            <Logo className="h-6" variant="auto" />
+          <Logo className="h-6" variant="auto" />
         </div>
 
-      
+
         {/* Middle - search (optional later) */}
-        <div className="hidden md:fle flex-1 justify-center">
-          <input
-            className="w-80 rounded-md border px-3 py-2 text-sm bg-[color:var(--surface)] placeholder:text-[color:var(--muted-foreground)]"
-            style={{ borderColor: "var(--border)" }}
-            placeholder="Search"
-          />
-        </div>
+        
+
+          <div className="hidden md:flex gap-2 items-center">
+            {breadcrumbs.map((crumb, idx) => {
+              const isLast = idx === breadcrumbs.length - 1
+              return (
+                <React.Fragment key={idx}>
+                  <p
+                    className={`capitalize ${isLast ? 'text-foreground font-semiold' : ''
+                      }`}
+                  >
+                    {crumb}
+                  </p>
+                  {idx < breadcrumbs.length - 1 && <ChevronRight size={16} />}
+                </React.Fragment>
+              )
+            })}
+          </div>
 
         {/* Right - controls */}
-        <div className="flex items-center gap-1 md:gap-3 ">
-          <ThemeToggle variant="icon" />
-          <span className="hidden sm:inline-flex items-center gap-1 text-xs badge-soft">
-            <Circle size={8} fill="currentColor" /> Live
-          </span>
+        
+          <div className="flex items-center gap-1 md:gap-3 ">
+            <span className="hidden sm:inline-flex items-center text-center gap-1 text-xs badge-soft">
+              <Circle size={8} fill="currentColor" /> Live
+            </span>
+            
+            <ThemeToggle variant="icon" />
 
-          <button
-            className="rounded-md p-2 hover:bg-[color:var(--muted)] transition"
-            aria-label="Notifications"
-            onClick={() => router.push("/notifications")}
-          >
-            <Bell size={18} />
-          </button>
+            <button
+              className="rounded-md p-2 hover:bg-[color:var(--muted)] transition"
+              aria-label="Notifications"
+              onClick={() => router.push("/notifications")}
+            >
+              <Bell size={18} />
+            </button>
 
-          <button
-            onClick={() => router.push("/settings")}
-            className="w-8 h-8 rounded-full overflow-hidden border border-[color:var(--border)] hover:opacity-80 transition"
-          >
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt="User avatar"
-                // fill
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-[color:var(--accent)]" />
-            )}
-          </button>
+            <button
+              onClick={() => router.push("/settings")}
+              className="w-8 h-8 rounded-full overflow-hidden border border-[color:var(--border)] hover:opacity-80 transition"
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="User avatar"
+                  // fill
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-[color:var(--accent)]" />
+              )}
+            </button>
 
-          
-         <div className="flex items-center gap-3">
-          <button
-            className="md:hidden p-2 rounded-md hover:bg-[color:var(--muted)] transition"
-            onClick={() => setIsClicked(true)}
-          >
-            <LayoutGrid size={20} />
-          </button>
-        </div>
-        </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                className="md:hidden p-2 rounded-md hover:bg-[color:var(--muted)] transition"
+                onClick={() => setIsClicked(true)}
+              >
+                <LayoutGrid size={20} />
+              </button>
+            </div>
+          </div>
 
       </div>
 
@@ -132,8 +165,8 @@ export default function Topbar() {
           >
             <div className="flex justify-between items-center p-4">
               <div className="">
-            <Logo className="h-6" variant="auto" />
-        </div>
+                <Logo className="h-6" variant="auto" />
+              </div>
               <button
                 onClick={() => setIsClicked(false)}
                 className="p-2 rounded-md hover:bg-[color:var(--muted)] transition"
@@ -151,11 +184,10 @@ export default function Topbar() {
                     key={idx}
                     href={item.link}
                     onClick={() => setIsClicked(false)}
-                    className={`flex items-center gap-3 transition ${
-                      active
+                    className={`flex items-center gap-3 transition ${active
                         ? "text-[color:var(--accent)]"
                         : "hover:text-[color:var(--accent-foreground)]"
-                    }`}
+                      }`}
                   >
                     <Icon size={22} />
                     {item.text}

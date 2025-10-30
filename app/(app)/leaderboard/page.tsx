@@ -35,7 +35,7 @@ export default function LeaderboardPage() {
   }, []);
 
   return (
-    <main className="max-w-3xl mx-auto p-4 space-y-6">
+    <main className="max-w-3xl mx-aut p-4 space-y-6">
       <h1 className="text-2xl font-bold">Leaderboard</h1>
       {loading && <div>Loading...</div>}
       <div className="rounded-md border" style={{ borderColor: "var(--border)" }}>
