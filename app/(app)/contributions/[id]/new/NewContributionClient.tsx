@@ -52,32 +52,88 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
   if (!editMode && plan) {
     return (
-      <div className="borde border-bordr bg-accent rounded-xl p-5 bg-card shadow-sm space-y-3">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold capitalize">Contribution Plan</h3>
+      <div className="border border-white/10 bg-[color:var(--accent)]/20 rounded-2xl p-6 shado\w-[0_0_25px_-10px_rgba(0,0,0,0.4)] backdro\p-blur-md space-y-4 transition-all hover:sh]adow-[0_0_35px_-8px_var(--accent-button)]">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-xl font-semibold tracking-tight text-foreground">
+              Contribution Plan
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Overview of your current savings schedule
+            </p>
+          </div>
           <button
             onClick={() => setEditMode(true)}
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm font-medium text-[color:var(--accent-button)] hover:underline"
           >
             Edit
           </button>
         </div>
-        <div className="text-sm space-y-1 text-muted-foreground">
-          <p>💸 Type: {plan.type}</p>
-          <p>📅 Frequency: {plan.frequency}</p>
-          <p>🕓 Start: {plan.start_date}</p>
-          <p>🏁 End: {plan.end_date}</p>
-          <p>🎯 Amount: ₦{Number(plan.amount).toLocaleString()}</p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 text-sm text-muted-foreground pt-3">
+          <p>
+            <span className="font-medium text-foreground">Type:</span> {plan.type}
+          </p>
+          <p>
+            <span className="font-medium text-foreground">Frequency:</span> {plan.frequency}
+          </p>
+          <p>
+            <span className="font-medium text-foreground">Start:</span>{" "}
+            {new Date(plan.start_date).toLocaleDateString()}
+          </p>
+          <p>
+            <span className="font-medium text-foreground">End:</span>{" "}
+            {new Date(plan.end_date).toLocaleDateString()}
+          </p>
+          <p className="col-span-2 sm:col-span-1">
+            <span className="font-medium text-foreground">Amount:</span>{" "}
+            ₦{Number(plan.amount).toLocaleString()}
+          </p>
         </div>
-        <div>
+
+        <div className="pt-4">
           <a
             href={`/contribute?squadId=${squadId}`}
-            className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+            className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
           >
-            Contribute
+            Make Contribution
           </a>
         </div>
       </div>
+
+
+
+
+
+
+
+
+      // <div className="borde border-bordr bg-accent rounded-xl p-5 bg-card shadow-sm space-y-3">
+      //   <div className="flex justify-between items-center">
+      //     <h3 className="text-lg font-semibold capitalize">Contribution Plan</h3>
+      //     <button
+      //       onClick={() => setEditMode(true)}
+      //       className="text-sm text-blue-600 hover:underline"
+      //     >
+      //       Edit
+      //     </button>
+      //   </div>
+      //   <div className="text-sm space-y-1 text-muted-foreground">
+      //     <p>💸 Type: {plan.type}</p>
+      //     <p>📅 Frequency: {plan.frequency}</p>
+      //     <p>🕓 Start: {plan.start_date}</p>
+      //     <p>🏁 End: {plan.end_date}</p>
+      //     <p>🎯 Amount: ₦{Number(plan.amount).toLocaleString()}</p>
+      //   </div>
+      //   <div>
+      //     <a
+      //       href={`/contribute?squadId=${squadId}`}
+      //       className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+      //     >
+      //       Contribute
+      //     </a>
+      //   </div>
+      // </div>
     );
   }
 
