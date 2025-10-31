@@ -18,8 +18,8 @@ const nav = [
 export default function Sidebar() {
   const pathname = usePathname();
   return (
-    <aside className="hidden md:flex md:flex-col w-60 shrink-0 gap-2 p-3 sticky top-0 h-dvh">
-<div className="px-2 py-3"><Logo className="h-6" variant="auto" /></div>
+    <aside className="hidden md:flex md:flex-col w-60 shrink-0 gap-2 p-3 sticky top-0 h-dvh bg-[#1d1333] text-white">
+<div className="px-2 py-3"><Logo className="h-6" variant="dark" /></div>
       <nav className="flex-1 space-y-1">
         {nav.map((n) => {
           const active = pathname?.startsWith(n.href);
@@ -30,7 +30,7 @@ export default function Sidebar() {
               href={n.href}
               className={clsx(
                 "flex items-center gap-2 rounded-md px-3 py-2",
-                active ? "bg-[color:var(--muted)]" : "hover:bg-[color:var(--muted)]"
+                active ? "bg-[color:var(--muted)] text-foreground" : "hover:bg-[color:var(--muted)] hover:text-foreground"
               )}
             >
               <Icon size={18} />

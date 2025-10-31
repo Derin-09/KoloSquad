@@ -36,7 +36,7 @@ export default function SquadsPage() {
 
         {squads.length === 0 ? (
           <p className="text-muted-foreground">
-            You&apos;re not in any squads yet.
+            You&apos;re not in any squads yet. Create or join one to get started!
           </p>
         ) : (
           <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:space-y-0 text-[#1d1333]">

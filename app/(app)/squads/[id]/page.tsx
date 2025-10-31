@@ -6,6 +6,7 @@ import Link from "next/link";
 // import NewContributionPlan from "../../contributions/[id]/new/page";
 import { ContributionType, MemberType, Squad, SquadIdType } from "@/types/types";
 import NewContributionPlan from "../../contributions/[id]/new/NewContributionClient";
+import Spinner from "@/app/loading";
 
 
 
@@ -19,7 +20,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     async function fetchData() {
-      // 🟣 Fetch squad info
+      // Fetch squad info
       const { data: squadData, error: squadError } = await supabase
         .from("squads")
         .select("id, name, target_amount, invite_code, created_by")
@@ -29,7 +30,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       if (squadError) console.error("Squad fetch error:", squadError);
       setSquad(squadData);
 
-      // 🧑‍🤝‍🧑 Fetch members
+      // Fetch members
       const { data: membersData, error: memberError } = await supabase
         .from("squad_members")
         .select("user_id, role, profiles(full_name, avatar_url)")
@@ -42,11 +43,12 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
           (membersData || []).map((m) => ({
             user_id: m.user_id,
             role: m.role,
-            profiles: m.profiles?.[0] || undefined, // take first element or undefined
+            profiles: m.profiles?.[0] || undefined,
           }))
         );
+        // console.log('members are', members[0].role)
 
-      // 💰 Fetch contributions
+      // Fetch contributions
       const { data: contribData } = await supabase
         .from("contributions")
         .select("amount, status, created_at")
@@ -65,29 +67,35 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
   }, [squadId]);
 
   if (!squad) {
-    return <p className="p-6 text-center text-muted-foreground">Loading squad...</p>;
+    return (
+    // <p className="p-6 text-center text-muted-foreground">Loading squad...</p>
+    <Spinner/>
+  );
   }
 
+
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-12">
-      {/* 🌟 Squad Header */}
+    <div className="max-w-3xl mx-aut px-6 space-y-12">
+      {/*  Squad Header */}
+      
+        <Link
+          href="/squads"
+          className="text-sm font-semibold text-[color:var(--accent-button)] hover:underline"
+        >
+          ← Back
+        </Link>
+        
       <header className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight capitalize">{squad.name}</h1>
           <p className="text-muted-foreground">
-            🎯 Target: ₦{(squad.target_amount ?? 0).toLocaleString()} &nbsp;|&nbsp; 💰 Saved: ₦
+             Target: ₦{(squad.target_amount ?? 0).toLocaleString()} &nbsp;|&nbsp;  Saved: ₦
             {totalSaved.toLocaleString()}
           </p>
         </div>
-        <Link
-          href="/squads"
-          className="text-sm text-[color:var(--accent-button)] hover:underline"
-        >
-          ← Back
-        </Link>
       </header>
 
-      {/* 🔗 Invite Code */}
+      {/*  Invite Code */}
       <section className="rounded-2xl bg-[color:var(--accent-muted)] p-5 flex justify-between items-center">
         <div>
           <h3 className="font-semibold text-lg">Invite Code</h3>
@@ -98,7 +106,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
         </code>
       </section>
 
-      {/* 🧑‍🤝‍🧑 Squad Members */}
+      {/*  Squad Members */}
       <section>
         <h2 className="text-xl font-semibold mb-3">Squad Members</h2>
         {members.length === 0 ? (
@@ -125,15 +133,15 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
         )}
       </section>
 
-      {/* 💡 New Plan */}
+      {/*  New Plan */}
       <section className="pt-2">
-        <h2 className="text-xl font-semibold mb-3">Create a Contribution Plan</h2>
+        {/* <h2 className="text-xl font-semibold mb-3">Create a Contribution Plan</h2> */}
         <NewContributionPlan
           squadId={squadId} 
           />
       </section>
 
-      {/* 🧾 Contribution History */}
+      {/*  Contribution History */}
       <section>
         <h2 className="text-xl font-semibold mb-3">Contribution History</h2>
         {contributions.length === 0 ? (

@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Logo } from "../Logo";
 import Image from "next/image";
+import { data } from "framer-motion/client";
 
 const mobileNavItems = [
   { text: "Dashboard", logo: LayoutDashboard, link: "/dashboard" },
@@ -35,11 +36,45 @@ const mobileNavItems = [
 export default function Topbar() {
   const [isClicked, setIsClicked] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [squadId, setSquadId] = useState('')
+  const [confirmId, setConfirmId] = useState('')
+  const [name, setName] = useState('')
   const router = useRouter();
   const pathname = usePathname();
   const segments = pathname?.split("/").filter(Boolean) || []
 
+
+
+  
+useEffect(() => {
+  const fetchSquadName = async () => {
+    const match = pathname.match(/^\/squads\/([^\/]+)/);
+    if (!match) return;
+
+    const id = match[1];
+    const { data, error } = await supabase
+      .from("squads")
+      .select("name")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Failed to fetch squad:", error.message);
+      return;
+    }
+
+    setName(data.name);
+  };
+
+  fetchSquadName();
+}, [pathname]);
+
+
+
+ 
+
   const segmentLabels: Record<string, string> = {
+    'contribution-plans': 'Contribution Plan'
     // payroll: "Payroll",
     // adhoc: "Adhoc Payroll",
     // dashboard: "Dashboard",
@@ -50,14 +85,21 @@ export default function Topbar() {
     // loan: "Loan",
   }
 
-  const breadcrumbs =
-    segments.length === 0
-      ? ["Dashboard"]
-      : segments.map((seg) => segmentLabels[seg] || seg)
 
-  const currentPage = breadcrumbs[breadcrumbs.length - 1] || "Dashboard"
+  // const breadcrumbs =
+  //   segments.length === 0
+  //     ? ["Dashboard"]
+  //     : segments.map((seg) => segmentLabels[seg] || seg)
 
-  // Fetch avatar on mount + refresh when auth state changes
+const breadcrumbs = segments.map((seg, idx) => {
+  if (segments[0] === "squads" && idx === 1 && name) {
+    return name; // replace ID with actual name
+  }
+  return segmentLabels[seg] || seg;
+});
+
+
+
   useEffect(() => {
     const getUserAvatar = async () => {
       const { data } = await supabase.auth.getUser();
@@ -96,7 +138,7 @@ export default function Topbar() {
               return (
                 <React.Fragment key={idx}>
                   <p
-                    className={`capitalize ${isLast ? 'text-foreground font-semiold' : ''
+                    className={`capitalize ${isLast ? 'text-foreground font-semibold' : ''
                       }`}
                   >
                     {crumb}

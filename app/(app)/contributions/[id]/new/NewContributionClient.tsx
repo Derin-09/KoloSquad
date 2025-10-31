@@ -116,21 +116,27 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
         <option value="personal">Personal</option>
       </select>
 
-      <label className="block text-sm font-medium">Start Date</label>
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        className="w-full rounded-md border border-input px-3 py-2 bg-background"
-      />
 
-      <label className="block text-sm font-medium">End Date</label>
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-        className="w-full rounded-md border border-input px-3 py-2 bg-background"
-      />
+      <div className="md:flex gap-4 w-full">
+        <div className="space-y-4 flex-1">
+          <label className="block text-sm font-medium">Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full rounded-md border border-input px-3 py-2 bg-background"
+          />
+        </div>
+        <div className="space-y-4 flex-1">
+          <label className="block text-sm font-medium">End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full rounded-md border border-input px-3 py-2 bg-background"
+          />
+        </div>
+      </div>
 
       <button
         onClick={createPlan}

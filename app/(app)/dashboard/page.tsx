@@ -8,6 +8,7 @@ import { SimpleBars } from "@/components/charts/SimpleBars";
 import { Donut } from "@/components/charts/Donut";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useRouter } from "next/navigation";
+import Spinner from "@/app/loading";
 
 interface Squad {
   id: string;
@@ -180,7 +181,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {loading && <p>Loading...</p>}
+        {loading && <Spinner/>}
         {error && (
           <div className="card p-3">
             <p className="text-red-600 dark:text-red-400 mb-3">{error}</p>

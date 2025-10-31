@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import Spinner from "@/app/loading";
 
 interface Squad {
   id: string;
@@ -53,7 +54,7 @@ export default function PayoutsPage() {
         </div>
       </header>
 
-      {loading && <div>Loading...</div>}
+      {loading && <Spinner/>}
       {err && <div className="text-sm text-red-600">{err}</div>}
 
       <section className="card p-4 space-y-3">
