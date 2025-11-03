@@ -19,6 +19,38 @@ interface MemberType {
   total_contributed: number;
 }
 
+// type RawMember = {
+//     user_id: string;
+//     role: string;
+//     profiles: {
+//         full_name: string | null;
+//         avatar_url: string | null;
+//     } | null;
+//     contributions: {
+//         amount: number;
+//         status: string;
+//     }[] | null;
+// }[]
+
+// type RawMembersType = RawMember[];
+
+
+type RawMember = {
+  user_id: string;
+  role: string;
+  profiles: {
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+  contributions: {
+    amount: number;
+    status: string;
+  }[] | null;
+};
+
+type RawMembersType = RawMember[];
+
+
 export default function SquadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: squadId } = use(params);
 
@@ -40,26 +72,42 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       else setSquad(squadData);
 
       // Fetch members with total contributed
+      // const { data: rawMembers, error: memberError } = await supabase
+      //   .from("squad_members")
+      //   .select(`
+      //     user_id,
+      //     role,
+      //     profiles (
+      //       full_name,
+      //       avatar_url
+      //     ),
+      //     contributions!left (
+      //       amount,
+      //       status
+      //     )
+      //   `)
+      //   .eq("squad_id", squadId);
+
+
       const { data: rawMembers, error: memberError } = await supabase
-        .from("squad_members")
-        .select(`
-          user_id,
-          role,
-          profiles (
-            full_name,
-            avatar_url
-          ),
-          contributions!left (
-            amount,
-            status
-          )
-        `)
-        .eq("squad_id", squadId);
+  .from("squad_members")
+  .select(`
+    user_id,
+    role,
+    profiles (full_name, avatar_url),
+    contributions (amount, status)
+  `)
+  .eq("squad_id", squadId);
+
+  // const typedRawMembers = (rawMembers ?? []) as RawMembersType;
+  const typedRawMembers = (rawMembers ?? []) as unknown as RawMembersType;
+
+
 
       if (memberError) {
         console.error("Member fetch error:", memberError);
       } else {
-        const mapped: MemberType[] = (rawMembers || []).map((m: any) => {
+        const mapped: MemberType[] = typedRawMembers.map((m) => {
           const successful = (m.contributions || []).filter(
             (c: { status: string }) => c.status === "successful"
           );
@@ -111,13 +159,13 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       {/* Fixed Back Button */}
       <Link
         href="/squads"
-        className="absolute top-6 left-6 z-20 bg-[color:var(--card)]/80 backdrop-blur-md border border-white/10 text-[color:var(--accent-button)] font-semibold px-4 py-2 rounded-lg shadow-lg hover:shadow-[0_0_25px_-5px_var(--accent-button)] transition-all text-sm"
+        className="absolute top-6 left-6 z-20 bg-[color:var(--card)]/80 backdrop-blur-md border border-white/10 text-[color:var(--accent-button)] font-semibold px-4 py-2 rounded-lg  transition-all text-sm"
       >
         ← Back
       </Link>
 
       {/* Header */}
-      <header className="bg-gradient-to-br from-[color:var(--card)]/90 to-[color:var(--accent-muted)]/40 border border-white/10 rounded-3xl p-8 shadow-md flex flex-col md:flex-row justify-between gap-6 transition-transform hover:scale-[1.01]">
+      <header className="bg-gradient-to-br from-[color:var(--card)]/90 to-[color:var(--accent-muted)]/40 border border-white/10 rounded-3xl p-8 shadow-md shadow-[0_0_25px_-10px_var(--accent-button)] flex flex-col md:flex-row justify-between gap-6 transition-transform hover:scale-[1.01]">
         <div className="space-y-3">
           <h1 className="text-3xl sm:text-4xl font-bold capitalize tracking-tight">{squad.name}</h1>
           <p className="text-muted-foreground text-sm">
@@ -136,7 +184,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
           <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
             Invite Code
           </h3>
-          <code className="font-mono text-lg font-semibold bg-[color:var(--accent-muted)]/40 px-4 py-2 rounded-lg block shadow-inner">
+          <code className="font-mono text-lg font-semibold bg-[color:var(--accent-muted)]/40 px-4 py-2 rounded-lg block ">
             {squad.invite_code || "N/A"}
           </code>
         </div>
@@ -146,7 +194,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       <section>
         <h2 className="text-2xl font-semibold mb-6 tracking-tight">Squad Members</h2>
 
-        <div className="overflow-x-auto rounded-2xl border border-white/10 shadow-[0_0_25px_-10px_var(--accent-button)] bg-[color:var(--card)]/70 backdrop-blur-lg">
+        <div className="overflow-x-auto rounded-2xl border border-white/10  bg-[color:var(--card)]/70 backdrop-blur-lg">
           <table className="w-full text-sm text-left text-muted-foreground">
             <thead className="bg-[color:var(--accent-muted)]/30 text-xs uppercase text-muted-foreground tracking-wide">
               <tr>
