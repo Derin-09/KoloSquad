@@ -17,6 +17,7 @@ export interface SquadIdType {
 
 export interface PlanType {
     squad_id: string,
+    id: string
     created_by: string,
     frequency: string,
     amount: number | null,
@@ -24,6 +25,8 @@ export interface PlanType {
     start_date: string,
     end_date: string,
     next_due_date: string,
+    approvals: string[]
+    status: string
 }
 
 export interface PlanDataType {
