@@ -54,7 +54,7 @@ export default function ContributionPlansPage() {
               href={`/contributions`}
               className="inline-block mt-3 rounded-md text-[#1d1333] bg-[#F8F9FD] shadow-md hover:scale-105 active:shadow-none active:mt-2 px-3 py-1.5 text-sm hover:brightness-95"
             >
-              Create Contribution Plan
+              View Contribution Plan
             </Link>
           </div>
         ))}
