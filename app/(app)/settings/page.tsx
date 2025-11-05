@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const [fullName, setFullName] = useState("");
@@ -114,6 +115,17 @@ export default function SettingsPage() {
           <button className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 hover:brightness-95 text-sm">Update preferences</button>
         </div>
       </section>
+
+      <div>
+        <div className="pt-10 border-t border-white/10 flex justify-end">
+          <Link href={'/sign-in'}
+            // onClick={deleteSquad}
+            className="px-5 py-2 bg-red-600/80 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors hover:cursor-pointer"
+          >
+            Log Out
+          </Link>
+        </div>
+      </div>
     </main>
   );
 }

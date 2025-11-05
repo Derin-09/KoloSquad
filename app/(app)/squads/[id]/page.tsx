@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase/client";
 import { ContributionType, SquadIdType } from "@/types/types";
 import NewContributionPlan from "../../contributions/[id]/new/NewContributionClient";
 import Spinner from "@/app/loading";
+import { useRouter } from "next/navigation";
+
 
 interface ProfileType {
   full_name: string | null;
@@ -19,20 +21,6 @@ interface MemberType {
   total_contributed: number;
 }
 
-// type RawMember = {
-//     user_id: string;
-//     role: string;
-//     profiles: {
-//         full_name: string | null;
-//         avatar_url: string | null;
-//     } | null;
-//     contributions: {
-//         amount: number;
-//         status: string;
-//     }[] | null;
-// }[]
-
-// type RawMembersType = RawMember[];
 
 
 type RawMember = {
@@ -53,11 +41,11 @@ type RawMembersType = RawMember[];
 
 export default function SquadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: squadId } = use(params);
-
   const [squad, setSquad] = useState<SquadIdType | null>(null);
   const [members, setMembers] = useState<MemberType[]>([]);
   const [contributions, setContributions] = useState<ContributionType[]>([]);
   const [totalSaved, setTotalSaved] = useState<number>(0);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -71,36 +59,19 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       if (squadError) console.error("Squad fetch error:", squadError);
       else setSquad(squadData);
 
-      // Fetch members with total contributed
-      // const { data: rawMembers, error: memberError } = await supabase
-      //   .from("squad_members")
-      //   .select(`
-      //     user_id,
-      //     role,
-      //     profiles (
-      //       full_name,
-      //       avatar_url
-      //     ),
-      //     contributions!left (
-      //       amount,
-      //       status
-      //     )
-      //   `)
-      //   .eq("squad_id", squadId);
-
 
       const { data: rawMembers, error: memberError } = await supabase
-  .from("squad_members")
-  .select(`
-    user_id,
-    role,
-    profiles (full_name, avatar_url),
-    contributions (amount, status)
-  `)
-  .eq("squad_id", squadId);
+        .from("squad_members")
+        .select(`
+          user_id,
+          role,
+          profiles (full_name, avatar_url),
+          contributions (amount, status)
+        `)
+        .eq("squad_id", squadId);
 
-  // const typedRawMembers = (rawMembers ?? []) as RawMembersType;
-  const typedRawMembers = (rawMembers ?? []) as unknown as RawMembersType;
+      // const typedRawMembers = (rawMembers ?? []) as RawMembersType;
+      const typedRawMembers = (rawMembers ?? []) as unknown as RawMembersType;
 
 
 
@@ -153,6 +124,26 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
   }, [squadId]);
 
   if (!squad) return <Spinner />;
+
+
+  const deleteSquad = async () => {
+    if (!confirm("Are you sure you want to delete this squad? This cannot be undone.")) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not signed in");
+      if (user.id !== squad?.created_by) throw new Error("Only the owner can delete this squad");
+
+      const { error } = await supabase.from("squads").delete().eq("id", squadId);
+      if (error) throw error;
+
+      alert("Squad deleted successfully");
+      router.refresh(); 
+      router.push("/squads");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete squad");
+    }
+  };
 
   return (
     <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 space-y-12 animate-fadeIn">
@@ -212,9 +203,8 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
                 return (
                   <tr
                     key={i}
-                    className={`transition-colors hover:bg-[color:var(--accent-muted)]/20 ${
-                      isOwner ? "bg-[color:var(--accent-muted)]/30 font-semibold" : ""
-                    }`}
+                    className={`transition-colors hover:bg-[color:var(--accent-muted)]/20 ${isOwner ? "bg-[color:var(--accent-muted)]/30 font-semibold" : ""
+                      }`}
                   >
                     <td className="px-6 py-4 flex items-center gap-3">
                       {avatar ? (
@@ -270,11 +260,10 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
                   </p>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    c.status === "successful"
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${c.status === "successful"
                       ? "bg-green-500/20 text-green-300"
                       : "bg-yellow-500/20 text-yellow-300"
-                  }`}
+                    }`}
                 >
                   {c.status}
                 </span>
@@ -283,6 +272,17 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
           </div>
         )}
       </section>
+
+      {squad?.created_by && (
+        <div className="pt-10 border-t border-white/10 flex justify-end">
+          <button
+            onClick={deleteSquad}
+            className="px-5 py-2 bg-red-600/80 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors hover:cursor-pointer"
+          >
+            Delete Squad
+          </button>
+        </div>
+      )}
     </div>
   );
 }
