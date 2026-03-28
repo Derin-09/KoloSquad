@@ -15,7 +15,7 @@ export function SignupForm() {
 
   const appUrl = useMemo(() =>
     (typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000",
-  []);
+    []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,9 +60,35 @@ export function SignupForm() {
       }
 
       // If your project auto-confirms users, proceed.
+      // Get the current user (after sign-in or email verification)
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+
+      if (user) {
+        const { data: existing } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (!existing) {
+          const { data: profilesInsert, error: insertError } = await supabase
+            .from("profiles")
+            .insert({
+              id: user.id,
+              full_name: user.user_metadata?.full_name ?? null,
+              avatar_url: user.user_metadata?.avatar_url ?? null,
+            });
+            console.log('yeahhhh', profilesInsert)
+
+          if (insertError) {
+            console.log("Profile insert failed:", insertError);
+          }
+        }
+      }
       window.location.href = "/onboarding";
     } catch (e) {
-        const err = e instanceof Error ? e.message :  "Sign up failed";
+      const err = e instanceof Error ? e.message : "Sign up failed";
       setError(err);
     } finally {
       setLoading(false);

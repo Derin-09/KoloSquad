@@ -28,9 +28,56 @@ export default function VerifyOtpPage() {
         type: "sms",
       });
       if (error) throw error;
+      // After successful verification, create profile if it doesn't exist
+      // const { data: { user } } = await supabase.auth.getUser();
+      // if (user) {
+      //   // Check if profile exists
+      //   const { data: profile, error: profileError } = await supabase
+      //     .from('profiles')
+      //     .select('id')
+      //     .eq('id', user.id)
+      //     .single();
+      //   if (!profile && !profileError) {
+      //     // Insert profile using metadata if available
+      //     const { full_name, avatar_url } = user.user_metadata || {};
+      //     await supabase.from('profiles').insert([
+      //       {
+      //         id: user.id,
+      //         full_name: full_name || null,
+      //         avatar_url: avatar_url || null,
+      //       }
+      //     ]);
+      //   }
+      // }
+
+      // const { data: userData } = await supabase.auth.getUser();
+      // const user = userData.user;
+
+      // if (user) {
+      //   const { data: existing } = await supabase
+      //     .from("profiles")
+      //     .select("id")
+      //     .eq("id", user.id)
+      //     .maybeSingle();
+
+      //   if (!existing) {
+      //     const { data: profilesInsert, error: insertError } = await supabase
+      //       .from("profiles")
+      //       .insert({
+      //         id: user.id,
+      //         full_name: user.user_metadata?.full_name ?? null,
+      //         avatar_url: user.user_metadata?.avatar_url ?? null,
+      //       });
+      //       console.log('yeahhhh', profilesInsert)
+
+      //     if (insertError) {
+      //       console.log("Profile insert failed:", insertError);
+      //     }
+      //   }
+      // }
       router.replace("/onboarding/goals");
     } catch (e) {
-      const err = e instanceof Error ? e.message :  "Invalid code. Try again.";
+      const err = e instanceof Error ? e.message : "Invalid code. Try again.";
       setErr(err);
     } finally {
       setLoading(false);
