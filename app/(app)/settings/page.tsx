@@ -22,7 +22,7 @@ export default function SettingsPage() {
         setEmail(user.email || "");
         setFullName((user.user_metadata)?.full_name || "");
         setSquadNick((user.user_metadata)?.squad_nickname || "");
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -45,10 +45,27 @@ export default function SettingsPage() {
         }
       }
       const { error } = await supabase.auth.updateUser({ data: { full_name: fullName, squad_nickname: squadNick, ...(avatar_url ? { avatar_url } : {}) } });
+
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+
+      if (user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({
+            full_name: fullName,
+            avatar_url: avatar_url ?? null,
+          })
+          .eq("id", user.id);
+
+        if (profileError) {
+          console.log("Profile update failed:", profileError);
+        }
+      }
       if (error) throw error;
       setMsg("Profile updated");
     } catch (e) {
-        const err = e instanceof Error ? e.message :  "Update failed";
+      const err = e instanceof Error ? e.message : "Update failed";
       setErr(err);
     } finally {
       setSaving(false);

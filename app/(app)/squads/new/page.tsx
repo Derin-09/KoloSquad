@@ -68,6 +68,7 @@ export default function NewSquadPage() {
       const { error: planError } = await supabase.from("contribution_plans").insert({
         squad_id: squad.id,
         created_by: user.id,
+        user_id: user.id,
         frequency: "weekly", // defaults
         amount: 1000,
         type: "pooled",

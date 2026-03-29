@@ -54,55 +54,80 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
         .from("squads")
         .select("id, name, target_amount, invite_code, created_by")
         .eq("id", squadId)
-        .single();
+        .maybeSingle();
 
       if (squadError) console.error("Squad fetch error:", squadError);
       else setSquad(squadData);
 
 
-      const { data: rawMembers, error: memberError } = await supabase
-        .from("squad_members")
-        .select(`
-          user_id,
-          role,
-          profiles (full_name, avatar_url),
-          contributions (amount, status)
-        `)
-        .eq("squad_id", squadId);
+      // const { data: rawMembers, error: memberError } = await supabase
+      //   .from("squad_members")
+      //   .select(`
+      //     user_id,
+      //     role,
+      //     profiles (full_name, avatar_url),
+      //     contributions (amount, status)
+      //   `)
+      //   .eq("squad_id", squadId);
+
+      const { data: memberData, error: memberError } = await supabase
+  .from("squad_member_contributions")
+  .select("*")
+  .eq("squad_id", squadId);
 
       // const typedRawMembers = (rawMembers ?? []) as RawMembersType;
-      const typedRawMembers = (rawMembers ?? []) as unknown as RawMembersType;
+      // const typedRawMembers = (rawMembers ?? []) as unknown as RawMembersType;
 
 
+
+      // if (memberError) {
+      //   console.error("Member fetch error:", memberError);
+      // } else {
+      //   const mapped: MemberType[] = typedRawMembers.map((m) => {
+      //     const successful = (m.contributions || []).filter(
+      //       (c: { status: string }) => c.status === "successful"
+      //     );
+      //     const total = successful.reduce(
+      //       (sum: number, c: { amount: number }) => sum + c.amount,
+      //       0
+      //     );
+      //     return {
+      //       user_id: m.user_id,
+      //       role: m.role,
+      //       profiles: {
+      //         full_name: m.profiles?.full_name ?? null,
+      //         avatar_url: m.profiles?.avatar_url ?? null,
+      //       },
+      //       total_contributed: total,
+      //     };
+      //   });
+
+      //   // Place owner at the top
+      //   const sorted = mapped.sort((a, b) =>
+      //     a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0
+      //   );
+      //   setMembers(sorted);
+      // }
 
       if (memberError) {
-        console.error("Member fetch error:", memberError);
-      } else {
-        const mapped: MemberType[] = typedRawMembers.map((m) => {
-          const successful = (m.contributions || []).filter(
-            (c: { status: string }) => c.status === "successful"
-          );
-          const total = successful.reduce(
-            (sum: number, c: { amount: number }) => sum + c.amount,
-            0
-          );
-          return {
-            user_id: m.user_id,
-            role: m.role,
-            profiles: {
-              full_name: m.profiles?.full_name ?? null,
-              avatar_url: m.profiles?.avatar_url ?? null,
-            },
-            total_contributed: total,
-          };
-        });
+  console.error("Member fetch error:", memberError);
+} else {
+  const mapped: MemberType[] = (memberData || []).map((m) => ({
+    user_id: m.user_id,
+    role: m.role,
+    profiles: {
+      full_name: m.full_name,
+      avatar_url: m.avatar_url,
+    },
+    total_contributed: m.total_contributed,
+  }));
 
-        // Place owner at the top
-        const sorted = mapped.sort((a, b) =>
-          a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0
-        );
-        setMembers(sorted);
-      }
+  const sorted = mapped.sort((a, b) =>
+    a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0
+  );
+
+  setMembers(sorted);
+}
 
       // Fetch contributions
       const { data: contribData } = await supabase
@@ -144,6 +169,9 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
       alert(err instanceof Error ? err.message : "Failed to delete squad");
     }
   };
+
+  
+    console.log('aaa', members)
 
   return (
     <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 space-y-12 animate-fadeIn">
