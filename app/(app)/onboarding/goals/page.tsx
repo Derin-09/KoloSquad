@@ -11,8 +11,14 @@ export default function OnboardingGoals() {
 
   async function next() {
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData, error } = await supabase.auth.getUser();
+
+      if (error || !userData.user) {
+        console.log("No user session");
+        return;
+      }
       const user = userData?.user;
+      console.log("USER:", user);
       if (user) {
         await supabase.from("user_onboarding").upsert({
           user_id: user.id,
