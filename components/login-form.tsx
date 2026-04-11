@@ -36,8 +36,8 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
-      <div>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="space-y-2">
         <label className="block text-sm font-medium">Email</label>
         <input
 className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
@@ -48,7 +48,7 @@ className="w-full rounded-md border border-[color:var(--accent-input)] focus:bor
           required
         />
       </div>
-      <div>
+      <div className="space-y-2">
         <label className="block text-sm font-medium">Password</label>
         <input
 className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
