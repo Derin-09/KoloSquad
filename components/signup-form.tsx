@@ -48,7 +48,7 @@ export function SignupForm() {
         options: {
           data: { full_name: fullName, avatar_url },
           // After verifying email, redirect into onboarding
-          emailRedirectTo: appUrl + "/onboarding",
+          emailRedirectTo: appUrl + "/dashboard",
         },
       });
       if (error) throw error;

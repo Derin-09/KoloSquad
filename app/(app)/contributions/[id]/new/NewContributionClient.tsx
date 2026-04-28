@@ -43,6 +43,8 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
   // squad metadata used for auto-calculation
   const [squadTarget, setSquadTarget] = useState<number>(0);
+  const [squadStartDate, setSquadStartDate] = useState<number>(0);
+  const [squadEndDate, setSquadEndDate] = useState<number>(0);
   const [memberCount, setMemberCount] = useState<number>(1);
   const [calculatedAmount, setCalculatedAmount] = useState<number>(0);
 
@@ -127,7 +129,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
       try {
         const { data: squad } = await supabase
           .from("squads")
-          .select("target_amount, name")
+          .select("target_amount, name, start_date, end_date")
           .eq("id", squadId)
           .single();
         const { data: members } = await supabase
@@ -137,6 +139,8 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
         if (!mounted) return;
           setSquadName(squad?.name);
+          setSquadStartDate(squad?.start_date)
+          setSquadEndDate(squad?.end_date)
         if (squad && typeof squad.target_amount === "number") {
           setSquadTarget(Number(squad.target_amount));
         } else if (squad && squad.target_amount != null) {
@@ -371,11 +375,13 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
           </p>
           <p>
             <span className="font-medium text-foreground">Start:</span>{" "}
-            {new Date(plan.start_date).toLocaleDateString()}
+            {format(new Date(squadStartDate), "PPP")}
+
           </p>
           <p>
             <span className="font-medium text-foreground">End:</span>{" "}
-            {new Date(plan.end_date).toLocaleDateString()}
+            {format(new Date(squadEndDate), "PPP")}
+
           </p>
           <p className="col-span-2 sm:col-span-1">
             <span className="font-medium text-foreground">Amount:</span> 

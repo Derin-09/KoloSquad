@@ -10,14 +10,20 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useRouter } from "next/navigation";
 import Spinner from "@/app/loading";
 
+
+type Contribution = { amount: number; status: string };
+type Member = { user_id: string };
+
 interface Squad {
   id: string;
   name: string;
   target_amount: number;
   balance: number;
   invite_code: string;
-  contributions: { length: number };
-  members: { user_id: string }[];
+  contributions: Contribution[] | null;
+  members: Member[] | null;
+  // contributions: { length: number };
+  // members: { user_id: string }[];
 }
 
 export default function DashboardPage() {
@@ -49,13 +55,18 @@ export default function DashboardPage() {
           return;
         }
 
+        console.log(user, 'userr')
+
+        // const { data, error } = await supabase
+        //   .from("squads")
+        //   .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)").or(`created_by.eq.${user.id},squad_members.user_id.eq.${user.id}`)
+        //   .order("created_at", { ascending: false });
         const { data, error } = await supabase
-          .from("squads")
-          .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)")
-          .order("created_at", { ascending: false });
+  .rpc("get_user_squads", { user_uuid: user.id });
+  const squads: Squad[] = (data || []) as Squad[];
         if (error) throw error;
 
-        const withBalance = (data || []).map((s) => ({
+        const withBalance = (squads || []).map((s) => ({
           id: s.id,
           name: s.name,
           target_amount: Number(s.target_amount || 0),
@@ -174,10 +185,17 @@ export default function DashboardPage() {
               You saved ₦{totals.totalSaved.toLocaleString()} this month.
             </h1>
           </div>
+          <div className="flex gap-2 items-center">
           <div className="flex px-1 md:px-3 py-2 rounded-md text-[color:var(--accent)]/70 md:bg-black md:text-white md:dark:bg-white md:dark:text-black ">
             <Link href="/squads/new" className="px-3 py-2">
               New Squad
             </Link>
+          </div>
+          <div className="flex px-1 md:px-3 py-2 rounded-md text-[color:var(--accent)]/70 md:bg-black md:text-white md:dark:bg-white md:dark:text-black ">
+            <Link href="/squads/join" className="px-3 py-2">
+              Join Squad
+            </Link>
+          </div>
           </div>
         </div>
 
@@ -267,42 +285,13 @@ export default function DashboardPage() {
                       {(s.members || []).length} member
                       {(s.members || []).length === 1 ? "" : "s"}
                     </span>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/flex?name=${encodeURIComponent(
-                          s.name
-                        )}&saved=${encodeURIComponent(
-                          s.balance
-                        )}&target=${encodeURIComponent(s.target_amount || 0)}`}
-                        className="underline hover:scale-105"
-                        // onClick={(e) => {
-                        //   e.stopPropagation()
-                        // }}
-                        // onClick={(e) => {
-                        //   e.stopPropagation();
-                        //   router.push(`/flex?name=${encodeURIComponent(s.name)}&saved=${s.balance}&target=${s.target_amount}`);
-                        // }}
-                      >
-                        Flex card
-                      </Link>
-                      <div
-                        // href={`/contribute?squadId=${s.id}`}
-                        className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/contribute?squadId=${s.id}`);
-                        }}
-                      >
-                        Contribute
-                      </div>
-                    </div>
                   </div>
                 </Link>
               ))}
 
               {!loading && squads.length === 0 && (
                 <div className="text-sm opacity-80">
-                  No squads yet. Create your first squad.
+                  No squads yet. <Link href={"/squads/new"} className="hover:cursor-pointer"> Create your first squad.</Link>
                 </div>
               )}
             </div>

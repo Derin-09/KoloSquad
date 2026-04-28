@@ -7,16 +7,20 @@ import NewSquadPage from "./new/page"
 import JoinSquadPage from "./join/page"
 import Link from "next/link"
 import { User, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Squad {
   id: string
   name: string
   memberCount: number
+  target_amount?: number;
+  balance?: number;
 }
 
 export default function SquadsPage() {
   const [squads, setSquads] = useState<Squad[]>([])
   const [activeTab, setActiveTab] = useState<"create" | "join">("create")
+  const router = useRouter()
 
   useEffect(() => {
     async function fetchSquads() {
@@ -110,7 +114,6 @@ export default function SquadsPage() {
                 key={squad.id}
                 className="relative block bg-accent rounded-xl p-4 hover:bg-muted transition group"
               >
-                <Link href={`/squads/${squad.id}`} className="block">
                   <div className="flex justify-between items-center">
                     <p className="font-medium capitalize text-[18px]">{squad.name}</p>
                     <div className="flex items-center gap-2">
@@ -118,8 +121,36 @@ export default function SquadsPage() {
                       <p>{squad.memberCount}</p>
                     </div>
                   </div>
+                  <div className="fle flex-col items-center justify-center">
+                    
+                <Link href={`/squads/${squad.id}`} className="block">
                   <p className="text-sm text-muted-foreground">View contributions →</p>
+                  
                 </Link>
+                  
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/flex?name=${encodeURIComponent(
+                          squad.name
+                        )}&saved=${encodeURIComponent(
+                          squad.balance || ''
+                        )}&target=${encodeURIComponent(squad.target_amount || 0)}`}
+                        className="underline hover:scale-105"
+                      >
+                        Flex card
+                      </Link>
+                      <div
+                        // href={`/contribute?squadId=${s.id}`}
+                        className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/contribute?squadId=${squad.id}`);
+                        }}
+                      >
+                        Contribute
+                      </div>
+                    </div>
+                    </div>
 
                 <button
                   onClick={() => handleDelete(squad.id)}
