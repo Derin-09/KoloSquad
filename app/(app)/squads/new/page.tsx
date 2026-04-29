@@ -39,7 +39,10 @@ export default function NewSquadPage() {
   const [loading, setLoading] = useState(false);
   const [contribShow, setContribShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [memberCount, setMemberCount] = useState<number>(1)
+  const [frequency, setFrequency] = useState<"weekly" | "bi-weekly" | "monthly">(
+    "weekly"
+  );
   const handleStartDateSelect = (date: Date | undefined) => {
     if (!date) return;
     const today = new Date();
@@ -134,14 +137,16 @@ export default function NewSquadPage() {
       <main className="max-w-md mx-aut space-y-4">
         <h1 className="text-2xl font-bold">Create Squad</h1>
 
-        <label className="block text-sm font-medium">Name</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Rent Gang"
-          className="w-full rounded-md border-2 border-[color:var(--accent-input)] 
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Name</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Rent Gang"
+            className="w-full rounded-md border-2 border-[color:var(--accent-input)] 
                    focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-        />
+          />
+        </div>
 
         {/* <label className="block text-sm font-medium">Target (₦)</label>
       <input
@@ -187,8 +192,47 @@ export default function NewSquadPage() {
               +
             </button>
           </div>
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Number of members</label>
+            <input
+              type="number"
+              value={memberCount}
+              onChange={(e) => setMemberCount(Number(e.target.value))}
+              className="w-full rounded-md border-2 border-[color:var(--accent-input)]
+                 focus:border-[color:var(--accent-input-focus)] outline-none
+                 px-3 py-2 text-center text-lg transition-colors"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Duration </label>
+            <input
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder="e.g. 30"
+              className="w-full rounded-md border-2 border-[color:var(--accent-input)] 
+                   focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Frequency</label>
+            <select
+              value={frequency}
+              onChange={(e) =>
+                setFrequency(e.target.value as "weekly" | "bi-weekly" | "monthly")
+              }
+              className="w-full rounded-md border border-input px-3 py-2 bg-background"
+            >
+              <option value="weekly">Weekly</option>
+              <option value="bi-weekly">Bi-Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+
+          
         </div>
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium mb-1">Start Date</label>
           <Popover>
             <PopoverTrigger asChild>
@@ -218,16 +262,6 @@ export default function NewSquadPage() {
           </Popover>
         </div>
         <div>
-          <label className="block text-sm font-medium">Duration (in days)</label>
-          <input
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            placeholder="e.g. 30"
-            className="w-full rounded-md border-2 border-[color:var(--accent-input)] 
-                   focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-          />
-        </div>
-        <div>
           <label className="block text-sm font-medium mb-1">End Date</label>
           <Button
             variant="outline"
@@ -240,7 +274,7 @@ export default function NewSquadPage() {
             <CalendarIcon className="mr-2 h-4 w-4" />
             {endDate ? format(new Date(endDate), "PPP") : "Calculated automatically"}
           </Button>
-        </div>
+        </div> */}
 
 
         <button
