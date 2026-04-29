@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
 
@@ -32,15 +33,19 @@ export default function NewSquadPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [createdSquad, setCreatedSquad] = useState<Squad | null>(null);
-  const [duration, setDuration] = useState<string>("");
+  const [duration, setDuration] = useState<"week(s)" | "month(s)" | "year(s)">(
+    "week(s)"
+  );;
+  const [durationNumber, setDurationNumber] = useState<number>();
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [target, setTarget] = useState(10000);
   const [loading, setLoading] = useState(false);
   const [contribShow, setContribShow] = useState(false);
+  const [dialogShow, setDialogShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [memberCount, setMemberCount] = useState<number>(1)
-  const [frequency, setFrequency] = useState<"weekly" | "bi-weekly" | "monthly">(
+  const [frequency, setFrequency] = useState<"weekly" | "monthly" | "yearly">(
     "weekly"
   );
   const handleStartDateSelect = (date: Date | undefined) => {
@@ -91,8 +96,10 @@ export default function NewSquadPage() {
           target_amount: target,
           invite_code: inviteCode,
           created_by: user.id,
-          start_date: startDate,
-          end_date: endDate
+          duration,
+          duration_number: durationNumber,
+          member_count: memberCount,
+          frequency
         })
         .select()
         .single();
@@ -129,8 +136,40 @@ export default function NewSquadPage() {
       setError(e instanceof Error ? e.message : "Failed to create squad");
     } finally {
       setLoading(false);
+      setDialogShow(false)
+      router.push(`/squads`)
+      
     }
   };
+
+  const calculatePeriods = () => {
+    if (!durationNumber) return 1;
+
+    if (frequency === "weekly") {
+      if (duration === "week(s)") return durationNumber;
+      if (duration === "month(s)") return durationNumber * 4;
+      if (duration === "year(s)") return durationNumber * 52;
+    }
+
+
+    if (frequency === "monthly") {
+      if (duration === "week(s)") return Math.ceil(durationNumber / 4);
+      if (duration === "month(s)") return durationNumber;
+      if (duration === "year(s)") return durationNumber * 12;
+    }
+
+
+    if (frequency === "yearly") {
+      if (duration === "week(s)") return Math.floor(durationNumber / 52);
+      if (duration === "month(s)") return Math.floor(durationNumber * 12);
+      if (duration === "year(s)") return durationNumber;
+    }
+
+    return 1;
+  };
+
+  const periods = calculatePeriods();
+  const calculatedAmount = target / memberCount / periods;
 
   if (!contribShow) {
     return (
@@ -192,46 +231,68 @@ export default function NewSquadPage() {
               +
             </button>
           </div>
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Number of members</label>
-            <input
-              type="number"
-              value={memberCount}
-              onChange={(e) => setMemberCount(Number(e.target.value))}
-              className="w-full rounded-md border-2 border-[color:var(--accent-input)]
+        </div>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Number of members</label>
+          <input
+            type="number"
+            placeholder="0"
+            value={memberCount}
+            onChange={(e) => setMemberCount(Number(e.target.value))}
+            className="w-full rounded-md border-2 border-[color:var(--accent-input)]
                  focus:border-[color:var(--accent-input-focus)] outline-none
                  px-3 py-2 text-center text-lg transition-colors"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Duration </label>
-            <input
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              placeholder="e.g. 30"
-              className="w-full rounded-md border-2 border-[color:var(--accent-input)] 
-                   focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Frequency</label>
-            <select
-              value={frequency}
-              onChange={(e) =>
-                setFrequency(e.target.value as "weekly" | "bi-weekly" | "monthly")
-              }
-              className="w-full rounded-md border border-input px-3 py-2 bg-background"
-            >
-              <option value="weekly">Weekly</option>
-              <option value="bi-weekly">Bi-Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-
-          
+          />
         </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Duration </label>
+          <div className="grid grid-cols-2 py-2 gap-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Duration </label>
+              <input
+                value={durationNumber}
+                onChange={(e) => setDurationNumber(Number(e.target.value))}
+                placeholder="e.g. 3"
+                type="number"
+                className="w-full col-span-1 rounded-md border-2 border-[color:var(--accent-input)] 
+                   focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Period </label>
+              <select
+                value={duration}
+                onChange={(e) =>
+                  setDuration(e.target.value as "week(s)" | "month(s)" | "year(s)")
+                }
+                className="w-full col-span-1 rounded-md border border-input px-3 py-2 bg-background"
+              >
+                <option value="week(s)">Week(s)</option>
+                <option value="month(s)">Month(s)</option>
+                <option value="year(s)">Year(s)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Frequency</label>
+          <select
+            value={frequency}
+            onChange={(e) =>
+              setFrequency(e.target.value as "weekly" | "yearly" | "monthly")
+            }
+            className="w-full rounded-md border border-input px-3 py-2 bg-background"
+          >
+            <option value="weekly">Weekly</option>
+            <option value="bi-weekly">Bi-Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+
+        </div>
+
+
         {/* <div>
           <label className="block text-sm font-medium mb-1">Start Date</label>
           <Popover>
@@ -278,7 +339,7 @@ export default function NewSquadPage() {
 
 
         <button
-          onClick={createSquad}
+          onClick={() => setDialogShow(true)}
           disabled={loading || !name || target <= 0}
           className="w-full rounded-md bg-[color:var(--accent-button)] 
                    text-[color:var(--accent-foreground)] px-3 py-2 hover:brightness-95 text-sm"
@@ -289,17 +350,121 @@ export default function NewSquadPage() {
         {error && (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
+{/* 
+        {dialogShow && (
+          <div className="absolute w-screen h-screen flex justify-center items-center bg-black/30">
+          <Dialog>
+            <div className="border border-white/10 bg-[color:var(--accent)]/20 rounded-2xl p-6 shadow-[0_0_25px_-10px_rgba(0,0,0,0.4)] backdrop-blur-md space-y-4 transition-all hover:shadow-[0_0_35px_-8px_var(--accent-button)]">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-xl font-semibold tracking-tight text-foreground">
+                    {name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Before you create, review the overview of your savings schedule
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setDialogShow(false)}
+                  className="text-sm font-medium text-[color:var(--accent-button)] hover:underline"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-y-3 text-sm text-muted-foreground pt-3 w-full">
+  <p className="capitalize">
+    <span className="font-medium text-foreground ">Frequency: </span> {frequency}
+  </p>
+  <p>
+    <span className="font-medium text-foreground">Amount: </span>
+    ₦{Number(target).toLocaleString()}
+  </p>
+  <p>
+    <span className="font-medium text-foreground">Duration: </span> {durationNumber} {duration}
+  </p>
+  <p>
+    <span className="font-medium text-foreground">Number of Members: </span> {memberCount}
+  </p>
+  <p>
+    <span className="font-medium text-foreground">Weekly amount per member: </span>
+    ₦{Math.round(calculatedAmount).toLocaleString()}
+  </p>
+</div>
+
+              <div className="flex items-center justify-between pt-4">
+                <button
+                  onClick={createSquad}
+                  className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
+                >
+                  Submit
+                </button>
+              </div>
+
+
+            </div>
+          </Dialog>
+          </div>
+        )} */}
+
+
+<Dialog open={dialogShow} onOpenChange={setDialogShow}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>{name}</DialogTitle>
+      <DialogDescription>
+        Before you create, review the overview of your savings schedule
+      </DialogDescription>
+    </DialogHeader>
+
+    <div className="grid grid-cols-2 gap-y-3 text-sm text-muted-foreground pt-3 w-full">
+      <p className="capitalize">
+        <span className="font-medium text-foreground">Frequency: </span> {frequency}
+      </p>
+      <p>
+        <span className="font-medium text-foreground">Amount: </span>
+        ₦{Number(target).toLocaleString()}
+      </p>
+      <p>
+        <span className="font-medium text-foreground">Duration: </span> {durationNumber} {duration}
+      </p>
+      <p>
+        <span className="font-medium text-foreground">Number of Members: </span> {memberCount}
+      </p>
+      <p>
+        <span className="font-medium text-foreground">Weekly amount per member: </span>
+        ₦{Math.round(calculatedAmount).toLocaleString()}
+      </p>
+    </div>
+
+    <div className="flex items-center justify-between pt-4">
+      <button
+        onClick={createSquad}
+        className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
+      >
+        Submit
+      </button>
+      {/* <button
+        onClick={() => setDialogShow(false)}
+        className="text-sm font-medium text-[color:var(--accent-button)] hover:underline"
+      >
+        Cancel
+      </button> */}
+    </div>
+  </DialogContent>
+</Dialog>
       </main>
     );
   }
 
 
 
-  return (
-    <>
-      {createdSquad && <NewContributionPlan squadId={createdSquad.id} />}
-    </>
-  );
+  // return (
+  //   <>
+  //     {createdSquad && <NewContributionPlan squadId={createdSquad.id} />}
+  //   </>
+  // );
 
 
 }

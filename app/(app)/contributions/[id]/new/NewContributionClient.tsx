@@ -373,7 +373,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
             <span className="font-medium text-foreground">Frequency:</span>{" "}
             {plan.frequency}
           </p>
-          <p>
+          {/* <p>
             <span className="font-medium text-foreground">Start:</span>{" "}
             {format(new Date(squadStartDate), "PPP")}
 
@@ -382,7 +382,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
             <span className="font-medium text-foreground">End:</span>{" "}
             {format(new Date(squadEndDate), "PPP")}
 
-          </p>
+          </p> */}
           <p className="col-span-2 sm:col-span-1">
             <span className="font-medium text-foreground">Amount:</span> 
             {/* ₦{Number(plan.amount).toLocaleString()} */}
