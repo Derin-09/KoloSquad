@@ -11,6 +11,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Spinner from "@/app/loading";
 
 
 
@@ -20,6 +21,11 @@ type Squad = {
   target_amount: number;
   invite_code: string;
   created_by: string;
+};
+
+type RulesTypes = {
+  rewards: string[]
+  penalties: string[]
 };
 
 const getStep = (value: number) => {
@@ -45,9 +51,36 @@ export default function NewSquadPage() {
   const [dialogShow, setDialogShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [memberCount, setMemberCount] = useState<number>(1)
+  const [amountPerMember, setAmountPerMember] = useState<number>(0)
   const [frequency, setFrequency] = useState<"weekly" | "monthly" | "yearly">(
     "weekly"
   );
+  const [rules, setRules] = useState<RulesTypes>({
+    rewards: ["Streak Badge", "Top Saver Badge", "Goal Crusher Badge"],
+    penalties: ["Lose streak if missed", "Funny reminder message", "Drop on leaderboard"]
+  })
+  const [selectedRewards, setSelectedRewards] = useState<string[]>([]);
+  const [selectedPenalties, setSelectedPenalties] = useState<string[]>([]);
+
+  const handleRewardChange = (reward: string) => {
+    setSelectedRewards(prev =>
+      prev.includes(reward)
+        ? prev.filter(r => r !== reward)
+        : [...prev, reward]
+    );
+  };
+
+  const handlePenaltyChange = (penalty: string) => {
+    setSelectedPenalties(prev =>
+      prev.includes(penalty)
+        ? prev.filter(p => p !== penalty)
+        : [...prev, penalty]
+    );
+  };
+
+  if (loading) {
+  return <Spinner />; // Or whatever your loading UI is
+}
   const handleStartDateSelect = (date: Date | undefined) => {
     if (!date) return;
     const today = new Date();
@@ -81,7 +114,7 @@ export default function NewSquadPage() {
     try {
       setLoading(true);
       setError(null);
-
+      
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -99,7 +132,10 @@ export default function NewSquadPage() {
           duration,
           duration_number: durationNumber,
           member_count: memberCount,
-          frequency
+        amount_per_member: amountPerMember,
+          frequency,
+          rewards: selectedRewards,
+          penalties: selectedPenalties,
         })
         .select()
         .single();
@@ -128,7 +164,7 @@ export default function NewSquadPage() {
 
       if (planError) throw planError;
 
-      // router.replace(`/squads/${squad.id}`);
+      router.replace(`/squads/${squad.id}`);
       // router.replace(`/contributions/${squad.id}/new`);
       setCreatedSquad(squad);
       setContribShow(true)
@@ -137,8 +173,7 @@ export default function NewSquadPage() {
     } finally {
       setLoading(false);
       setDialogShow(false)
-      router.push(`/squads`)
-      
+
     }
   };
 
@@ -170,7 +205,7 @@ export default function NewSquadPage() {
 
   const periods = calculatePeriods();
   const calculatedAmount = target / memberCount / periods;
-
+  setAmountPerMember(calculatedAmount)
   if (!contribShow) {
     return (
       <main className="max-w-md mx-aut space-y-4">
@@ -292,51 +327,50 @@ export default function NewSquadPage() {
 
         </div>
 
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Rules </label>
+          <div className=" py-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium space-y-4">Select the rules that should apply </label>
+              <div>
+                <p>Rewards</p>
+                {rules.rewards.map((r, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
+                      value={idx}
+                      checked={selectedRewards.includes(r)}
+                      onChange={() => handleRewardChange(r)}
+                      placeholder="e.g. 3"
+                      type="checkbox"
+                      className=" rounded-md border-2 border-[color:var(--accent-input)] 
+                   focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
+                    />
+                    <div>{r}</div>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <p>Penalties</p>
+                {rules.penalties.map((r, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
 
-        {/* <div>
-          <label className="block text-sm font-medium mb-1">Start Date</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !startDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? format(new Date(startDate), "PPP") : "Pick a start date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={startDate ? new Date(startDate) : undefined}
-                onSelect={handleStartDateSelect}
-                disabled={(date) => {
-                  const t = new Date();
-                  t.setHours(0, 0, 0, 0);
-                  return date < t;
-                }}
-              />
-            </PopoverContent>
-          </Popover>
+                      value={idx}
+                      checked={selectedPenalties.includes(r)}
+                      onChange={() => handlePenaltyChange(r)}
+                      placeholder="e.g. 3"
+                      type="checkbox"
+                      className="rounded-md border-2 border-[color:var(--accent-input)] 
+                   focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
+                    />
+                    <div>{r}</div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">End Date</label>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !endDate && "text-muted-foreground"
-            )}
-            disabled
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {endDate ? format(new Date(endDate), "PPP") : "Calculated automatically"}
-          </Button>
-        </div> */}
-
 
         <button
           onClick={() => setDialogShow(true)}
@@ -350,110 +384,70 @@ export default function NewSquadPage() {
         {error && (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
-{/* 
-        {dialogShow && (
-          <div className="absolute w-screen h-screen flex justify-center items-center bg-black/30">
-          <Dialog>
-            <div className="border border-white/10 bg-[color:var(--accent)]/20 rounded-2xl p-6 shadow-[0_0_25px_-10px_rgba(0,0,0,0.4)] backdrop-blur-md space-y-4 transition-all hover:shadow-[0_0_35px_-8px_var(--accent-button)]">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-semibold tracking-tight text-foreground">
-                    {name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Before you create, review the overview of your savings schedule
-                  </p>
-                </div>
 
-                <button
-                  onClick={() => setDialogShow(false)}
-                  className="text-sm font-medium text-[color:var(--accent-button)] hover:underline"
-                >
-                  Cancel
-                </button>
+
+        <Dialog open={dialogShow} onOpenChange={setDialogShow}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{name}</DialogTitle>
+              <DialogDescription>
+                Before you create, review the overview of your savings schedule
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid grid-cols-2 gap-y-3 text-sm text-muted-foreground pt-3 w-full">
+              <p className="capitalize">
+                <span className="font-medium text-foreground">Frequency: </span> {frequency}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Amount: </span>
+                ₦{Number(target).toLocaleString()}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Duration: </span> {durationNumber} {duration}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Number of Members: </span> {memberCount}
+              </p>
+              <p className="col-span-2">
+                <span className="font-medium  text-foreground">Weekly amount per member: </span>
+                ₦{Math.round(calculatedAmount).toLocaleString()}
+              </p>
+
+               <div>
+                <span className="font-medium text-foreground">Rewards: </span>
+                {
+                  selectedRewards.map((r, idx) => (
+                    <p key={idx}>{r}</p>
+                  ))
+                }
               </div>
-
-              <div className="grid grid-cols-2 gap-y-3 text-sm text-muted-foreground pt-3 w-full">
-  <p className="capitalize">
-    <span className="font-medium text-foreground ">Frequency: </span> {frequency}
-  </p>
-  <p>
-    <span className="font-medium text-foreground">Amount: </span>
-    ₦{Number(target).toLocaleString()}
-  </p>
-  <p>
-    <span className="font-medium text-foreground">Duration: </span> {durationNumber} {duration}
-  </p>
-  <p>
-    <span className="font-medium text-foreground">Number of Members: </span> {memberCount}
-  </p>
-  <p>
-    <span className="font-medium text-foreground">Weekly amount per member: </span>
-    ₦{Math.round(calculatedAmount).toLocaleString()}
-  </p>
-</div>
-
-              <div className="flex items-center justify-between pt-4">
-                <button
-                  onClick={createSquad}
-                  className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
-                >
-                  Submit
-                </button>
+               <div className="flex flex-col">
+                <span className="font-medium text-foreground">Penalties: </span> 
+                {
+                  selectedPenalties.map((r, idx) => (
+                    <p key={idx}>{r}</p>
+                  ))
+                }
               </div>
-
-
             </div>
-          </Dialog>
-          </div>
-        )} */}
 
-
-<Dialog open={dialogShow} onOpenChange={setDialogShow}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>{name}</DialogTitle>
-      <DialogDescription>
-        Before you create, review the overview of your savings schedule
-      </DialogDescription>
-    </DialogHeader>
-
-    <div className="grid grid-cols-2 gap-y-3 text-sm text-muted-foreground pt-3 w-full">
-      <p className="capitalize">
-        <span className="font-medium text-foreground">Frequency: </span> {frequency}
-      </p>
-      <p>
-        <span className="font-medium text-foreground">Amount: </span>
-        ₦{Number(target).toLocaleString()}
-      </p>
-      <p>
-        <span className="font-medium text-foreground">Duration: </span> {durationNumber} {duration}
-      </p>
-      <p>
-        <span className="font-medium text-foreground">Number of Members: </span> {memberCount}
-      </p>
-      <p>
-        <span className="font-medium text-foreground">Weekly amount per member: </span>
-        ₦{Math.round(calculatedAmount).toLocaleString()}
-      </p>
-    </div>
-
-    <div className="flex items-center justify-between pt-4">
-      <button
-        onClick={createSquad}
-        className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
-      >
-        Submit
-      </button>
-      {/* <button
+            <div className="flex items-center justify-between pt-4">
+              <button
+                onClick={createSquad}
+                className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
+              >
+                Submit
+              </button>
+              {/* <button
         onClick={() => setDialogShow(false)}
         className="text-sm font-medium text-[color:var(--accent-button)] hover:underline"
       >
         Cancel
       </button> */}
-    </div>
-  </DialogContent>
-</Dialog>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     );
   }

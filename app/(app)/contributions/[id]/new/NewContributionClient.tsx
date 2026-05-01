@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, differenceInWeeks, differenceInMonths } from "date-fns";
 import { cn } from "@/lib/utils";
+import { sq } from "date-fns/locale";
 
 /**
  * Minimal typed representation of Supabase user metadata we care about.
@@ -24,11 +25,14 @@ interface AuthUser {
   };
 }
 
+
+type RulesTypes = {
+  rewards: string[]
+  penalties: string[]
+};
+
 export default function NewContributionPlan({ squadId }: { squadId: string }) {
   const [plan, setPlan] = useState<PlanType | null>(null);
-  const [frequency, setFrequency] = useState<"weekly" | "bi-weekly" | "monthly">(
-    "weekly"
-  );
   const [amount, setAmount] = useState<number>(1000);
   const [squadName, setSquadName] = useState<string>('');
   const [type, setType] = useState<"pooled" | "personal">("pooled");
@@ -36,17 +40,24 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
   const [endDate, setEndDate] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState(true);
-
-  // typed user (no 'any')
+  const [editMode, setEditMode] = useState(true); 
   const [user, setUser] = useState<AuthUser | null>(null);
-
-  // squad metadata used for auto-calculation
   const [squadTarget, setSquadTarget] = useState<number>(0);
   const [squadStartDate, setSquadStartDate] = useState<number>(0);
   const [squadEndDate, setSquadEndDate] = useState<number>(0);
   const [memberCount, setMemberCount] = useState<number>(1);
   const [calculatedAmount, setCalculatedAmount] = useState<number>(0);
+    const [frequency, setFrequency] = useState<"weekly" | "monthly" | "yearly">(
+      "weekly"
+    );
+    const [rules, setRules] = useState<RulesTypes>({
+      rewards: ["Streak Badge", "Top Saver Badge", "Goal Crusher Badge"],
+      penalties: ["Lose streak if missed", "Funny reminder message", "Drop on leaderboard"]
+    })
+  const [duration, setDuration] = useState<"week(s)" | "month(s)" | "year(s)">(
+    "week(s)"
+  );;
+  const [durationNumber, setDurationNumber] = useState<number>();
 
   const router = useRouter();
 
@@ -102,11 +113,11 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
         setPlan(data);
         // seed form fields from existing plan
         if (data) {
-          setFrequency(data.frequency ?? "weekly");
-          setAmount(Number(data.amount ?? 1000));
-          setType(data.type ?? "pooled");
-          setStartDate(data.start_date ?? "");
-          setEndDate(data.end_date ?? "");
+          // setFrequency(data.frequency ?? "weekly");
+          // setAmount(Number(data.amount ?? 1000));
+          // setType(data.type ?? "pooled");
+          // setStartDate(data.start_date ?? "");
+          // setEndDate(data.end_date ?? "");
           setEditMode(false);
         }
       } catch (err) {
@@ -121,6 +132,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
     };
   }, [squadId]);
 
+        console.log(squadId, 'ssss')
   // Fetch squad target + member count for calculations (always top-level)
   useEffect(() => {
     if (!squadId) return;
@@ -129,18 +141,23 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
       try {
         const { data: squad } = await supabase
           .from("squads")
-          .select("target_amount, name, start_date, end_date")
+          .select("target_amount, name, duration, duration_number, member_count, frequency, rewards, penalties, amount_per_member")
           .eq("id", squadId)
           .single();
         const { data: members } = await supabase
           .from("squad_members")
           .select("id")
           .eq("squad_id", squadId);
-
+        console.log(squad, 'ssssaa')
         if (!mounted) return;
           setSquadName(squad?.name);
-          setSquadStartDate(squad?.start_date)
-          setSquadEndDate(squad?.end_date)
+          setFrequency(squad?.frequency ?? "weekly");
+          setAmount(Number(squad?.target_amount ?? 1000));
+          setCalculatedAmount(Number(squad?.amount_per_member ?? 1000))
+          setRules({rewards: squad?.rewards, penalties: squad?.penalties})
+          setMemberCount(squad?.member_count)
+          setDuration(squad?.duration)
+          setDurationNumber(squad?.duration_number)
         if (squad && typeof squad.target_amount === "number") {
           setSquadTarget(Number(squad.target_amount));
         } else if (squad && squad.target_amount != null) {
@@ -164,31 +181,31 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
   }, [squadId]);
 
   // Recalculate estimated per-member payment whenever dates/frequency/target/members change
-  useEffect(() => {
-    if (!startDate || !endDate || !squadTarget || !memberCount) {
-      setCalculatedAmount(0);
-      return;
-    }
+  // useEffect(() => {
+  //   if (!startDate || !endDate || !squadTarget || !memberCount) {
+  //     setCalculatedAmount(0);
+  //     return;
+  //   }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) {
-      setCalculatedAmount(0);
-      return;
-    }
+  //   const start = new Date(startDate);
+  //   const end = new Date(endDate);
+  //   if (isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) {
+  //     setCalculatedAmount(0);
+  //     return;
+  //   }
 
-    let periods = 1;
-    if (frequency === "weekly") {
-      periods = Math.max(1, differenceInWeeks(end, start));
-    } else if (frequency === "bi-weekly") {
-      periods = Math.max(1, Math.floor(differenceInWeeks(end, start) / 2));
-    } else if (frequency === "monthly") {
-      periods = Math.max(1, differenceInMonths(end, start));
-    }
+  //   let periods = 1;
+  //   if (frequency === "weekly") {
+  //     periods = Math.max(1, differenceInWeeks(end, start));
+  //   } else if (frequency === "bi-weekly") {
+  //     periods = Math.max(1, Math.floor(differenceInWeeks(end, start) / 2));
+  //   } else if (frequency === "monthly") {
+  //     periods = Math.max(1, differenceInMonths(end, start));
+  //   }
 
-    const perMember = squadTarget / Math.max(1, memberCount) / Math.max(1, periods);
-    setCalculatedAmount(perMember);
-  }, [startDate, endDate, squadTarget, memberCount, frequency]);
+  //   const perMember = squadTarget / Math.max(1, memberCount) / Math.max(1, periods);
+  //   setCalculatedAmount(perMember);
+  // }, [startDate, endDate, squadTarget, memberCount, frequency]);
 
   // ------------------ handlers that do not change hook order ------------------
 
@@ -338,6 +355,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
   // ------------------ UI ------------------
 
+        // console.log(squad, 'sssseee')
   // VIEW: existing plan
   if (!editMode && plan) {
     const approvedCount = plan.approvals?.length || 0;
@@ -366,13 +384,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 text-sm text-muted-foreground pt-3">
-          <p>
-            <span className="font-medium text-foreground">Type:</span> {plan.type}
-          </p>
-          <p>
-            <span className="font-medium text-foreground">Frequency:</span>{" "}
-            {plan.frequency}
-          </p>
+        
           {/* <p>
             <span className="font-medium text-foreground">Start:</span>{" "}
             {format(new Date(squadStartDate), "PPP")}
@@ -384,15 +396,44 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
 
           </p> */}
           <p className="col-span-2 sm:col-span-1">
-            <span className="font-medium text-foreground">Amount:</span> 
+            <span className="font-medium text-foreground">Amount: </span> 
             {/* ₦{Number(plan.amount).toLocaleString()} */}
             ₦{Number(squadTarget).toLocaleString()}
           </p>
+            <p>
+            <span className="font-medium text-foreground">Duration: </span> {duration} {durationNumber}
+          </p>
+          <p>
+            <span className="font-medium text-foreground">Frequency: </span>{" "}
+            {frequency}
+          </p>
           <p className="col-span-2 sm:col-span-1">
-            <span className="font-medium text-foreground">Weekly amount per member:</span> 
+            <span className="font-medium text-foreground">Weekly amount per member: </span> 
           ₦{Math.round(calculatedAmount).toLocaleString()}
           </p>
+          <p className="col-span-2 sm:col-span-1">
+            <span className="font-medium text-foreground">Number of members: </span> 
+          {memberCount}
+          </p>
+
+            <div>
+                <span className="font-medium text-foreground">Rewards: </span>
+                {
+                  rules?.rewards?.map((r, idx) => (
+                    <p key={idx}>{r}</p>
+                  ))
+                }
+              </div>
+               <div className="flex flex-col">
+                <span className="font-medium text-foreground">Penalties: </span> 
+                {
+                  rules?.penalties?.map((r, idx) => (
+                    <p key={idx}>{r}</p>
+                  ))
+                }
+              </div>
         </div>
+
 
         <div className="flex items-center justify-between pt-4">
           <a
@@ -441,7 +482,7 @@ export default function NewContributionPlan({ squadId }: { squadId: string }) {
       <select
         value={frequency}
         onChange={(e) =>
-          setFrequency(e.target.value as "weekly" | "bi-weekly" | "monthly")
+          setFrequency(e.target.value as "weekly" | "yearly" | "monthly")
         }
         className="w-full rounded-md border border-input px-3 py-2 bg-background"
       >

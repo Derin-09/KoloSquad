@@ -7,6 +7,7 @@ import { ContributionType, SquadIdType } from "@/types/types";
 import NewContributionPlan from "../../contributions/[id]/new/NewContributionClient";
 import Spinner from "@/app/loading";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
 interface ProfileType {
@@ -45,6 +46,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
   const [members, setMembers] = useState<MemberType[]>([]);
   const [contributions, setContributions] = useState<ContributionType[]>([]);
   const [totalSaved, setTotalSaved] = useState<number>(0);
+    const [dialogShow, setDialogShow] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -148,6 +150,10 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
     fetchData();
   }, [squadId]);
 
+  useEffect(()=> {
+    setDialogShow(true)
+  }, [squad])
+
   if (!squad) return <Spinner />;
 
 
@@ -173,8 +179,26 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
   
     console.log('aaa', members)
 
+   
+
   return (
     <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 space-y-12 animate-fadeIn">
+
+    {
+       dialogShow && (
+    <Dialog open={dialogShow} onOpenChange={setDialogShow}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{squad.name}</DialogTitle>
+              <DialogDescription>
+                Invite others with this code!
+              </DialogDescription>
+            </DialogHeader>
+              <p>{squad.invite_code}</p>
+          </DialogContent>
+        </Dialog>
+        )
+    }
       {/* Fixed Back Button */}
       <Link
         href="/squads"
