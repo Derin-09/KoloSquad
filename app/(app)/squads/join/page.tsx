@@ -29,32 +29,34 @@ export default function JoinSquadPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Sign in required");
 
-    // const { data: squad, error: qerr } = await supabase
-    //   .from("squads")
-    //   .select("id, invite_code")
-    //   // .eq("invite_code", code.trim().toUpperCase())
-    //   .ilike("invite_code", code.trim().toUpperCase())
-    //   .maybeSingle(); // handles not found gracefully
 
-    const { data: squad, error: qerr } = await supabase
-  .rpc("get_squad_by_code", { code: code.trim().toUpperCase() })
-  .single<SquadResult>();
+  //   const { data: squad, error: qerr } = await supabase
+  // .rpc("get_squad_by_code", { code: code.trim().toUpperCase() })
+  // .single<SquadResult>();
 
 
-      console.log("searching for code:", code.trim().toUpperCase());
+  //     console.log("searching for code:", code.trim().toUpperCase());
 
-    if (qerr) throw qerr;
-    console.log('sqyad', squad)
-    if (!squad) throw new Error("Invalid invite code");
+  //   if (qerr) throw qerr;
+  //   console.log('sqyad', squad)
+  //   if (!squad) throw new Error("Invalid invite code");
 
-    const { error: insertError } = await supabase.from("squad_members").insert([
-  {
-    squad_id: squad.id,
-    user_id: user.id,
-    role: "member",
-    display_name: user.user_metadata.full_name || user.email || "Anonymous"
-  }
-]);
+  const { data: squad, error } = await supabase.rpc("join_squad_by_code", {
+  code: code.trim().toUpperCase(),
+});
+
+if (error) {
+  console.log(error.message);
+}
+
+//     const { error: insertError } = await supabase.from("squad_members").insert([
+//   {
+//     squad_id: squad.id,
+//     user_id: user.id,
+//     role: "member",
+//     display_name: user.user_metadata.full_name || user.email || "Anonymous"
+//   }
+// ]);
 
     // await supabase
     //   .from("squad_members")
@@ -62,7 +64,7 @@ export default function JoinSquadPage() {
     //     { squad_id: squad.id, user_id: user.id, role: "member" },
     //     { onConflict: "squad_id,user_id" }
     //   );
-    if (insertError) throw insertError;
+    // if (insertError) throw insertError;
 
     router.replace("/dashboard");
   } catch (e) {

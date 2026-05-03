@@ -62,6 +62,13 @@ export default function NewSquadPage() {
   const [selectedRewards, setSelectedRewards] = useState<string[]>([]);
   const [selectedPenalties, setSelectedPenalties] = useState<string[]>([]);
 
+  
+  useEffect(() => {
+  const periods = calculatePeriods();
+  const calculatedAmount = target / memberCount / periods;
+  setAmountPerMember(calculatedAmount);
+}, [target, memberCount, duration, durationNumber, frequency]);
+
   const handleRewardChange = (reward: string) => {
     setSelectedRewards(prev =>
       prev.includes(reward)
@@ -97,18 +104,18 @@ export default function NewSquadPage() {
   };
 
 
-  useEffect(() => {
-    if (startDate && duration) {
-      const start = new Date(startDate);
-      const calculatedEndDate = new Date(start);
+  // useEffect(() => {
+  //   if (startDate && duration) {
+  //     const start = new Date(startDate);
+  //     const calculatedEndDate = new Date(start);
 
-      calculatedEndDate.setDate(start.getDate() + Number(duration));
+  //     calculatedEndDate.setDate(start.getDate() + Number(duration));
 
-      setEndDate(calculatedEndDate.toISOString());
-    } else {
-      setEndDate("");
-    }
-  }, [startDate, duration]);
+  //     setEndDate(calculatedEndDate.toISOString());
+  //   } else {
+  //     setEndDate("");
+  //   }
+  // }, [startDate, duration]);
 
   const createSquad = async () => {
     try {
@@ -132,7 +139,7 @@ export default function NewSquadPage() {
           duration,
           duration_number: durationNumber,
           member_count: memberCount,
-        amount_per_member: amountPerMember,
+          amount_per_member: amountPerMember,
           frequency,
           rewards: selectedRewards,
           penalties: selectedPenalties,
@@ -205,7 +212,7 @@ export default function NewSquadPage() {
 
   const periods = calculatePeriods();
   const calculatedAmount = target / memberCount / periods;
-  setAmountPerMember(calculatedAmount)
+  // setAmountPerMember(calculatedAmount)
   if (!contribShow) {
     return (
       <main className="max-w-md mx-aut space-y-4">
