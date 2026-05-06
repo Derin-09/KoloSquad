@@ -31,16 +31,11 @@ const SquadList: React.FC<SquadListProps> = ({ squads }) => {
 
 
     return (
-        <div className=''>
-            {squads.map((squad, idx) => {
-
-                // console.log(allMemberIds, 'members')
-                return (
+            <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-[color:var(--accent)] scrollbar-track-transparent">
+                {squads.slice(0, 5).map((squad, idx) => (
                     <SquadCard key={idx} {...squad} members={getMemberProfiles(squad.members)} />
-                )
-            })}
-        </div>
-    );
-};
+                ))}
+            </div>
+)};
 
 export default SquadList;
