@@ -3,12 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
+
 import { Card } from "@/components/ui/Card";
 import { SimpleBars } from "@/components/charts/SimpleBars";
-import { Donut } from "@/components/charts/Donut";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useRouter } from "next/navigation";
 import Spinner from "@/app/loading";
+import UserProfile from "@/components/pages/dashboard/UserProfile";
+import Alert from "@/components/pages/dashboard/Alert";
+import ContributionOverview from "@/components/pages/dashboard/ContributionOverview";
+import SquadList from "@/components/pages/dashboard/SquadList";
+import ContributionsSection from "@/components/pages/dashboard/ContributionsSection";
 
 
 type Contribution = { amount: number; status: string };
@@ -62,8 +67,8 @@ export default function DashboardPage() {
         //   .select("id, name, target_amount, invite_code, contributions:contributions(amount,status), members:squad_members(user_id)").or(`created_by.eq.${user.id},squad_members.user_id.eq.${user.id}`)
         //   .order("created_at", { ascending: false });
         const { data, error } = await supabase
-  .rpc("get_user_squads", { user_uuid: user.id });
-  const squads: Squad[] = (data || []) as Squad[];
+          .rpc("get_user_squads", { user_uuid: user.id });
+        const squads: Squad[] = (data || []) as Squad[];
         if (error) throw error;
 
         const withBalance = (squads || []).map((s) => ({
@@ -177,126 +182,69 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
+
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="text-sm">Hey, Saver!</div>
-            <h1 className="text-xl sm:text-2xl font-semibold">
-              You saved ₦{totals.totalSaved.toLocaleString()} this month.
-            </h1>
-          </div>
-          <div className="flex gap-2 items-center">
-          <div className="flex px-1 md:px-3 py-2 rounded-md text-[color:var(--accent)]/70 md:bg-black md:text-white md:dark:bg-white md:dark:text-black ">
-            <Link href="/squads/new" className="px-3 py-2">
-              New Squad
-            </Link>
-          </div>
-          <div className="flex px-1 md:px-3 py-2 rounded-md text-[color:var(--accent)]/70 md:bg-black md:text-white md:dark:bg-white md:dark:text-black ">
-            <Link href="/squads/join" className="px-3 py-2">
-              Join Squad
-            </Link>
-          </div>
-          </div>
-        </div>
+        {/* User Profile Section */}
+        <UserProfile username="SaverPro" level="Level 4 Saver 🔥" progress={80} />
 
-        {loading && <Spinner/>}
-        {error && (
-          <div className="card p-3">
-            <p className="text-red-600 dark:text-red-400 mb-3">{error}</p>
-            {error.includes("verify your email") && (
-              <button
-                onClick={async () => {
-                  try {
-                    const { data: userData } = await supabase.auth.getUser();
-                    const em = userData?.user?.email;
-                    if (em) await supabase.auth.resend({ type: "signup", email: em });
-                  } catch { }
-                }}
-                className="rounded-md bg-black text-white dark:bg-white dark:text-black px-3 py-2"
-              >
-                Resend verification email
-              </button>
-            )}
-          </div>
-        )}
+        {/* Alert Section (example: due contribution) */}
+        {/* <Alert message="Contribution due tomorrow (Rent Squad)" /> */}
 
-        <Card>
+
+        {loading && <Spinner />}
+        {error && <Alert message={error} />}
+
+        {/* Contribution Overview Section */}
+        {/* <ContributionOverview
+          saved={totals.totalSaved}
+          target={totals.totalTarget}
+          contribs={totals.totalContribs}
+          squads={squads.length}
+          streak={6} // Placeholder, replace with actual streak logic
+        /> */}
+        <ContributionsSection
+          saved={totals.totalSaved}
+          target={totals.totalTarget}
+          contribs={totals.totalContribs}
+          squads={squads.length}
+          streak={6} // Placeholder, replace with actual streak logic
+        />
+
+        {/* Chart Section */}
+        {/* <Card>
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm opacity-70">Last 30 days</div>
             <span className="badge-soft">Overview</span>
           </div>
           <SimpleBars data={weekData} labels={weekLabels} height={180} />
-        </Card>
+        </Card> */}
 
-        <div className="grid lg:grid-cols-2 gap-4">
-          <Card>
-            <div className="text-sm font-medium mb-2">Success rate</div>
-            <Donut
-              value={totals.totalContribs}
-              total={Math.max(totals.totalContribs, 150)}
-              label="Successful contributions"
-            />
-          </Card>
-
-          <Card>
-            <div className="text-sm font-medium mb-3">Your Squads</div>
-            <div className="flex flex-col gap-3 max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-[color:var(--accent)] scrollbar-track-transparent">
-              {squads.map((s) => (
-                <Link key={s.id} href={`/squads/${s.id}`} className="card p-3 space-y-2 hover:cursor-pointer block">
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold">{s.name}</div>
-                    <div className="text-xs opacity-70 flex items-center gap-2">
-                      <span>Invite: {s.invite_code}</span>
-                      <button
-                        className={`underline transition-colors duration-200 ${copiedCode === s.invite_code ? "text-[color:var(--accent)]" : ""
-                          }`}
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleCopy(s.invite_code)
-                        }}
-                      >
-                        {copiedCode === s.invite_code ? "Copied!" : "Copy code"}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="text-sm flex justify-between">
-                    <span>Saved</span>
-                    <span>
-                      ₦{s.balance.toLocaleString()} / ₦
-                      {(s.target_amount || 0).toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="h-2 rounded bg-black/10 dark:bg-white/10">
-                    <div
-                      className="h-2 rounded bg-[color:var(--accent)]"
-                      style={{
-                        width: `${Math.min(
-                          100,
-                          ((s.balance || 0) / Math.max(1, s.target_amount)) * 100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between mt-2 text-xs opacity-70">
-                    <span>
-                      {(s.members || []).length} member
-                      {(s.members || []).length === 1 ? "" : "s"}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-
-              {!loading && squads.length === 0 && (
-                <div className="text-sm opacity-80">
-                  No squads yet. <Link href={"/squads/new"} className="hover:cursor-pointer"> Create your first squad.</Link>
-                </div>
-              )}
+        {/* Your Squads Section */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-lg font-semibold">Your Squads</div>
+              <Link href="/squads" className="text-sm underline">See All</Link>
             </div>
-          </Card>
+            <SquadList
+              squads={squads.map((s) => ({
+                full_name: s.name,
+                due: "Dec 12", // Placeholder, replace with actual due date
+                saved: s.balance,
+                target: s.target_amount,
+                members: (s.members || []).map((m) => m.user_id),
+                percent: Math.round(((s.balance || 0) / Math.max(1, s.target_amount)) * 100),
+                active: true,
+              }))}
+            />
+          </div>
 
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-lg font-semibold">Recent</div>
+            </div>
+            <Card>Recents</Card>
+          </div>
         </div>
       </div>
     </ProtectedRoute>
