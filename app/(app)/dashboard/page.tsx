@@ -14,6 +14,13 @@ import Alert from "@/components/pages/dashboard/Alert";
 import ContributionOverview from "@/components/pages/dashboard/ContributionOverview";
 import SquadList from "@/components/pages/dashboard/SquadList";
 import ContributionsSection from "@/components/pages/dashboard/ContributionsSection";
+import Badges from "@/components/pages/dashboard/Badges";
+import { Button } from "@/components/ui/button";
+import { Bolt, Link2, Plus, PlusCircle, Zap } from "lucide-react";
+import { SiFlashforge, SiThunderstore } from "react-icons/si";
+import WeeklyChallenges from "@/components/pages/dashboard/WeeklyChallenges";
+import Leaderboard from "@/components/pages/dashboard/Leaderboard";
+import Activity from "@/components/pages/dashboard/Activity";
 
 
 type Contribution = { amount: number; status: string };
@@ -195,20 +202,45 @@ export default function DashboardPage() {
         {error && <Alert message={error} />}
 
         {/* Contribution Overview Section */}
-        {/* <ContributionOverview
-          saved={totals.totalSaved}
-          target={totals.totalTarget}
-          contribs={totals.totalContribs}
-          squads={squads.length}
-          streak={6} // Placeholder, replace with actual streak logic
-        /> */}
-        <ContributionsSection
-          saved={totals.totalSaved}
-          target={totals.totalTarget}
-          contribs={totals.totalContribs}
-          squads={squads.length}
-          streak={6} // Placeholder, replace with actual streak logic
-        />
+        <div className="flex gap-6 w-full">
+          <div className="flex-6">
+            <ContributionsSection
+              saved={totals.totalSaved}
+              target={totals.totalTarget}
+              contribs={totals.totalContribs}
+              squads={squads.length}
+              streak={6} // Placeholder, replace with actual streak logic
+            />
+          </div>
+          <div className="flex-4">
+            <Badges />
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <Button onClick={() => router.push('/squads/new')} className="flex items-center gap-2">
+            <PlusCircle />
+            <p>Create Squad</p>
+          </Button>
+          <Button variant={'secondary'} onClick={() => router.push('/squads/join')} className="flex items-center gap-2">
+            <Link2 />
+            <p>Join Squad</p>
+          </Button>
+          <Button variant={'secondary'} onClick={() => router.push('/squads')} className="flex items-center gap-2">
+            <Zap />
+            <p>Quick Contribute</p>
+          </Button>
+        </div>
+
+        <div className="flex gap-6 w-full">
+          <div className="flex-6">
+            <WeeklyChallenges
+            />
+          </div>
+          <div className="flex-4">
+            <Leaderboard />
+          </div>
+        </div>
 
         {/* Chart Section */}
         {/* <Card>
@@ -240,10 +272,7 @@ export default function DashboardPage() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-lg font-semibold">Recent</div>
-            </div>
-            <Card>Recents</Card>
+            <Activity />
           </div>
         </div>
       </div>
