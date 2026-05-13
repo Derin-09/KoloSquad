@@ -59,7 +59,6 @@ export interface Squad {
   members: Member[] | null;
 }
 
-
 export interface SquadIdType {
     id: string
     name: string
@@ -108,3 +107,31 @@ export interface MemberType {
         avatar_url?: string | null
     }
 }
+
+
+export interface BadgeType {
+  user_id: string;
+  squad_id: string;
+  awarded_at: string;
+  type: string;
+}
+export interface ChallengesType {
+  title: string;
+  type: string;
+  xp_award: number;
+}
+export interface LeaderboardType {
+  user_id: string;
+  squad_id: string;
+  full_name: string;
+  total_contributed: number;
+}
+export interface ActivitiesType {
+  user_id: string;
+  squad_id: string;
+  type: string;
+  title: string;
+  metadata: string;
+  created_at: string;
+}
+

@@ -12,11 +12,11 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) => {
       const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
       const user = useAuthStore((state) => state.user);
-      const fetchUser = useAuthStore((state) => state.fetchUser);
+    //   const fetchUser = useAuthStore((state) => state.fetchUser);
 
-    useEffect(() => {
-        void fetchUser();
-      }, [fetchUser]);
+    // useEffect(() => {
+    //     void fetchUser();
+    //   }, [fetchUser]);
 
       useEffect(() => {
         setAvatarUrl(user?.user_metadata?.avatar_url ?? null);

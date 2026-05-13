@@ -22,6 +22,7 @@ import Link from "next/link";
 import { Logo } from "../Logo";
 import Image from "next/image";
 import { data } from "framer-motion/client";
+import { useAuthStore } from "@/stores/auth-store";
 
 const mobileNavItems = [
   { text: "Dashboard", logo: LayoutDashboard, link: "/dashboard" },
@@ -42,6 +43,7 @@ export default function Topbar() {
   const router = useRouter();
   const pathname = usePathname();
   const segments = pathname?.split("/").filter(Boolean) || []
+  const data = useAuthStore((state) => state.user)
 
 
 
@@ -102,8 +104,8 @@ const breadcrumbs = segments.map((seg, idx) => {
 
   useEffect(() => {
     const getUserAvatar = async () => {
-      const { data } = await supabase.auth.getUser();
-      const user = data.user;
+      // const { data } = await supabase.auth.getUser();
+      const user = data
       if (user?.user_metadata?.avatar_url) {
         setAvatarUrl(user.user_metadata.avatar_url);
       }
@@ -118,7 +120,7 @@ const breadcrumbs = segments.map((seg, idx) => {
     return () => {
       listener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [data]);
 
   return (
     <header className="sticky top-0 z-30 bg-[color:var(--background)]/80 backdrop-blur-md border-b border-[color:var(--border)]">

@@ -22,15 +22,21 @@ import WeeklyChallenges from "@/components/pages/dashboard/WeeklyChallenges";
 import Leaderboard from "@/components/pages/dashboard/Leaderboard";
 import Activity from "@/components/pages/dashboard/Activity";
 import { useSquadStore } from "@/stores/squad-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { useDashboardStore } from "@/stores/dashboard-store";
 
 
 export default function DashboardPage() {
   // const [squads, setSquads] = useState<Squad[]>([]);
   const [error, setError] = useState<string | null>(null);
+  // const [dashboardData, setDashboardData] = useState(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const router = useRouter();
 
   const squads = useSquadStore((state) => state.stats)
+  // const user = useAuthStore((state) => state.user)
+  // const dashboardData = useDashboardStore((state) => state.dashboardData)
+  // const fetchDashboard = useDashboardStore((state) => state.fetchDashboard)
   const { isLoading, isError, refreshSquads, startRealtime, stopRealtime } = useSquadStore()
 
   useEffect(() => {
@@ -41,6 +47,20 @@ export default function DashboardPage() {
       stopRealtime()
     }
   }, [refreshSquads, startRealtime, stopRealtime])
+
+  // useEffect(() => {
+  //   // const fetchDashboard = async () => {
+  //   //   const { data } = await supabase
+  //   //     .from("dashboard_stats")
+  //   //     .select("*")
+  //   //     .eq("user_id", user?.id)
+  //   //     .single();
+
+  //   //     setDashboardData(data);
+  //   // }
+  //   user && fetchDashboard(user?.id);
+
+  // }, [])
 
   const squadsList = squads ?? [];
 
@@ -62,10 +82,11 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+
   return (
     <ProtectedRoute>
 
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-7xl mx-auto">
         {/* User Profile Section */}
         <UserProfile username="SaverPro" level="Level 4 Saver 🔥" progress={80} />
 
