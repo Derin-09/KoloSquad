@@ -1,9 +1,62 @@
+export type Contribution = { amount: number; status: string };
+export type Member = { user_id: string };
+
+export interface UserType {
+    id: string;
+    aud: string;
+    role: string;
+    email: string;
+    phone: string;
+    email_confirmed_at: string | null;
+    phone_confirmed_at?: string | null;
+    confirmation_sent_at: string | null;
+    confirmed_at: string | null;
+    last_sign_in_at: string | null;
+    created_at: string;
+    updated_at: string;
+    is_anonymous: boolean;
+    app_metadata: {
+        provider: string;
+        providers: string[];
+    };
+    user_metadata: {
+        avatar_url: string | null;
+        email: string;
+        email_verified: boolean;
+        full_name: string | null;
+        phone_verified: boolean;
+        squad_nickname: string | null;
+        sub: string;
+    };
+    identities: Array<{
+        identity_id: string;
+        id: string;
+        user_id: string;
+        identity_data: {
+            email: string;
+            email_verified: boolean;
+            full_name: string | null;
+            phone_verified: boolean;
+            sub: string;
+        };
+        provider: string;
+        last_sign_in_at: string | null;
+        created_at: string;
+        updated_at: string;
+        email: string;
+    }>;
+}
+
+
+
 export interface Squad {
-    id: string
-    name: string
-    target_amount: number | null
-    created_at: string
-    invite_code: string
+  id: string;
+  name: string;
+  target_amount: number;
+  balance: number;
+  invite_code: string;
+  contributions: Contribution[] | null;
+  members: Member[] | null;
 }
 
 

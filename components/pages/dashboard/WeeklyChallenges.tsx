@@ -25,7 +25,7 @@ const WeeklyChallenges = () => {
         <div className='flex flex-col gap-2'>
             {
                 challengesDetails.map((c, idx) => (
-                    <Card className='rounded-2xl p-6 border border-gray-400 flex justify-between items-center'>
+                    <Card key={idx} className='rounded-2xl p-6 border border-gray-400 flex justify-between items-center'>
                         <div className='flex flex-col '>
                             <p>{c.text}</p>
                             <p className='text-sm text-gray-400'>{c.xp}XP</p>

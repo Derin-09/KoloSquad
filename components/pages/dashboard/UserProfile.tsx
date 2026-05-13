@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { supabase } from '@/lib/supabase/client';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface UserProfileProps {
     username: string;
@@ -11,25 +11,16 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) => {
       const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+      const user = useAuthStore((state) => state.user);
+      const fetchUser = useAuthStore((state) => state.fetchUser);
+
     useEffect(() => {
-        const getUserAvatar = async () => {
-          const { data } = await supabase.auth.getUser();
-          const user = data.user;
-          if (user?.user_metadata?.avatar_url) {
-            setAvatarUrl(user.user_metadata.avatar_url);
-          }
-        };
-    
-        getUserAvatar();
-    
-        const { data: listener } = supabase.auth.onAuthStateChange(() => {
-          getUserAvatar();
-        });
-    
-        return () => {
-          listener?.subscription.unsubscribe();
-        };
-      }, []);
+        void fetchUser();
+      }, [fetchUser]);
+
+      useEffect(() => {
+        setAvatarUrl(user?.user_metadata?.avatar_url ?? null);
+      }, [user]);
     return (
     <Card className="flex items-center gap-4 p-4">
         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold overflow-hidden">
@@ -42,7 +33,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) 
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-[color:var(--accent)]" />
+                <div className="w-full h-full bg-accent" />
               )}
         </div>
         <div className="flex-1">
@@ -52,7 +43,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) 
             </div>
             <div className="flex items-center gap-2">
                 <div className="w-full bg-gray-300 rounded h-2 overflow-hidden">
-                    <div className="bg-[color:var(--accent)] h-2 rounded" style={{ width: `${progress}%` }} />
+                    <div className="bg-accent h-2 rounded" style={{ width: `${progress}%` }} />
                 </div>
             </div>
         </div>
