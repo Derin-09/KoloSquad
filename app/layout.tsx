@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 import { Suspense } from "react";
 import Spinner from "./loading";
@@ -56,12 +57,14 @@ export default function RootLayout({
         />
       </head>
       <body className={`${montserrat.className} antialiased`}>
-        <ThemeProvider
-          defaultTheme="system"
-          storageKey="kolosquad-theme"
-        >
-          <Suspense fallback={<Spinner />}>{children}</Suspense>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            defaultTheme="system"
+            storageKey="kolosquad-theme"
+          >
+            <Suspense fallback={<Spinner />}>{children}</Suspense>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

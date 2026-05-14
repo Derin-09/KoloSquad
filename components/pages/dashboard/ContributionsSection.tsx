@@ -17,11 +17,12 @@ interface ContributionOverviewProps {
   contribs: number;
   squads: number;
   streak: number;
+  className?: string
 }
-const ContributionsSection = ({ saved, target, contribs, squads, streak  }: ContributionOverviewProps) => {
+const ContributionsSection = ({ saved, target, contribs, squads, streak, className  }: ContributionOverviewProps) => {
     const details = [
         {
-            text: "Contributions",
+            text: "Contribs",
             number: contribs
         },
          {
@@ -34,7 +35,6 @@ const ContributionsSection = ({ saved, target, contribs, squads, streak  }: Cont
         }
     ]
     return (
-        <div>
             <Card>
                 <div className="text-sm font-medium mb-2">Success rate</div>
                 <div className='flex h-full items-center'>
@@ -58,7 +58,6 @@ const ContributionsSection = ({ saved, target, contribs, squads, streak  }: Cont
                 </div>
                 </div>
             </Card>
-        </div>
     )
 }
 

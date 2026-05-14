@@ -45,7 +45,7 @@ const SquadCard: React.FC<SquadCardProps> = ({ full_name, due, saved, target, me
                                     alt={m.full_name || 'User'}
                                     width={28}
                                     height={28}
-                                    className="rounded-full object-cover border-2 border-white shadow"
+                                    className="rounded-full w-8 h-8 object-cover border-2 border-white shadow"
                                     title={m.full_name}
                                 />
                             </span>

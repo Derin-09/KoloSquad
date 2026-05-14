@@ -1,4 +1,4 @@
-export function Donut({ value, total, size = 200, label }: { value: number; total: number; size?: number; label?: string }) {
+export function Donut({ value, total, size = 150, label }: { value: number; total: number; size?: number; label?: string }) {
   const pct = Math.round((value / Math.max(1, total)) * 100);
   const stroke = `conic-gradient(var(--success) ${pct}%, rgba(0,0,0,0.08) 0)`;
   return (

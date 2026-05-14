@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
+import AppInitializer from "@/components/app-initializer";
 
 
 
@@ -23,7 +24,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
         <Topbar />
-        <main className="flex-1 min-w-0 p-3 md:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 min-w-0 p-3 md:p-6 lg:p-8">
+          <AppInitializer />
+          {children}
+          </main>
       </div>
     </div>
   );

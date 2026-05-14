@@ -8,67 +8,27 @@ import JoinSquadPage from "./join/page"
 import Link from "next/link"
 import { User, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-
-interface Squad {
-  id: string
-  name: string
-  memberCount: number
-  target_amount?: number;
-  balance?: number;
-}
+import { useQueryClient } from "@tanstack/react-query"
+import {  useSquadStore } from "@/stores/squad-store"
+import { useAuthStore } from "@/stores/auth-store"
 
 export default function SquadsPage() {
-  const [squads, setSquads] = useState<Squad[]>([])
   const [activeTab, setActiveTab] = useState<"create" | "join">("create")
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const squads = useSquadStore((state) => state.stats)
+  const fetchSquad = useSquadStore((state) => state.fetchSquad)
+  const user = useAuthStore((state) => state.user)
 
-  useEffect(() => {
-    async function fetchSquads() {
-      // get user
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
 
-      // fetch squads where user is a member
-      const { data: memberData, error: memberError } = await supabase
-        .from("squad_members")
-        .select("squad_id")
-        .eq("user_id", user.id)
-
-      if (memberError || !memberData) {
-        console.error("Error fetching user squads:", memberError)
-        return
-      }
-
-      const squadIds = memberData.map((m) => m.squad_id)
-
-      // fetch squad info + member counts
-      const { data: squadData, error: squadError } = await supabase
-        .from("squads")
-        .select("id, name")
-        .in("id", squadIds)
-
-      if (squadError || !squadData) {
-        console.error("Error fetching squads:", squadError)
-        return
-      }
-
-      // get member count for each squad
-      const enriched = await Promise.all(
-        squadData.map(async (squad) => {
-          const { count } = await supabase
-            .from("squad_members")
-            .select("*", { count: "exact", head: true })
-            .eq("squad_id", squad.id)
-          return { ...squad, memberCount: count || 0 }
-        })
-      )
-
-      setSquads(enriched)
-    }
-
-    fetchSquads()
-  }, [])
-
+  const {
+    isLoading,
+    isError
+  } = useSquadStore()
+useEffect(() => {
+    user && fetchSquad(user?.id);
+  }, [fetchSquad, user?.id])
+  const showLoading = isLoading && (!squads || squads.length === 0)
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this squad?")) return
 
@@ -89,8 +49,7 @@ export default function SquadsPage() {
       const { error } = await supabase.from("squads").delete().eq("id", id)
       if (error) throw error
 
-      // instantly update UI
-      setSquads((prev) => prev.filter((s) => s.id !== id))
+      await queryClient.invalidateQueries({ queryKey: ["user-squads"] })
       alert("Squad deleted successfully")
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to delete squad")
@@ -103,13 +62,17 @@ export default function SquadsPage() {
       <div>
         <h1 className="text-2xl font-semibold mb-4">Your Squads</h1>
 
-        {squads.length === 0 ? (
+        {showLoading ? (
+          <p className="text-muted-foreground">Loading squads...</p>
+        ) : isError ? (
+          <p className="text-red-500">Could not load squads. Please refresh.</p>
+        ) : squads && squads.length === 0 ? (
           <p className="text-muted-foreground">
             You&apos;re not in any squads yet. Create or join one to get started!
           </p>
         ) : (
           <div className="space-y-3 md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:space-y-0 text-[#1d1333]">
-            {squads.map((squad) => (
+            {squads && squads.map((squad) => (
               <div
                 key={squad.id}
                 className="relative block bg-accent rounded-xl p-4 hover:bg-muted transition group"
@@ -118,7 +81,7 @@ export default function SquadsPage() {
                     <p className="font-medium capitalize text-[18px]">{squad.name}</p>
                     <div className="flex items-center gap-2">
                       <User size={15} />
-                      <p>{squad.memberCount}</p>
+                      <p>{squad.members?.length || 0}</p>
                     </div>
                   </div>
                   <div className="fle flex-col items-center justify-center">
@@ -141,7 +104,7 @@ export default function SquadsPage() {
                       </Link>
                       <div
                         // href={`/contribute?squadId=${s.id}`}
-                        className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+                        className="rounded-md bg-(--accent-button) text-accent-foreground px-2 py-1"
                         onClick={(e) => {
                           e.stopPropagation();
                           router.push(`/contribute?squadId=${squad.id}`);
@@ -183,7 +146,7 @@ export default function SquadsPage() {
           ))}
 
           <motion.div
-            className="absolute bottom-0 h-[2px] w-[50px] bg-purple-500"
+            className="absolute bottom-0 h-0.5 w-12.5 bg-purple-500"
             layoutId="underline"
             initial={false}
             animate={{
@@ -194,7 +157,7 @@ export default function SquadsPage() {
           />
         </div>
 
-        <div className="relative overflow-hidden min-h-[250px] mt-6">
+        <div className="relative overflow-hidden min-h-62.5 mt-6">
           <AnimatePresence mode="wait">
             {activeTab === "create" ? (
               <motion.div
