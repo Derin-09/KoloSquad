@@ -53,10 +53,10 @@ export interface Squad {
   id: string;
   name: string;
   target_amount: number;
-  balance: number;
+  balance?: number;
   invite_code: string;
-  contributions: Contribution[] | null;
-  members: Member[] | null;
+  contributions?: Contribution[] | null;
+  members?: Member[] | null;
 }
 
 export interface SquadIdType {
