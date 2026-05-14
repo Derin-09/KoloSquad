@@ -25,6 +25,15 @@ export default function AppInitializer() {
 //   );
 
   useEffect(() => {
+    async function runForUser(userId: string) {
+      await Promise.all([
+        // fetchDashboard(user.id),
+        fetchSquads(userId),
+        fetchUser(),
+        // fetchActivities(user.id),
+      ]);
+    }
+
     async function init() {
       const {
         data: { user },
@@ -32,16 +41,22 @@ export default function AppInitializer() {
 
       if (!user) return;
 
-      await Promise.all([
-        // fetchDashboard(user.id),
-        fetchSquads(user.id),
-        fetchUser(),
-        // fetchActivities(user.id),
-      ]);
+      await runForUser(user.id);
     }
 
     init();
-  }, []);
+
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const userId = session?.user?.id;
+      if (!userId) return;
+
+      await runForUser(userId);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, [fetchSquads, fetchUser]);
 
   return null;
 }

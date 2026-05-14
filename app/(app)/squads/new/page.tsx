@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import NewContributionPlan from "../../contributions/[id]/new/NewContributionClient";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -12,6 +11,8 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Spinner from "@/app/loading";
+import { useSquadStore } from "@/stores/squad-store";
+import { useAuthStore } from "@/stores/auth-store";
 
 
 
@@ -37,6 +38,8 @@ const getStep = (value: number) => {
 
 export default function NewSquadPage() {
   const router = useRouter();
+  const createSquadInStore = useSquadStore((state) => state.createSquad);
+  const user = useAuthStore((state) => state.user);
   const [name, setName] = useState("");
   const [createdSquad, setCreatedSquad] = useState<Squad | null>(null);
   const [duration, setDuration] = useState<"week(s)" | "month(s)" | "year(s)">(
@@ -85,9 +88,6 @@ export default function NewSquadPage() {
     );
   };
 
-  if (loading) {
-  return <Spinner />; // Or whatever your loading UI is
-}
   const handleStartDateSelect = (date: Date | undefined) => {
     if (!date) return;
     const today = new Date();
@@ -121,55 +121,21 @@ export default function NewSquadPage() {
     try {
       setLoading(true);
       setError(null);
-      
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Sign in required");
 
-      const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+      if (!user?.id) throw new Error("Sign in required");
 
-      const { data: squad, error: squadError } = await supabase
-        .from("squads")
-        .insert({
-          name,
-          target_amount: target,
-          invite_code: inviteCode,
-          created_by: user.id,
-          duration,
-          duration_number: durationNumber,
-          member_count: memberCount,
-          amount_per_member: amountPerMember,
-          frequency,
-          rewards: selectedRewards,
-          penalties: selectedPenalties,
-        })
-        .select()
-        .single();
-
-      if (squadError) throw squadError;
-
-      const { error: memberError } = await supabase.from("squad_members").insert({
-        squad_id: squad.id,
-        user_id: user.id,
-        role: "owner",
+      const squad = await createSquadInStore({
+        userId: user.id,
+        name,
+        targetAmount: target,
+        duration,
+        durationNumber,
+        memberCount,
+        amountPerMember,
+        frequency,
+        rewards: selectedRewards,
+        penalties: selectedPenalties,
       });
-
-      if (memberError) throw memberError;
-
-      const { error: planError } = await supabase.from("contribution_plans").insert({
-        squad_id: squad.id,
-        created_by: user.id,
-        user_id: user.id,
-        frequency: "weekly", // defaults
-        amount: 1000,
-        type: "pooled",
-        start_date: new Date().toISOString().split("T")[0],
-        next_due_date: new Date().toISOString().split("T")[0],
-        end_date: new Date().toISOString().split("T")[0]
-      });
-
-      if (planError) throw planError;
 
       router.replace(`/squads/${squad.id}`);
       // router.replace(`/contributions/${squad.id}/new`);
@@ -442,9 +408,10 @@ export default function NewSquadPage() {
             <div className="flex items-center justify-between pt-4">
               <button
                 onClick={createSquad}
+                disabled={loading}
                 className="inline-block rounded-lg bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-4 py-2 font-medium text-sm tracking-wide hover:opacity-90 transition"
               >
-                Submit
+                {loading ? "Submitting..." : "Submit"}
               </button>
               {/* <button
         onClick={() => setDialogShow(false)}

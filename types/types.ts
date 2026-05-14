@@ -113,7 +113,15 @@ export interface BadgeType {
   user_id: string;
   squad_id: string;
   awarded_at: string;
-  type: string;
+  code: string;
+}
+
+export interface BadgeCatalogType {
+    code: string;
+    title: string;
+    description: string | null;
+    icon: string | null;
+    xp_reward: number | null;
 }
 export interface ChallengesType {
   title: string;

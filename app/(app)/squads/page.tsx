@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
 import NewSquadPage from "./new/page"
@@ -10,18 +10,25 @@ import { User, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import {  useSquadStore } from "@/stores/squad-store"
+import { useAuthStore } from "@/stores/auth-store"
 
 export default function SquadsPage() {
   const [activeTab, setActiveTab] = useState<"create" | "join">("create")
   const router = useRouter()
   const queryClient = useQueryClient()
   const squads = useSquadStore((state) => state.stats)
+  const fetchSquad = useSquadStore((state) => state.fetchSquad)
+  const user = useAuthStore((state) => state.user)
+
 
   const {
     isLoading,
     isError
   } = useSquadStore()
-
+useEffect(() => {
+    user && fetchSquad(user?.id);
+  }, [fetchSquad, user?.id])
+  const showLoading = isLoading && (!squads || squads.length === 0)
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this squad?")) return
 
@@ -55,7 +62,7 @@ export default function SquadsPage() {
       <div>
         <h1 className="text-2xl font-semibold mb-4">Your Squads</h1>
 
-        {isLoading ? (
+        {showLoading ? (
           <p className="text-muted-foreground">Loading squads...</p>
         ) : isError ? (
           <p className="text-red-500">Could not load squads. Please refresh.</p>
@@ -97,7 +104,7 @@ export default function SquadsPage() {
                       </Link>
                       <div
                         // href={`/contribute?squadId=${s.id}`}
-                        className="rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-2 py-1"
+                        className="rounded-md bg-(--accent-button) text-accent-foreground px-2 py-1"
                         onClick={(e) => {
                           e.stopPropagation();
                           router.push(`/contribute?squadId=${squad.id}`);
@@ -139,7 +146,7 @@ export default function SquadsPage() {
           ))}
 
           <motion.div
-            className="absolute bottom-0 h-[2px] w-[50px] bg-purple-500"
+            className="absolute bottom-0 h-0.5 w-12.5 bg-purple-500"
             layoutId="underline"
             initial={false}
             animate={{
@@ -150,7 +157,7 @@ export default function SquadsPage() {
           />
         </div>
 
-        <div className="relative overflow-hidden min-h-[250px] mt-6">
+        <div className="relative overflow-hidden min-h-62.5 mt-6">
           <AnimatePresence mode="wait">
             {activeTab === "create" ? (
               <motion.div

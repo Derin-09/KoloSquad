@@ -34,9 +34,9 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const squads = useSquadStore((state) => state.stats)
-  // const user = useAuthStore((state) => state.user)
-  // const dashboardData = useDashboardStore((state) => state.dashboardData)
-  // const fetchDashboard = useDashboardStore((state) => state.fetchDashboard)
+  const user = useAuthStore((state) => state.user)
+  const dashboardData = useDashboardStore((state) => state.dashboardData)
+  const fetchDashboard = useDashboardStore((state) => state.fetchDashboard)
   const { isLoading, isError, refreshSquads, startRealtime, stopRealtime } = useSquadStore()
 
   useEffect(() => {
@@ -48,28 +48,25 @@ export default function DashboardPage() {
     }
   }, [refreshSquads, startRealtime, stopRealtime])
 
-  // useEffect(() => {
-  //   // const fetchDashboard = async () => {
-  //   //   const { data } = await supabase
-  //   //     .from("dashboard_stats")
-  //   //     .select("*")
-  //   //     .eq("user_id", user?.id)
-  //   //     .single();
-
-  //   //     setDashboardData(data);
-  //   // }
-  //   user && fetchDashboard(user?.id);
-
-  // }, [])
+  useEffect(() => {
+    user && fetchDashboard(user?.id);
+  }, [fetchDashboard, user?.id])
 
   const squadsList = squads ?? [];
+
+  // const totals = useMemo(() => {
+  //   const totalSaved = squadsList.reduce((acc, s) => acc + (s.balance || 0), 0);
+  //   const totalTarget = squadsList.reduce((acc, s) => acc + (s.target_amount || 0), 0);
+  //   const totalContribs = squadsList.reduce((acc, s) => acc + (s.contributions?.length || 0), 0);
+  //   return { totalSaved, totalTarget, totalContribs };
+  // }, [squadsList]);
 
   const totals = useMemo(() => {
     const totalSaved = squadsList.reduce((acc, s) => acc + (s.balance || 0), 0);
     const totalTarget = squadsList.reduce((acc, s) => acc + (s.target_amount || 0), 0);
-    const totalContribs = squadsList.reduce((acc, s) => acc + (s.contributions?.length || 0), 0);
+    const totalContribs = dashboardData?.total_contributions ?? 0;
     return { totalSaved, totalTarget, totalContribs };
-  }, [squadsList]);
+  }, [squadsList, dashboardData]);
 
 
   const weekLabels = ["Mar 1 - 7", "Mar 8 - 14", "Mar 15 - 21", "Mar 22 - 28", "Final wk"];
@@ -88,13 +85,13 @@ export default function DashboardPage() {
 
       <div className="space-y-6 max-w-7xl mx-auto">
         {/* User Profile Section */}
-        <UserProfile username="SaverPro" level="Level 4 Saver 🔥" progress={80} />
+        <UserProfile username="SaverPro" level={`Level ${dashboardData?.level || 0} Saver`} progress={dashboardData?.xp || 0} />
 
         {/* Alert Section (example: due contribution) */}
         {/* <Alert message="Contribution due tomorrow (Rent Squad)" /> */}
 
 
-        {isLoading && <Spinner />}
+        {isLoading && squadsList.length === 0 && <Spinner />}
         {error && <Alert message={error} />}
 
         {/* Contribution Overview Section */}

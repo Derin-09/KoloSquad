@@ -22,7 +22,7 @@ interface ContributionOverviewProps {
 const ContributionsSection = ({ saved, target, contribs, squads, streak, className  }: ContributionOverviewProps) => {
     const details = [
         {
-            text: "Contributions",
+            text: "Contribs",
             number: contribs
         },
          {

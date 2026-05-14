@@ -74,6 +74,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
 
       const { data: memberData, error: memberError } = await supabase
   .from("squad_member_contributions")
+  // .from("contributions")
   .select("*")
   .eq("squad_id", squadId);
 

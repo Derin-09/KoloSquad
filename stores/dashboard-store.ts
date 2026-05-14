@@ -1,23 +1,27 @@
 import { supabase } from "@/lib/supabase/client";
-import { ActivitiesType, BadgeType, ChallengesType, LeaderboardType } from "@/types/types";
+import { ActivitiesType, BadgeCatalogType, BadgeType, ChallengesType, LeaderboardType } from "@/types/types";
 import { create } from "zustand";
 
 type DashboardStats = {
     user_id: string;
     total_saved: number;
     total_goals: number;
-    contributions_count: number;
+    xp?: number;
+    level?: number;
+    total_contributions: number;
     active_squads: number;
 };
 
 type DashboardStoreType = {
     dashboardData: DashboardStats | null;
     badgesData: BadgeType[];
+    badgesCatalogData: BadgeCatalogType[];
     leaderboardData: LeaderboardType | null;
     challengesData: ChallengesType | null;
     activitiesData: ActivitiesType | null;
     fetchDashboard: (userId: string) => Promise<void>;
     fetchBadges: (userId: string) => Promise<void>;
+    fetchBadgesCatalog: () => Promise<void>;
     fetchLeaderboard: (userId: string) => Promise<void>;
     fetchChallenges: (userId: string) => Promise<void>;
     fetchActivity: (userId: string) => Promise<void>;
@@ -26,27 +30,54 @@ type DashboardStoreType = {
 export const useDashboardStore = create<DashboardStoreType>((set) => ({
     dashboardData: null,
     badgesData: [],
+    badgesCatalogData: [],
     leaderboardData: null,
     challengesData: null,
     activitiesData: null,
 
     fetchDashboard: async (userId: string) => {
-        const { data } = await supabase
-            .from("dashboard_stats")
+        const { data, error } = await supabase
+            .from("user_stats")
             .select("*")
             .eq("user_id", userId)
             .single();
 
+        if (error) {
+            console.error("fetchDashboard failed:", error.message);
+            set({ dashboardData: null });
+            return;
+        }
+
         set({ dashboardData: data });
     },
     fetchBadges: async (userId: string) => {
-        const { data } = await supabase
-            .from("badges")
+        const { data, error } = await supabase
+            .from("user_badges")
             .select("*")
             .eq("user_id", userId)
             .returns<BadgeType[]>();
 
+        if (error) {
+            console.error("fetchBadges failed:", error.message);
+            set({ badgesData: [] });
+            return;
+        }
+
         set({ badgesData: data ?? [] });
+    },
+    fetchBadgesCatalog: async () => {
+        const { data, error } = await supabase
+            .from("badges_catalog")
+            .select("*")
+            .returns<BadgeCatalogType[]>();
+
+        if (error) {
+            console.error("fetchBadgesCatalog failed:", error.message);
+            set({ badgesCatalogData: [] });
+            return;
+        }
+
+        set({ badgesCatalogData: data ?? [] });
     },
     fetchLeaderboard: async (userId: string) => {
         const { data } = await supabase

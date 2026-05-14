@@ -9,9 +9,13 @@ interface UserProfileProps {
     progress: number;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) => {
+const UserProfile: React.FC<UserProfileProps> = (
+    {  level, progress }
+) => {
       const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
       const user = useAuthStore((state) => state.user);
+      const username = useAuthStore((s) => s.profile?.full_name);
+      const profile = useAuthStore((state) => state.profile);
     //   const fetchUser = useAuthStore((state) => state.fetchUser);
 
     // useEffect(() => {
@@ -19,8 +23,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) 
     //   }, [fetchUser]);
 
       useEffect(() => {
-        setAvatarUrl(user?.user_metadata?.avatar_url ?? null);
-      }, [user]);
+        setAvatarUrl(profile?.avatar_url ?? user?.user_metadata?.avatar_url ?? null);
+      }, [profile, user]);
+      const displayName = profile?.full_name ?? user?.user_metadata?.full_name ?? username;
     return (
     <Card className="flex items-center gap-4 p-4">
         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold overflow-hidden">
@@ -38,7 +43,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, level, progress }) 
         </div>
         <div className="flex-1">
             <div className="flex items-center justify-between">
-                <div className="font-semibold text-lg">{username}</div>
+                <div className="font-semibold text-lg">{displayName}</div>
                 <span className="text-xs font-medium">{level}</span>
             </div>
             <div className="flex items-center gap-2">
