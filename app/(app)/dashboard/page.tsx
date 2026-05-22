@@ -16,7 +16,7 @@ import SquadList from "@/components/pages/dashboard/SquadList";
 import ContributionsSection from "@/components/pages/dashboard/ContributionsSection";
 import Badges from "@/components/pages/dashboard/Badges";
 import { Button } from "@/components/ui/button";
-import { Bolt, Link2, Plus, PlusCircle, Zap } from "lucide-react";
+import { Bolt, ChevronRight, Link2, Plus, PlusCircle, Zap } from "lucide-react";
 import { SiFlashforge, SiThunderstore } from "react-icons/si";
 import WeeklyChallenges from "@/components/pages/dashboard/WeeklyChallenges";
 import Leaderboard from "@/components/pages/dashboard/Leaderboard";
@@ -149,7 +149,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-lg font-semibold">Your Squads</div>
-              <Link href="/squads" className="text-sm underline">See All</Link>
+              <Link href="/squads" className="text-sm underline"><ChevronRight /></Link>
             </div>
             <SquadList
               squads={squadsList.map((s) => ({
