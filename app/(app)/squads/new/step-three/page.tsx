@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { ArrowRight, BadgeCheck, Minus, Plus, UserPlus2, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, ChevronLeft, Minus, Plus, UserPlus2, Users } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,6 +80,8 @@ export default function StepThree() {
 
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
+        <ChevronLeft onClick={router.back}/>
+        
       <div className="mx-auto flex w-full max-w-3xl items-center justify-center">
         <div
         //   animated={false}
