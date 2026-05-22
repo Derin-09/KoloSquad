@@ -7,9 +7,14 @@ export type StepOneDraftValues = {
   durationNumber: number;
 };
 
+export type StepTwoDraftValues = {
+  memberCount: number;
+};
+
 export type SquadDraft = {
   currentStep?: number;
   stepOne?: StepOneDraftValues;
+  stepTwo?: StepTwoDraftValues;
 };
 
 function isBrowser() {
