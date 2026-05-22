@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CircleHelp, Users } from "lucide-react";
+import { ArrowRight, ChevronLeft, CircleHelp, Users, X } from "lucide-react";
 import { useFormik } from "formik";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
+  clearSquadDraft,
   getSquadDraft,
   patchSquadDraft,
   type StepOneDraftValues,
 } from "@/app/(app)/squads/new/draft-storage";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
   export const initialStepOneValues: StepOneDraftValues = {
@@ -29,13 +31,21 @@ import {
 
 export default function StepOne() {
     const router = useRouter()
+    const saved = getSquadDraft();
+      const [showCancelModal, setShowCancelModal] = useState(false);
+       const handleConfirmCancel = () => {
+          clearSquadDraft();
+          setShowCancelModal(false);
+          router.push("/squads");
+        };
   const {values, setFieldValue, handleChange, handleBlur, handleSubmit, setValues, isSubmitting} = useFormik<StepOneDraftValues>({
-    initialValues: initialStepOneValues,
+    initialValues: saved?.stepOne || initialStepOneValues,
     onSubmit: () => {
       patchSquadDraft({ currentStep: 2, stepOne: values });
       router.push('/squads/new/step-two')
     },
   });
+
 
   const parsedGoalAmount = Number(values.goalAmount.replace(/[^0-9.]/g, ""));
   const isStepOneComplete =
@@ -45,20 +55,34 @@ export default function StepOne() {
     values.durationNumber > 0 &&
     Boolean(values.duration);
 
+    console.log(values, 'values')
   useEffect(() => {
     patchSquadDraft({ currentStep: 1, stepOne: values });
   }, [values]);
 
   useEffect(() => {
-    const saved = getSquadDraft();
 
     if (saved?.stepOne) {
-      setValues({ ...initialStepOneValues, ...saved.stepOne });
+      setValues({ ...values, ...saved.stepOne });
     }
   }, [setValues]);
 
+  
+
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
+      <div className="w-full flex justify-between items-center gap-2 pb-3">
+        <ChevronLeft onClick={router.back}/>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Cancel squad creation"
+          onClick={() => setShowCancelModal(true)}
+        >
+          <X size={18} />
+        </Button>
+      </div>
       <div className="mx-auto flex  w-full max-w-3xl items-center justify-center">
         <Card
           animated={false}
@@ -165,6 +189,29 @@ export default function StepOne() {
               <ArrowRight size={18} />
             </Button>
           </form>
+
+          <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+        <DialogContent className="max-w-md p-10">
+          <DialogHeader>
+            <DialogTitle>Cancel squad creation?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel squad creation?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCancelModal(false)}
+            >
+              No, continue editing
+            </Button>
+            <Button type="button" variant="destructive" onClick={handleConfirmCancel}>
+              Yes, cancel and clear
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
         </Card>
       </div>
     </main>

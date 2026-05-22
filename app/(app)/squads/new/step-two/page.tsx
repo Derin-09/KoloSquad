@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { ArrowRight, BadgeCheck, CalendarDays, Gauge, Zap, X } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowRight, BadgeCheck, CalendarDays, Gauge, Zap } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,7 +57,7 @@ const savingModes: Array<{
 export default function StepTwo() {
   const router = useRouter();
   const saved = getSquadDraft();
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
 
   const { values, setFieldValue, handleSubmit, setValues } = useFormik<StepTwoDraftValues>({
     initialValues: initialStepTwoValues,
@@ -93,15 +94,12 @@ export default function StepTwo() {
   const handleModeSelect = (modeId: StepTwoDraftValues["mode"]) => {
     if (!availableModes.includes(modeId)) {
       // Show toast with appropriate message
-      const mode = savingModes.find((m) => m.id === modeId);
       const duration = saved?.stepOne?.duration;
       if (duration === "week(s)") {
-        setToastMessage("You're only saving for weeks. Weekly Hustle is your only option for this duration.");
+        toast.error("You're only saving for weeks. Weekly Hustle is your only option for this duration.");
       } else if (duration === "month(s)" && modeId === "relaxed") {
-        setToastMessage("You're only saving for months. Relaxed (yearly) isn't available for this duration.");
+        toast.error("You're only saving for months. Relaxed (yearly) isn't available for this duration.");
       }
-      // Auto-dismiss toast after 3 seconds
-      setTimeout(() => setToastMessage(null), 3000);
       return;
     }
     setFieldValue("mode", modeId);
@@ -110,10 +108,10 @@ export default function StepTwo() {
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
       <div className="mx-auto flex w-full max-w-3xl items-center justify-center">
-        <Card
-          animated={false}
-          hoverable={false}
-          className="w-full max-w-130 rounded-4xl border-2 border-border bg-surface px-8 py-8 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:px-10 sm:py-9"
+        <div
+        //   animated={false}
+        //   hoverable={false}
+        //   className="w-full max-w-130 rounded-4xl border-2 border-border bg-surface px-8 py-8 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:px-10 sm:py-9"
         >
           <div className="flex items-center justify-between text-[11px] font-semibold text-foreground">
             <p className="uppercase tracking-[0.12em] text-muted-foreground">Step 2 of 5</p>
@@ -138,8 +136,19 @@ export default function StepTwo() {
                 const active = values.mode === mode.id;
                 const isDisabled = !availableModes.includes(mode.id);
                 return (
+                    // <Card 
+                    // key={mode.id}  
+                    // className="p-0"
+                    // // className={[
+                    // //   "relative rounde-4xl border-2 bg-surface p- text-left transition",
+                    // //   isDisabled && "opacity-50 cursor-not-allowed",
+                    // //   active
+                    // //     ? "border-accent-foreground shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
+                    // //     : "border-border hover:border-accent",
+                    // // ].join(" ")}
+                    // >
                   <button
-                    key={mode.id}
+                   key={mode.id}
                     type="button"
                     onClick={() => handleModeSelect(mode.id)}
                     disabled={isDisabled}
@@ -169,6 +178,7 @@ export default function StepTwo() {
                       {active && <BadgeCheck size={15} className="text-accent-foreground" />}
                     </div>
                   </button>
+                //   </Card>
                 );
               })}
             </div>
@@ -190,20 +200,18 @@ export default function StepTwo() {
                 <ArrowRight size={18} />
               </Button>
             </div>
+
+            
+              {/* <Button
+                type="submit"
+                className="h-12 w-full bg-accent-foreground px-10 text-surface hover:bg-accent-foreground/90"
+              >
+                <span className="font-semibold">Next</span>
+                <ArrowRight size={18} />
+              </Button> */}
           </form>
 
-          {toastMessage && (
-            <div className="fixed bottom-4 left-4 right-4 z-50 flex items-center justify-between rounded-lg border border-border bg-surface p-4 shadow-lg sm:left-auto sm:w-fit sm:bottom-6 sm:right-6">
-              <p className="text-sm font-medium text-muted-foreground">{toastMessage}</p>
-              <button
-                onClick={() => setToastMessage(null)}
-                className="ml-4 shrink-0 text-muted-foreground hover:text-foreground"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          )}
-        </Card>
+        </div>
       </div>
     </main>
   );

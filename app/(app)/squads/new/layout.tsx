@@ -26,11 +26,11 @@ export default function SquadLayout({ children }: { children: React.ReactNode })
     || (pathname?.startsWith("/reset-password") ?? false)
     || (pathname?.startsWith("/onboarding") ?? false);
 
-  const handleConfirmCancel = () => {
-    clearSquadDraft();
-    setShowCancelModal(false);
-    router.push("/squads");
-  };
+  // const handleConfirmCancel = () => {
+  //   clearSquadDraft();
+  //   setShowCancelModal(false);
+  //   router.push("/squads");
+  // };
 
   if (isStandalone) {
     return <main className=" p-3 md:p-6 lg:p-8">{children}</main>;
@@ -38,23 +38,12 @@ export default function SquadLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-[calc(100dvh-7rem)] flex-col">
-      <div className="w-full flex justify-between items-center gap-2 pb-3">
-        <ChevronLeft onClick={router.back}/>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          aria-label="Cancel squad creation"
-          onClick={() => setShowCancelModal(true)}
-        >
-          <X size={18} />
-        </Button>
-      </div>
+      
       <div className="flex flex-1 justify-center overflow-y-auto">
           {children}
       </div>
 
-      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+      {/* <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
         <DialogContent className="max-w-md p-10">
           <DialogHeader>
             <DialogTitle>Cancel squad creation?</DialogTitle>
@@ -75,7 +64,7 @@ export default function SquadLayout({ children }: { children: React.ReactNode })
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }

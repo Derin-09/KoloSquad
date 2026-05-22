@@ -9,6 +9,8 @@ interface CardProps {
   className?: string;
   animated?: boolean;
   hoverable?: boolean;
+  onClick?: () => void;
+  disabled?: boolean
 }
 
 export function Card({ 
