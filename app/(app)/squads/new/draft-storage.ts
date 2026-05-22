@@ -3,7 +3,8 @@ export const SQUAD_DRAFT_STORAGE_KEY = "squad-create-draft";
 export type StepOneDraftValues = {
   squadName: string;
   goalAmount: string;
-  duration: string;
+  duration: "week(s)" | "month(s)" | "year(s)";
+  durationNumber: number;
 };
 
 export type SquadDraft = {

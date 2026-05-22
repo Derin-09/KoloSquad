@@ -4,6 +4,14 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { clearSquadDraft } from "@/app/(app)/squads/new/draft-storage";
 
 
@@ -46,28 +54,28 @@ export default function SquadLayout({ children }: { children: React.ReactNode })
           {children}
       </div>
 
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
-          <div className="w-full max-w-md rounded-xl border border-border bg-surface p-5 shadow-xl">
-            <h2 className="text-lg font-semibold text-foreground">Cancel squad creation?</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+        <DialogContent className="max-w-md p-10">
+          <DialogHeader>
+            <DialogTitle>Cancel squad creation?</DialogTitle>
+            <DialogDescription>
               Are you sure you want to cancel squad creation?
-            </p>
-            <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCancelModal(false)}
-              >
-                No, continue editing
-              </Button>
-              <Button type="button" variant="destructive" onClick={handleConfirmCancel}>
-                Yes, cancel and clear
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCancelModal(false)}
+            >
+              No, continue editing
+            </Button>
+            <Button type="button" variant="destructive" onClick={handleConfirmCancel}>
+              Yes, cancel and clear
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

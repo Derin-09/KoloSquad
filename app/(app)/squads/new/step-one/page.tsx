@@ -1,9 +1,16 @@
 "use client";
 
-import { ArrowRight, CircleHelp, ChevronDown, Users } from "lucide-react";
+import { ArrowRight, CircleHelp, Users } from "lucide-react";
 import { useFormik } from "formik";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import {
@@ -16,12 +23,13 @@ import {
   export const initialStepOneValues: StepOneDraftValues = {
       squadName: "",
       goalAmount: "",
-      duration: "6 Months",
+      duration: "month(s)",
+      durationNumber: 6,
     }
 
 export default function StepOne() {
     const router = useRouter()
-  const {values, setFieldValue, handleChange, handleBlur, handleReset, handleSubmit, setValues} = useFormik({
+  const {values, setFieldValue, handleChange, handleBlur, handleSubmit, setValues} = useFormik<StepOneDraftValues>({
     initialValues: initialStepOneValues,
     onSubmit: () => {
       patchSquadDraft({ currentStep: 2, stepOne: values });
@@ -37,7 +45,7 @@ export default function StepOne() {
     const saved = getSquadDraft();
 
     if (saved?.stepOne) {
-      setValues(saved.stepOne);
+      setValues({ ...initialStepOneValues, ...saved.stepOne });
     }
   }, [setValues]);
 
@@ -96,27 +104,38 @@ export default function StepOne() {
               />
             </label>
 
-            <label className="block space-y-2">
-              <span className="text-xs md:text-sm font-semibold text-foreground">Duration</span>
-              <div className="relative">
-                <select
-                  name="duration"
-                  value={values.duration}
-                  onChange={(e) => setFieldValue("duration", e.target.value)}
+            <div className="space-y-2">
+              <label className="block text-xs md:text-sm font-semibold text-foreground">Duration</label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  name="durationNumber"
+                  value={values.durationNumber}
+                  onChange={(e) => setFieldValue("durationNumber", Number(e.target.value) || 1)}
                   onBlur={handleBlur}
-                  className="w-full appearance-none rounded-sm border border-border bg-muted px-3 py-3 pr-10 text-sm outline-none transition-colors focus:border-accent focus:bg-surface"
-                >
-                  <option value="6 Months">6 Months</option>
-                  <option value="3 Months">3 Months</option>
-                  <option value="12 Months">12 Months</option>
-                  <option value="18 Months">18 Months</option>
-                </select>
-                <ChevronDown
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  className="w-full rounded-sm border border-border bg-muted px-3 py-3 text-sm outline-none transition-colors focus:border-accent focus:bg-surface"
                 />
+                <Select
+                  value={values.duration}
+                  onValueChange={(value) =>
+                    setFieldValue(
+                      "duration",
+                      value as StepOneDraftValues["duration"]
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="week(s)">Week(s)</SelectItem>
+                    <SelectItem value="month(s)">Month(s)</SelectItem>
+                    <SelectItem value="year(s)">Year(s)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </label>
+            </div>
 
             <div className="flex items-start gap-3 rounded-sm border border-border bg-muted px-3 py-3">
               <div className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
