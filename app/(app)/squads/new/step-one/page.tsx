@@ -29,13 +29,21 @@ import {
 
 export default function StepOne() {
     const router = useRouter()
-  const {values, setFieldValue, handleChange, handleBlur, handleSubmit, setValues} = useFormik<StepOneDraftValues>({
+  const {values, setFieldValue, handleChange, handleBlur, handleSubmit, setValues, isSubmitting} = useFormik<StepOneDraftValues>({
     initialValues: initialStepOneValues,
     onSubmit: () => {
       patchSquadDraft({ currentStep: 2, stepOne: values });
       router.push('/squads/new/step-two')
     },
   });
+
+  const parsedGoalAmount = Number(values.goalAmount.replace(/[^0-9.]/g, ""));
+  const isStepOneComplete =
+    values.squadName.trim().length > 0 &&
+    Number.isFinite(parsedGoalAmount) &&
+    parsedGoalAmount > 0 &&
+    values.durationNumber > 0 &&
+    Boolean(values.duration);
 
   useEffect(() => {
     patchSquadDraft({ currentStep: 1, stepOne: values });
@@ -81,7 +89,7 @@ export default function StepOne() {
               <span className="text-xs md:text-sm font-semibold text-foreground">Squad Name</span>
               <input
                 type="text"
-                placeholder="e.g. Dream Vacation 2024"
+                placeholder="e.g. Dream Vacation"
                 name="squadName"
                 value={values.squadName}
                 onChange={handleChange}
@@ -95,7 +103,7 @@ export default function StepOne() {
               <input
                 type="text"
                 inputMode="decimal"
-                placeholder="$ 0.00"
+                placeholder="₦ 0.00"
                 name="goalAmount"
                 value={values.goalAmount}
                 onChange={handleChange}
@@ -150,6 +158,7 @@ export default function StepOne() {
 
             <Button
               type="submit"
+              disabled={!isStepOneComplete || isSubmitting}
               className="h-12 w-full rounded-sm bg-accent-foreground text-surface hover:bg-accent-foreground/90"
             >
               <span className="font-semibold">Next</span>
