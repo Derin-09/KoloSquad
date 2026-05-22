@@ -8,6 +8,11 @@ export type StepOneDraftValues = {
 };
 
 export type StepTwoDraftValues = {
+  mode: "relaxed" | "casual" | "hustle";
+  frequency: "yearly" | "monthly" | "weekly";
+};
+
+export type StepThreeDraftValues = {
   memberCount: number;
 };
 
@@ -15,6 +20,7 @@ export type SquadDraft = {
   currentStep?: number;
   stepOne?: StepOneDraftValues;
   stepTwo?: StepTwoDraftValues;
+  stepThree?: StepThreeDraftValues;
 };
 
 function isBrowser() {
