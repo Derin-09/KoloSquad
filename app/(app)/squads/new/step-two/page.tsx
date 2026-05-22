@@ -55,6 +55,7 @@ const savingModes: Array<{
 
 export default function StepTwo() {
   const router = useRouter();
+  const saved = getSquadDraft();
 
   const { values, setFieldValue, handleSubmit, setValues } = useFormik<StepTwoDraftValues>({
     initialValues: initialStepTwoValues,
@@ -69,12 +70,21 @@ export default function StepTwo() {
   }, [values]);
 
   useEffect(() => {
-    const saved = getSquadDraft();
     if (saved?.stepTwo) {
       setValues({ ...initialStepTwoValues, ...saved.stepTwo });
     }
   }, [setValues]);
 
+  console.log(saved?.stepOne, 'saved')
+
+  switch (saved?.stepOne?.duration) {
+    case "month(s)":
+        break
+    case "week(s)":
+    break
+    case "year(s)":
+    break
+  }
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
       <div className="mx-auto flex w-full max-w-3xl items-center justify-center">
