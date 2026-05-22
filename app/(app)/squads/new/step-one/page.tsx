@@ -29,6 +29,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
       durationNumber: 6,
     }
 
+  function parseGoalAmount(input: string): number {
+    const cleaned = input.replace(/[^0-9.]/g, "").trim();
+    if (!cleaned) return 0;
+
+    const [whole, ...decimalParts] = cleaned.split(".");
+    const normalized = decimalParts.length > 0
+      ? `${whole}.${decimalParts.join("")}`
+      : whole;
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
 export default function StepOne() {
     const router = useRouter()
     const saved = getSquadDraft();
@@ -46,16 +59,15 @@ export default function StepOne() {
     },
   });
 
-
-  const parsedGoalAmount = Number(values.goalAmount.replace(/[^0-9.]/g, ""));
+  const parsedGoalAmount = parseGoalAmount(values.goalAmount);
+  const parsedDurationNumber = Number(values.durationNumber);
   const isStepOneComplete =
     values.squadName.trim().length > 0 &&
-    Number.isFinite(parsedGoalAmount) &&
     parsedGoalAmount > 0 &&
-    values.durationNumber > 0 &&
+    Number.isFinite(parsedDurationNumber) &&
+    parsedDurationNumber > 0 &&
     Boolean(values.duration);
 
-    console.log(values, 'values')
   useEffect(() => {
     patchSquadDraft({ currentStep: 1, stepOne: values });
   }, [values]);
@@ -63,7 +75,11 @@ export default function StepOne() {
   useEffect(() => {
 
     if (saved?.stepOne) {
-      setValues({ ...values, ...saved.stepOne });
+      setValues({
+        ...initialStepOneValues,
+        ...saved.stepOne,
+        durationNumber: Number(saved.stepOne.durationNumber) || initialStepOneValues.durationNumber,
+      });
     }
   }, [setValues]);
 

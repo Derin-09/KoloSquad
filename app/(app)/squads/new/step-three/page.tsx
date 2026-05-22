@@ -34,6 +34,7 @@ function formatNaira(amount: number) {
 export default function StepThree() {
   const router = useRouter();
   const draft = getSquadDraft();
+  const saved = getSquadDraft();
 
   const { values, setFieldValue, handleSubmit, setValues } = useFormik<StepThreeDraftValues>({
     initialValues: initialStepThreeValues,
@@ -48,7 +49,6 @@ export default function StepThree() {
   }, [values]);
 
   useEffect(() => {
-    const saved = getSquadDraft();
     if (saved?.stepThree) {
       setValues({ ...initialStepThreeValues, ...saved.stepThree });
     }
@@ -71,10 +71,10 @@ export default function StepThree() {
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
       <div className="mx-auto flex w-full max-w-3xl items-center justify-center">
-        <Card
-          animated={false}
-          hoverable={false}
-          className="w-full max-w-130 rounded-4xl border-2 border-border bg-surface px-8 py-8 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:px-10 sm:py-9"
+        <div
+        //   animated={false}
+        //   hoverable={false}
+        //   className="w-full max-w-130 rounded-4xl border-2 border-border bg-surface px-8 py-8 shadow-[0_24px_60px_rgba(0,0,0,0.12)] sm:px-10 sm:py-9"
         >
           <div className="flex items-center justify-between text-[11px] font-semibold text-foreground">
             <p className="uppercase tracking-[0.12em] text-muted-foreground">Step 3 of 5</p>
@@ -82,7 +82,7 @@ export default function StepThree() {
           </div>
 
           <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full border border-border bg-muted">
-            <div className="h-full w-[60%] rounded-full bg-accent-foreground" />
+            <div className="h-full w-[60%] rounded-full bg-accent" />
           </div>
 
           <div className="mt-6 space-y-2">
@@ -146,14 +146,14 @@ export default function StepThree() {
               <p className="mt-1 text-center text-5xl font-black leading-none text-foreground">
                 {formatNaira(individualWeeklyAmount)}
               </p>
-              <p className="mt-2 text-center text-sm text-muted-foreground">Each member saves weekly</p>
+              <p className="mt-2 text-center text-sm text-muted-foreground">Each member saves {saved?.stepTwo?.frequency}</p>
 
               <div className="my-4 h-px w-full bg-border" />
 
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <p className="text-lg font-semibold text-foreground">{formatNaira(totalWeeklyGoal)}</p>
-                  <p className="text-xs text-muted-foreground">Total Weekly Goal</p>
+                  <p className="text-xs text-muted-foreground">Total {saved?.stepTwo?.frequency} Goal</p>
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-foreground">{values.memberCount} Members</p>
@@ -185,7 +185,7 @@ export default function StepThree() {
               You can adjust squad size later before final activation.
             </p>
           </form>
-        </Card>
+        </div>
       </div>
     </main>
   );

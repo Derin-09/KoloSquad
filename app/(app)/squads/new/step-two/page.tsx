@@ -63,6 +63,7 @@ export default function StepTwo() {
     initialValues: initialStepTwoValues,
     onSubmit: () => {
       patchSquadDraft({ currentStep: 3, stepTwo: values });
+      console.log(saved?.stepTwo, 'saved')
       router.push("/squads/new/step-three");
     },
   });
@@ -119,7 +120,7 @@ export default function StepTwo() {
           </div>
 
           <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full border border-border bg-muted">
-            <div className="h-full w-[40%] rounded-full bg-accent-foreground" />
+            <div className="h-full w-[40%] rounded-full bg-accent" />
           </div>
 
           <div className="mt-6 space-y-2">
@@ -136,17 +137,6 @@ export default function StepTwo() {
                 const active = values.mode === mode.id;
                 const isDisabled = !availableModes.includes(mode.id);
                 return (
-                    // <Card 
-                    // key={mode.id}  
-                    // className="p-0"
-                    // // className={[
-                    // //   "relative rounde-4xl border-2 bg-surface p- text-left transition",
-                    // //   isDisabled && "opacity-50 cursor-not-allowed",
-                    // //   active
-                    // //     ? "border-accent-foreground shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
-                    // //     : "border-border hover:border-accent",
-                    // // ].join(" ")}
-                    // >
                   <button
                    key={mode.id}
                     type="button"
@@ -156,8 +146,8 @@ export default function StepTwo() {
                       "relative rounded-4xl border-2 bg-surface p-4 text-left transition",
                       isDisabled && "opacity-50 cursor-not-allowed",
                       active
-                        ? "border-accent-foreground shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
-                        : "border-border hover:border-accent",
+                        ? "border-accent shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
+                        : "border-border hover:border-accent-foreground",
                     ].join(" ")}
                   >
                     {mode.recommended && (
