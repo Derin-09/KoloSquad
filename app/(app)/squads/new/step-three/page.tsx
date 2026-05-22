@@ -27,13 +27,21 @@ function durationToWeeks(unit: "week(s)" | "month(s)" | "year(s)", count: number
   return Math.max(1, count * 52);
 }
 
+function weeksToContributionPeriods(
+  totalWeeks: number,
+  frequency: "weekly" | "monthly" | "yearly"
+) {
+  if (frequency === "weekly") return Math.max(1, totalWeeks);
+  if (frequency === "monthly") return Math.max(1, Math.ceil(totalWeeks / 4));
+  return Math.max(1, Math.ceil(totalWeeks / 52));
+}
+
 function formatNaira(amount: number) {
   return `N${Math.round(amount).toLocaleString()}`;
 }
 
 export default function StepThree() {
   const router = useRouter();
-  const draft = getSquadDraft();
   const saved = getSquadDraft();
 
   const { values, setFieldValue, handleSubmit, setValues } = useFormik<StepThreeDraftValues>({
@@ -54,19 +62,21 @@ export default function StepThree() {
     }
   }, [setValues]);
 
-  const goalAmount = toNumericAmount(draft?.stepOne?.goalAmount ?? "0");
-  const durationCount = draft?.stepOne?.durationNumber ?? 1;
-  const durationUnit = draft?.stepOne?.duration ?? "month(s)";
+  const goalAmount = toNumericAmount(saved?.stepOne?.goalAmount ?? "0");
+  const durationCount = saved?.stepOne?.durationNumber ?? 1;
+  const durationUnit = saved?.stepOne?.duration ?? "month(s)";
+  const contributionFrequency = saved?.stepTwo?.frequency ?? "weekly";
   const totalWeeks = durationToWeeks(durationUnit, durationCount);
+  const totalContributionPeriods = weeksToContributionPeriods(totalWeeks, contributionFrequency);
 
-  const { individualWeeklyAmount, totalWeeklyGoal } = useMemo(() => {
-    const weeklyGoal = goalAmount > 0 ? goalAmount / totalWeeks : 0;
-    const perMember = values.memberCount > 0 ? weeklyGoal / values.memberCount : 0;
+  const { individualContributionAmount, totalContributionGoal } = useMemo(() => {
+    const periodGoal = goalAmount > 0 ? goalAmount / totalContributionPeriods : 0;
+    const perMember = values.memberCount > 0 ? periodGoal / values.memberCount : 0;
     return {
-      individualWeeklyAmount: perMember,
-      totalWeeklyGoal: weeklyGoal,
+      individualContributionAmount: perMember,
+      totalContributionGoal: periodGoal,
     };
-  }, [goalAmount, totalWeeks, values.memberCount]);
+  }, [goalAmount, totalContributionPeriods, values.memberCount]);
 
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
@@ -144,16 +154,16 @@ export default function StepThree() {
                 Individual Contribution
               </p>
               <p className="mt-1 text-center text-5xl font-black leading-none text-foreground">
-                {formatNaira(individualWeeklyAmount)}
+                {formatNaira(individualContributionAmount)}
               </p>
-              <p className="mt-2 text-center text-sm text-muted-foreground">Each member saves {saved?.stepTwo?.frequency}</p>
+              <p className="mt-2 text-center text-sm text-muted-foreground">Each member saves {contributionFrequency}</p>
 
               <div className="my-4 h-px w-full bg-border" />
 
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <p className="text-lg font-semibold text-foreground">{formatNaira(totalWeeklyGoal)}</p>
-                  <p className="text-xs text-muted-foreground">Total {saved?.stepTwo?.frequency} Goal</p>
+                  <p className="text-lg font-semibold text-foreground">{formatNaira(totalContributionGoal)}</p>
+                  <p className="text-xs text-muted-foreground">Total {contributionFrequency} Goal</p>
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-foreground">{values.memberCount} Members</p>
