@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { ArrowRight, BadgeCheck, CalendarDays, Gauge, Zap } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarDays, Gauge, Zap, X } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +56,7 @@ const savingModes: Array<{
 export default function StepTwo() {
   const router = useRouter();
   const saved = getSquadDraft();
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const { values, setFieldValue, handleSubmit, setValues } = useFormik<StepTwoDraftValues>({
     initialValues: initialStepTwoValues,
@@ -75,16 +76,37 @@ export default function StepTwo() {
     }
   }, [setValues]);
 
-  console.log(saved?.stepOne, 'saved')
+  // Determine which modes are available based on Step 1 duration
+  const getAvailableModes = () => {
+    const duration = saved?.stepOne?.duration;
+    if (duration === "week(s)") {
+      return ["hustle"]; // Only weekly saving for week durations
+    }
+    if (duration === "month(s)") {
+      return ["casual", "hustle"]; // No yearly for month durations
+    }
+    return ["relaxed", "casual", "hustle"]; // All available for year durations
+  };
 
-  switch (saved?.stepOne?.duration) {
-    case "month(s)":
-        break
-    case "week(s)":
-    break
-    case "year(s)":
-    break
-  }
+  const availableModes = getAvailableModes();
+
+  const handleModeSelect = (modeId: StepTwoDraftValues["mode"]) => {
+    if (!availableModes.includes(modeId)) {
+      // Show toast with appropriate message
+      const mode = savingModes.find((m) => m.id === modeId);
+      const duration = saved?.stepOne?.duration;
+      if (duration === "week(s)") {
+        setToastMessage("You're only saving for weeks. Weekly Hustle is your only option for this duration.");
+      } else if (duration === "month(s)" && modeId === "relaxed") {
+        setToastMessage("You're only saving for months. Relaxed (yearly) isn't available for this duration.");
+      }
+      // Auto-dismiss toast after 3 seconds
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
+    setFieldValue("mode", modeId);
+    setFieldValue("frequency", savingModes.find((m) => m.id === modeId)?.frequency || "weekly");
+  };
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
       <div className="mx-auto flex w-full max-w-3xl items-center justify-center">
@@ -114,16 +136,16 @@ export default function StepTwo() {
               {savingModes.map((mode) => {
                 const Icon = mode.icon;
                 const active = values.mode === mode.id;
+                const isDisabled = !availableModes.includes(mode.id);
                 return (
                   <button
                     key={mode.id}
                     type="button"
-                    onClick={() => {
-                      setFieldValue("mode", mode.id);
-                      setFieldValue("frequency", mode.frequency);
-                    }}
+                    onClick={() => handleModeSelect(mode.id)}
+                    disabled={isDisabled}
                     className={[
                       "relative rounded-4xl border-2 bg-surface p-4 text-left transition",
+                      isDisabled && "opacity-50 cursor-not-allowed",
                       active
                         ? "border-accent-foreground shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
                         : "border-border hover:border-accent",
@@ -169,6 +191,18 @@ export default function StepTwo() {
               </Button>
             </div>
           </form>
+
+          {toastMessage && (
+            <div className="fixed bottom-4 left-4 right-4 z-50 flex items-center justify-between rounded-lg border border-border bg-surface p-4 shadow-lg sm:left-auto sm:w-fit sm:bottom-6 sm:right-6">
+              <p className="text-sm font-medium text-muted-foreground">{toastMessage}</p>
+              <button
+                onClick={() => setToastMessage(null)}
+                className="ml-4 shrink-0 text-muted-foreground hover:text-foreground"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
         </Card>
       </div>
     </main>
