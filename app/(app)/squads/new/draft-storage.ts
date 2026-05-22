@@ -16,11 +16,19 @@ export type StepThreeDraftValues = {
   memberCount: number;
 };
 
+export type StepFourDraftValues = {
+  penalties: {
+    loseStreakIfMissed: boolean;
+    funnyReminderMessage: boolean;
+  };
+};
+
 export type SquadDraft = {
   currentStep?: number;
   stepOne?: StepOneDraftValues;
   stepTwo?: StepTwoDraftValues;
   stepThree?: StepThreeDraftValues;
+  stepFour?: StepFourDraftValues;
 };
 
 function isBrowser() {
