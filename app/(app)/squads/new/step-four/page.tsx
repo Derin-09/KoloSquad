@@ -19,6 +19,8 @@ import {
   patchSquadDraft,
   type StepFourDraftValues,
 } from "@/app/(app)/squads/new/draft-storage";
+import { useDashboardStore } from "@/stores/dashboard-store";
+import { useAuthStore } from "@/stores/auth-store";
 
 const initialStepFourValues: StepFourDraftValues = {
   penalties: {
@@ -30,6 +32,9 @@ const initialStepFourValues: StepFourDraftValues = {
 export default function StepFour() {
   const router = useRouter();
   const saved = getSquadDraft();
+  const badgesData = useDashboardStore((state) => state.badgesData);
+  const fetchBadges = useDashboardStore((state) => state.fetchBadges);
+  const user = useAuthStore((state) => state.user);
 
   const { values, setFieldValue, setValues, handleSubmit } = useFormik<StepFourDraftValues>({
     initialValues: initialStepFourValues,
@@ -49,6 +54,13 @@ export default function StepFour() {
     }
   }, [setValues]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    fetchBadges(user.id);
+  }, [user?.id, fetchBadges]);
+
+  console.log(badgesData, 'badges')
+
   return (
     <main className="w-full px-8 py-2 sm:px-6 sm:py-3 lg:px-8">
       <button
@@ -67,7 +79,7 @@ export default function StepFour() {
         </div>
 
         <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full border border-border bg-muted">
-          <div className="h-full w-[80%] rounded-full bg-accent-foreground" />
+          <div className="h-full w-[80%] rounded-full bg-accent" />
         </div>
 
         <div className="mt-6 space-y-2">
