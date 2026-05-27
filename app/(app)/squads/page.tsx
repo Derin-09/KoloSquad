@@ -105,7 +105,7 @@ export default function SquadsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by squad name or goal..."
-              className="h-12 w-full rounded-full border border-border bg-background/80 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-[#79b8c4]"
+              className="h-12 w-full rounded-full border border-border bg-surface/70 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-(--accent-input-focus)"
             />
           </div>
 
@@ -130,8 +130,8 @@ export default function SquadsPage() {
                   onClick={() => setActiveCategory(category)}
                   className={`rounded-full px-4 py-2 text-xs font-medium transition ${
                     selected
-                      ? "bg-[#544319] text-[#f2dc9e]"
-                      : "border border-border bg-card text-muted-foreground hover:text-foreground"
+                      ? "bg-(--accent) text-accent-foreground"
+                      : "border border-border bg-surface text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {category}
@@ -160,13 +160,13 @@ export default function SquadsPage() {
             return (
               <article
                 key={squad.id}
-                className="group relative rounded-3xl border border-border bg-card/80 p-5 text-foreground shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
+                className="group relative rounded-3xl border border-border bg-surface p-5 text-foreground shadow-sm"
               >
                 <div className="mb-4 flex items-start justify-between gap-4">
-                  <div className="inline-flex size-10 items-center justify-center rounded-2xl border border-border bg-background/60 text-[#a9cdd2]">
+                  <div className="inline-flex size-10 items-center justify-center rounded-2xl border border-border bg-muted text-accent-foreground">
                     <Compass size={18} />
                   </div>
-                  <span className="rounded-full bg-[#3b3728] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#d8bc73]">
+                  <span className="rounded-full bg-(--primary-foreground) px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-accent-foreground">
                     {cardCategory}
                   </span>
                 </div>
@@ -183,8 +183,8 @@ export default function SquadsPage() {
                   <span className="font-semibold text-foreground">{currency(target)}</span>
                 </div>
 
-                <div className="mb-3 h-2 overflow-hidden rounded-full bg-[#2f363d]">
-                  <div className="h-full rounded-full bg-[#b7e6ee]" style={{ width: `${achieved}%` }} />
+                <div className="mb-3 h-2 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full bg-(--accent-button)" style={{ width: `${achieved}%` }} />
                 </div>
 
                 <div className="mb-5 flex items-center justify-between text-xs text-muted-foreground">
@@ -192,13 +192,13 @@ export default function SquadsPage() {
                     {members.slice(0, 2).map((member, idx) => (
                       <span
                         key={member.user_id || idx}
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-background bg-[#3c4856] text-[10px] font-medium text-white"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-(--accent-input) text-[10px] font-medium text-accent-foreground"
                       >
                         {(member.user_id || "U").slice(0, 1).toUpperCase()}
                       </span>
                     ))}
                     {members.length > 2 && (
-                      <span className="ml-2 inline-flex items-center rounded-full border border-border bg-background/50 px-1.5 py-0.5 text-[10px]">
+                      <span className="ml-2 inline-flex items-center rounded-full border border-border bg-muted px-1.5 py-0.5 text-[10px]">
                         +{members.length - 2}
                       </span>
                     )}
@@ -209,7 +209,7 @@ export default function SquadsPage() {
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/squads/${squad.id}`}
-                    className="inline-flex h-11 w-full items-center justify-center rounded-full bg-[#b6e7ef] text-sm font-semibold text-[#0f2a34]"
+                    className="inline-flex h-11 w-full items-center justify-center rounded-full bg-(--accent) text-sm font-semibold text-accent-foreground"
                   >
                     View Squad
                   </Link>
@@ -225,7 +225,7 @@ export default function SquadsPage() {
                 <button
                   type="button"
                   onClick={() => handleDelete(squad.id)}
-                  className="absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 text-red-300 opacity-0 transition group-hover:opacity-100"
+                  className="absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full border border-destructive/40 bg-destructive/10 text-destructive opacity-0 transition group-hover:opacity-100"
                   title="Delete squad"
                 >
                   <Trash2 size={14} />
@@ -238,7 +238,7 @@ export default function SquadsPage() {
 
       <Link
         href="/squads/new/step-one"
-        className="fixed bottom-6 right-6 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-[#b6e7ef] px-5 text-sm font-semibold text-[#0f2a34] shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+        className="fixed bottom-6 right-6 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-(--accent) px-5 text-sm font-semibold text-accent-foreground shadow-lg"
       >
         <Plus size={18} />
         Create New
