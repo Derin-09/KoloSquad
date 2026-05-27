@@ -8,6 +8,7 @@ import NewContributionPlan from "../../contributions/[id]/new/NewContributionCli
 import Spinner from "@/app/loading";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ExternalLink, Zap, Clock, AlertCircle, Users } from "lucide-react";
 
 
 interface ProfileType {
@@ -183,7 +184,7 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
    
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 space-y-12 animate-fadeIn">
+    <div className="relative min-h-screen max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8 animate-fadeIn">
 
     {
        dialogShow && (
@@ -200,66 +201,109 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
         </Dialog>
         )
     }
-      {/* Fixed Back Button */}
+      {/* Back Button */}
       <Link
         href="/squads"
-        className="absolute top-6 left-6 z-20 bg-[color:var(--card)]/80 backdrop-blur-md border border-white/10 text-[color:var(--accent-button)] font-semibold px-4 py-2 rounded-lg  transition-all text-sm"
+        className="inline-flex items-center gap-2 text-[color:var(--accent-button)] font-semibold px-4 py-2 rounded-lg hover:bg-[color:var(--accent-muted)]/20 transition-all text-sm mb-8"
       >
-        ← Back
+        ← Back to Squads
       </Link>
 
-      {/* Header */}
-      <header className="bg-gradient-to-br from-[color:var(--card)]/90 to-[color:var(--accent-muted)]/40 border border-white/10 rounded-3xl p-8 shadow-md shadow-[0_0_25px_-10px_var(--accent-button)] flex flex-col md:flex-row justify-between gap-6 transition-transform hover:scale-[1.01]">
-        <div className="space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-bold capitalize tracking-tight">{squad.name}</h1>
-          <p className="text-muted-foreground text-sm">
-            Target:{" "}
-            <span className="font-semibold text-foreground">
-              ₦{(squad.target_amount ?? 0).toLocaleString()}
-            </span>{" "}
-            &nbsp;|&nbsp; Saved:{" "}
-            <span className="font-semibold text-[color:var(--accent-button)]">
-              ₦{totalSaved.toLocaleString()}
+      <div className="space-y-8">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-br from-[color:var(--card)]/90 to-[color:var(--accent-muted)]/40 border border-white/10 rounded-3xl p-8 space-y-6">
+          {/* Badges */}
+          <div className="flex flex-wrap gap-2">
+            <span className="bg-[color:var(--accent-button)]/20 text-[color:var(--accent-button)] px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
+              High Performance
             </span>
-          </p>
+            <span className="bg-blue-500/20 text-blue-300 px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
+              Public Squad
+            </span>
+          </div>
+
+          {/* Title & Description */}
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold tracking-tight">{squad.name}</h1>
+            <p className="text-muted-foreground text-base">The elite circle for engineering leads and tech enthusiasts building long-term wealth through disciplined weekly savings.</p>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4 border-t border-white/10">
+            <div>
+              <p className="text-xs uppercase text-muted-foreground font-semibold tracking-widest">Total Assets</p>
+              <p className="text-2xl font-bold text-foreground mt-1">₦{totalSaved.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground font-semibold tracking-widest">Squad Rank</p>
+              <p className="text-2xl font-bold text-[color:var(--accent-button)] mt-1">#4 Globally</p>
+            </div>
+            <div className="col-span-2 md:col-span-1">
+              <p className="text-xs uppercase text-muted-foreground font-semibold tracking-widest">Invite Code</p>
+              <code className="font-mono text-lg font-bold mt-1 block">{squad.invite_code || "N/A"}</code>
+            </div>
+          </div>
         </div>
 
-        <div className="text-right space-y-2">
-          <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-            Invite Code
-          </h3>
-          <code className="font-mono text-lg font-semibold bg-[color:var(--accent-muted)]/40 px-4 py-2 rounded-lg block ">
-            {squad.invite_code || "N/A"}
-          </code>
-        </div>
-      </header>
+        {/* Goal Progress & Leaderboard Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Goal Progress */}
+          <div className="bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
+            <h3 className="text-sm uppercase text-muted-foreground font-semibold tracking-widest mb-6">Annual Goal Progress</h3>
+            
+            {/* Donut Chart */}
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative w-32 h-32">
+                <svg viewBox="0 0 120 120" className="w-full h-full transform -rotate-90">
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="12"
+                    className="text-[color:var(--accent-muted)]/30"
+                  />
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="12"
+                    strokeDasharray={`${75 * 3.14} ${100 * 3.14}`}
+                    className="text-[color:var(--accent-button)] transition-all"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-bold">75%</span>
+                  <span className="text-xs text-muted-foreground">Complete</span>
+                </div>
+              </div>
+            </div>
 
-      {/* Members Table */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-6 tracking-tight">Squad Members</h2>
+            <div className="text-center pt-4 border-t border-white/10">
+              <p className="text-xs text-muted-foreground">Goal: <span className="text-[color:var(--accent-button)] font-semibold">₦320,000</span></p>
+            </div>
+          </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-white/10  bg-[color:var(--card)]/70 backdrop-blur-lg">
-          <table className="w-full text-sm text-left text-muted-foreground">
-            <thead className="bg-[color:var(--accent-muted)]/30 text-xs uppercase text-muted-foreground tracking-wide">
-              <tr>
-                <th className="px-6 py-3">Member</th>
-                <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">Total Contributed</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((m, i) => {
+          {/* Leaderboard */}
+          <div className="lg:col-span-2 bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-sm uppercase text-muted-foreground font-semibold tracking-widest">Leaderboard</h3>
+              <ExternalLink className="w-4 h-4 text-muted-foreground" />
+            </div>
+
+            <div className="space-y-4">
+              {members.slice(0, 3).map((m, i) => {
                 const name = m.profiles.full_name || "Unnamed User";
                 const avatar = m.profiles.avatar_url;
-                const isOwner = m.role === "owner";
-
+                const badges = ["100%", "98%", "95%"];
+                
                 return (
-                  <tr
-                    key={i}
-                    className={`transition-colors hover:bg-[color:var(--accent-muted)]/20 ${isOwner ? "bg-[color:var(--accent-muted)]/30 font-semibold" : ""
-                      }`}
-                  >
-                    <td className="px-6 py-4 flex items-center gap-3">
+                  <div key={i} className="flex items-center justify-between pb-4 border-b border-white/5 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-full bg-[color:var(--accent-muted)] flex items-center justify-center text-xs font-bold text-white">{i + 1}</span>
                       {avatar ? (
                         <img
                           src={avatar}
@@ -267,75 +311,161 @@ export default function SquadPage({ params }: { params: Promise<{ id: string }> 
                           className="w-10 h-10 rounded-full object-cover border border-white/10"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-[color:var(--accent-muted)] flex items-center justify-center font-semibold text-white">
+                        <div className="w-10 h-10 rounded-full bg-[color:var(--accent-muted)]/50 flex items-center justify-center font-semibold text-white">
                           {name.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span>{name}</span>
-                    </td>
-                    <td className="px-6 py-4 capitalize">{m.role}</td>
-                    <td className="px-6 py-4 font-medium text-[color:var(--accent-button)]">
-                      ₦{m.total_contributed.toLocaleString()}
-                    </td>
-                  </tr>
+                      <div>
+                        <p className="font-semibold text-sm">{name}</p>
+                        <p className="text-xs text-muted-foreground">Consistency: {badges[i]}</p>
+                      </div>
+                    </div>
+                    <p className="font-bold text-[color:var(--accent-button)]">₦{m.total_contributed.toLocaleString()}</p>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
-      </section>
 
-      {/* New Plan */}
-      <section className="pt-4">
-        <div className="bg-[color:var(--card)]/70 p-8 rounded-3xl border border-white/10 shadow-[0_0_25px_-10px_var(--accent-button)] backdrop-blur-md">
-          <NewContributionPlan squadId={squadId} />
-        </div>
-      </section>
+        {/* Squad Rules */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-8 backdrop-blur-md space-y-6">
+            <h3 className="text-lg font-bold">Squad Rules</h3>
 
-      {/* Contributions */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Contribution History</h2>
-        {contributions.length === 0 ? (
-          <p className="text-muted-foreground text-sm italic">No contributions yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {contributions.map((c, i) => (
-              <div
-                key={i}
-                className="flex justify-between items-center bg-[color:var(--card)]/60 border border-white/10 rounded-xl px-6 py-4 shadow-[0_0_20px_-10px_var(--accent-button)] hover:shadow-[0_0_25px_-8px_var(--accent-button)] transition-all"
-              >
-                <div>
-                  <p className="font-semibold text-sm">
-                    ₦{c.amount.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(c.created_at).toLocaleDateString()}
-                  </p>
+            {/* Weekly Contribution */}
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-[color:var(--accent-button)]/20 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-[color:var(--accent-button)]" />
                 </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${c.status === "successful"
-                      ? "bg-green-500/20 text-green-300"
-                      : "bg-yellow-500/20 text-yellow-300"
-                    }`}
-                >
-                  {c.status}
-                </span>
               </div>
-            ))}
+              <div>
+                <p className="font-semibold text-sm">Weekly Contribution</p>
+                <p className="text-xs text-muted-foreground mt-1">₦500 minimum<br/>Due every Sunday by 11:59 PM</p>
+              </div>
+            </div>
+
+            {/* Grace Period */}
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-blue-400" />
+                </div>
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Grace Period</p>
+                <p className="text-xs text-muted-foreground mt-1">2 Passes per Year<br/>Notification required 48hrs prior</p>
+              </div>
+            </div>
+
+            {/* Penalty */}
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                </div>
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Penalty Clause</p>
+                <p className="text-xs text-muted-foreground mt-1">5% Late Fee<br/>Redistributed to active members</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Membership */}
+          <div className="bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
+            <div className="flex gap-4 mb-6">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-green-400" />
+                </div>
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Membership</p>
+                <p className="text-xs text-muted-foreground mt-1">{members.length}/15 Members<br/>3 Spots available currently</p>
+              </div>
+            </div>
+
+            {/* Member Activity */}
+            <div className="pt-6 border-t border-white/10">
+              <h4 className="text-sm font-semibold mb-4">Member Activity</h4>
+              <div className="flex items-center justify-center gap-2">
+                {members.slice(0, 6).map((m, i) => (
+                  m.profiles.avatar_url ? (
+                    <img
+                      key={i}
+                      src={m.profiles.avatar_url}
+                      alt={m.profiles.full_name || "Member"}
+                      className="w-10 h-10 rounded-full object-cover border border-white/10"
+                    />
+                  ) : (
+                    <div key={i} className="w-10 h-10 rounded-full bg-[color:var(--accent-muted)]/50 flex items-center justify-center text-xs font-semibold text-white">
+                      {(m.profiles.full_name || "U").charAt(0).toUpperCase()}
+                    </div>
+                  )
+                ))}
+                {members.length > 6 && (
+                  <div className="w-10 h-10 rounded-full bg-[color:var(--accent-muted)] flex items-center justify-center text-xs font-bold text-white">
+                    +{members.length - 6}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* New Plan Section */}
+        {/* <div className="bg-[color:var(--card)]/70 p-8 rounded-3xl border border-white/10 shadow-[0_0_25px_-10px_var(--accent-button)] backdrop-blur-md">
+          <NewContributionPlan squadId={squadId} />
+        </div> */}
+
+        {/* Contribution History */}
+        {/* <div>
+          <h2 className="text-2xl font-bold mb-6">Contribution History</h2>
+          {contributions.length === 0 ? (
+            <p className="text-muted-foreground text-sm italic">No contributions yet.</p>
+          ) : (
+            <div className="grid gap-3">
+              {contributions.map((c, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between items-center bg-[color:var(--card)]/60 border border-white/10 rounded-xl px-6 py-4 shadow-[0_0_20px_-10px_var(--accent-button)] hover:shadow-[0_0_25px_-8px_var(--accent-button)] transition-all"
+                >
+                  <div>
+                    <p className="font-semibold text-sm">
+                      ₦{c.amount.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(c.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${c.status === "successful"
+                        ? "bg-green-500/20 text-green-300"
+                        : "bg-yellow-500/20 text-yellow-300"
+                      }`}
+                  >
+                    {c.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div> */}
+
+        {/* Delete Squad Button */}
+        {squad?.created_by && (
+          <div className="pt-6 border-t border-white/10 flex justify-end">
+            <button
+              onClick={deleteSquad}
+              className="px-6 py-2 bg-red-600/80 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"
+            >
+              Delete Squad
+            </button>
           </div>
         )}
-      </section>
-
-      {squad?.created_by && (
-        <div className="pt-10 border-t border-white/10 flex justify-end">
-          <button
-            onClick={deleteSquad}
-            className="px-5 py-2 bg-red-600/80 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors hover:cursor-pointer"
-          >
-            Delete Squad
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -129,7 +129,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={() => router.push('/squads/new')} className="flex items-center gap-2">
+          <Button onClick={() => router.push('/squads/new/step-one')} className="flex items-center gap-2">
             <PlusCircle />
             <p>Create Squad</p>
           </Button>
