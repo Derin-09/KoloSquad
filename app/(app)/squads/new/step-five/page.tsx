@@ -103,8 +103,14 @@ export default function StepFive() {
 
 
   const handleCreateSquad = async () => {
-    if (!summary || !user?.id) {
-      setError("Missing setup details. Please review previous steps.");
+    // Ensure both summary and user are loaded before submission
+    if (!summary) {
+      setError("Squad details not loaded. Please refresh.");
+      return;
+    }
+    
+    if (!user?.id) {
+      setError("User session not ready. Please wait a moment and try again.");
       return;
     }
 
@@ -238,11 +244,13 @@ export default function StepFive() {
         <Button
           type="button"
           onClick={handleCreateSquad}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !user?.id}
           className="mt-4 h-12 w-full rounded-2xl bg-accent-foreground text-surface hover:bg-accent-foreground/90"
         >
           {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Rocket size={18} />}
-          <span className="font-semibold">{isSubmitting ? "Creating Squad..." : "Create Squad"}</span>
+          <span className="font-semibold">
+            {isSubmitting ? "Creating Squad..." : !user?.id ? "Waiting for user..." : "Create Squad"}
+          </span>
         </Button>
 
         <Button

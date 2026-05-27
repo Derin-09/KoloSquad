@@ -30,15 +30,19 @@ export const useAuthStore = create<AuthStoreType>((set, get) => ({
     user: null,
     profile: null,
     fetchUser: async () => {
+        console.log("[AUTH STORE] fetchUser called");
         const { data: sessionData } = await supabase.auth.getSession();
+        console.log("[AUTH STORE] getSession result:", sessionData.session?.user?.id ?? "no user");
         const sessionUser = sessionData.session?.user ?? null;
 
         // Use local session immediately so UI can hydrate even if network is flaky.
         set({ user: sessionUser });
+        console.log("[AUTH STORE] Set user in store:", sessionUser?.id ?? "null");
 
         const { data, error } = await supabase.auth.getUser();
+        console.log("[AUTH STORE] getUser result:", { hasError: !!error, userId: data?.user?.id ?? "none" });
         if (error) {
-            console.error("auth.getUser failed:", error.message);
+            console.error("[AUTH STORE] auth.getUser failed:", error.message);
 
             // Keep session-backed user if available; do not wipe auth state on transient failures.
             if (!sessionUser) {

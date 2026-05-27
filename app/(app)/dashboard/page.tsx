@@ -40,12 +40,30 @@ export default function DashboardPage() {
   const { isLoading, isError, refreshSquads, startRealtime, stopRealtime } = useSquadStore()
 
   useEffect(() => {
-    void refreshSquads()
-    startRealtime()
+    let isMounted = true;
+    
+    const loadSquads = async () => {
+      // Set a reasonable timeout so spinner doesn't hang indefinitely
+      const timeoutId = setTimeout(() => {
+        if (isMounted) {
+          setError("Taking longer than expected to load squads. Please refresh.");
+        }
+      }, 8000);
+      
+      try {
+        await refreshSquads();
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+    
+    void loadSquads();
+    startRealtime();
 
     return () => {
-      stopRealtime()
-    }
+      isMounted = false;
+      stopRealtime();
+    };
   }, [refreshSquads, startRealtime, stopRealtime])
 
   useEffect(() => {
