@@ -20,6 +20,7 @@ export type StepFourDraftValues = {
   penalties: {
     loseStreakIfMissed: boolean;
     funnyReminderMessage: boolean;
+    dropOnLeaderboard: boolean;
   };
 };
 

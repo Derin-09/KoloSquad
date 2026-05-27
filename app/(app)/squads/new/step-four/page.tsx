@@ -9,6 +9,7 @@ import {
   BellRing,
   ChevronLeft,
   Flame,
+  TrendingDown,
   ShieldAlert,
   Trophy,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const initialStepFourValues: StepFourDraftValues = {
   penalties: {
     loseStreakIfMissed: false,
     funnyReminderMessage: true,
+    dropOnLeaderboard: true,
   },
 };
 
@@ -199,6 +201,40 @@ export default function StepFour() {
                 }`}
               >
                 {values.penalties.funnyReminderMessage ? (
+                  <span className="inline-block size-2 rounded-full bg-surface" />
+                ) : null}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setFieldValue(
+                  "penalties.dropOnLeaderboard",
+                  !values.penalties.dropOnLeaderboard
+                )
+              }
+              className="flex w-full items-center justify-between rounded-3xl border-2 border-border bg-surface px-4 py-4 text-left"
+            >
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex size-8 items-center justify-center rounded-full bg-muted text-foreground">
+                  <TrendingDown size={15} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Drop on leaderboard</p>
+                  <p className="text-xs text-muted-foreground">
+                    Move down the leaderboard rank after missed contributions.
+                  </p>
+                </div>
+              </div>
+              <span
+                className={`mt-0.5 inline-flex size-5 items-center justify-center rounded-full border-2 ${
+                  values.penalties.dropOnLeaderboard
+                    ? "border-accent-foreground bg-accent-foreground"
+                    : "border-foreground/80 bg-surface"
+                }`}
+              >
+                {values.penalties.dropOnLeaderboard ? (
                   <span className="inline-block size-2 rounded-full bg-surface" />
                 ) : null}
               </span>
