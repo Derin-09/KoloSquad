@@ -1,9 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CalendarDays, CheckCircle2, Loader2, ShieldCheck, Sparkles, Users, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  ChartNoAxesColumnIncreasing,
+  Loader2,
+  Shield,
+  Users,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +23,18 @@ type SquadLookupResult = {
   duration_number?: number;
   frequency?: string;
 };
+
+type LeaderboardEntry = {
+  name: string;
+  consistency: string;
+  amount: string;
+};
+
+const leaderboard: LeaderboardEntry[] = [
+  { name: "Alex Rivero", consistency: "Consistency: 100%", amount: "$42k" },
+  { name: "Jordan Wei", consistency: "Consistency: 98%", amount: "$38k" },
+  { name: "Sarah Connor", consistency: "Consistency: 95%", amount: "$31k" },
+];
 
 function normalizeCode(input: string) {
   return input.trim().toUpperCase();
@@ -129,21 +146,11 @@ export default function JoinSquadPage() {
     return 0;
   }, [squad?.amount_per_member, squad?.member_count, squad?.target_amount]);
 
-  const platformFee = useMemo(() => weeklyContribution * 0.01, [weeklyContribution]);
-  const totalDue = useMemo(() => weeklyContribution + platformFee, [platformFee, weeklyContribution]);
+  const annualGoal = useMemo(() => Number(squad?.target_amount || 320000), [squad?.target_amount]);
+  const progressPercent = 75;
+  const assetsValue = useMemo(() => Math.round((annualGoal * progressPercent) / 100), [annualGoal]);
 
-  const payoutDate = useMemo(() => {
-    const date = new Date();
-    date.setDate(date.getDate() + 14);
-
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  }, []);
-
-  async function handleConfirmJoin() {
+  async function handleJoinSquad() {
     if (!normalizedCode) {
       setError("Missing join code.");
       return;
@@ -161,7 +168,7 @@ export default function JoinSquadPage() {
         throw new Error(joinError.message || "Failed to join squad.");
       }
 
-      router.replace(squad?.id ? `/squads/${squad.id}` : "/dashboard");
+      router.replace(squad?.id ? `/contributions?squadId=${encodeURIComponent(squad.id)}` : "/contributions");
     } catch (joinError) {
       const message =
         joinError instanceof Error
@@ -185,136 +192,158 @@ export default function JoinSquadPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl rounded-[28px] border border-[#242424] bg-[#090b10] p-5 text-white shadow-[0_0_120px_rgba(30,45,84,0.2)] md:p-8">
-      <div className="mb-6 space-y-1">
-        <h1 className="text-3xl font-semibold tracking-tight">Join the Squad</h1>
-        <p className="text-sm text-[#9ea4b2]">
-          Review your commitment and confirm your entry into the financial circle.
-        </p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1.25fr_0.95fr]">
-        <section className="space-y-4">
-          <div className="rounded-3xl border border-[#242932] bg-linear-to-br from-[#131926] via-[#10141d] to-[#0b1018] p-5">
-            <div className="mb-4 flex items-start gap-3">
-              <div className="inline-flex size-11 items-center justify-center rounded-full bg-[#3f351f] text-[#f6d384]">
-                <Users className="size-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold">{squad?.name || "Verified Squad"}</h2>
-                <p className="text-xs uppercase tracking-[0.08em] text-[#9ca5b6]">
-                  Active squad • {Math.max(1, Number(squad?.member_count || 0))} members
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl bg-white/8 p-4">
-                <p className="text-xs text-[#9ca5b6]">Weekly Contribution</p>
-                <p className="mt-1 text-3xl font-semibold text-[#8bd3ff]">{formatCurrency(weeklyContribution)}</p>
-              </div>
-              <div className="rounded-2xl bg-white/8 p-4">
-                <p className="text-xs text-[#9ca5b6]">Next Payout Date</p>
-                <p className="mt-1 inline-flex items-center gap-2 text-2xl font-semibold text-[#f4cf88]">
-                  <CalendarDays className="size-5" />
-                  {payoutDate}
-                </p>
-              </div>
-            </div>
+    <main className="mx-auto max-w-6xl rounded-[28px] border border-[#20242d] bg-[#090c13] p-5 text-white shadow-[0_0_90px_rgba(21,33,61,0.28)] md:p-8">
+      <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr]">
+        <section className="rounded-3xl border border-[#2a303d] bg-linear-to-br from-[#1a1d24] via-[#151922] to-[#12161d] p-5">
+          <div className="mb-4 flex items-center gap-2 text-xs">
+            <span className="rounded-full bg-[#3a311f] px-3 py-1 text-[#f1c66d]">High Performance</span>
+            <span className="rounded-full border border-[#3a4050] px-3 py-1 text-[#d6dbe7]">Public Squad</span>
           </div>
 
-          <div className="rounded-3xl border border-[#242932] bg-[#11141b] p-5">
-            <h3 className="mb-4 text-xl font-semibold">Squad Benefits</h3>
-            <ul className="space-y-4">
-              <li className="flex gap-3">
-                <Sparkles className="mt-0.5 size-4 text-[#89d0ff]" />
-                <p className="text-sm text-[#cad0dc]">
-                  <span className="font-semibold text-white">Guaranteed Rotational Payout</span>
-                  Receive your turn-based payout as scheduled within the circle.
-                </p>
-              </li>
-              <li className="flex gap-3">
-                <ShieldCheck className="mt-0.5 size-4 text-[#89d0ff]" />
-                <p className="text-sm text-[#cad0dc]">
-                  <span className="font-semibold text-white">Default Protection</span>
-                  Members are vetted and contribution records are tracked for consistency.
-                </p>
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 className="mt-0.5 size-4 text-[#89d0ff]" />
-                <p className="text-sm text-[#cad0dc]">
-                  <span className="font-semibold text-white">Credit Score Impact</span>
-                  Strong participation history helps you build financial credibility.
-                </p>
-              </li>
-            </ul>
+          <h1 className="text-4xl font-semibold tracking-tight">{squad?.name || "Tech Titans"}</h1>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#c6ccda]">
+            The elite circle for engineering leads and tech enthusiasts building long-term wealth through disciplined weekly savings.
+          </p>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-[#8e97ac]">Total Assets</p>
+              <p className="mt-1 text-4xl font-semibold text-[#9fe3ff]">{formatCurrency(assetsValue)}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-[#8e97ac]">Squad Rank</p>
+              <p className="mt-1 text-4xl font-semibold text-[#edcb90]">#4 Globally</p>
+            </div>
           </div>
         </section>
 
-        <section className="space-y-4">
-          <div className="rounded-3xl border border-[#242932] bg-[#11141b] p-5">
-            <h3 className="mb-4 text-2xl font-semibold">Payment Summary</h3>
-
-            <div className="space-y-2 text-sm text-[#c2c9d8]">
-              <div className="flex items-center justify-between">
-                <span>First Deposit</span>
-                <span className="font-semibold text-white">{formatCurrency(weeklyContribution)}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-[#273043] pb-3">
-                <span>Platform Fee (1%)</span>
-                <span className="font-semibold text-white">{formatCurrency(platformFee)}</span>
-              </div>
-              <div className="flex items-center justify-between pt-1 text-base">
-                <span className="font-semibold text-white">Total Due</span>
-                <span className="font-semibold text-[#8fe0f7]">{formatCurrency(totalDue)}</span>
-              </div>
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-[#2a3345] bg-[#171f2e] p-4">
-              <p className="inline-flex items-center gap-2 text-xs text-[#9fb8da]">
-                <Wallet className="size-4" />
-                Wallet Balance
-              </p>
-              <p className="mt-1 text-lg font-semibold">{formatCurrency(1420000)}</p>
-            </div>
-
-            <Button
-              onClick={handleConfirmJoin}
-              disabled={joining || !normalizedCode}
-              className="mt-6 h-12 w-full rounded-full bg-[#a9d7df] text-[#072027] hover:bg-[#96c6cf]"
+        <section className="rounded-3xl border border-[#2a303d] bg-linear-to-br from-[#1a1d24] via-[#151922] to-[#12161d] p-5">
+          <h2 className="text-center text-sm font-semibold text-[#cfd6e3]">Annual Goal Progress</h2>
+          <div className="mt-4 flex justify-center">
+            <div
+              className="relative grid size-36 place-items-center rounded-full"
+              style={{
+                background: `conic-gradient(#a6dfe9 ${progressPercent * 3.6}deg, #2f3747 0deg)`,
+              }}
             >
-              {joining ? (
-                <span className="inline-flex items-center gap-2">
-                  <Loader2 className="size-4 animate-spin" />
-                  Joining Squad...
-                </span>
-              ) : (
-                "Confirm & Pay First Deposit"
-              )}
-            </Button>
+              <div className="grid size-28 place-items-center rounded-full bg-[#131821]">
+                <p className="text-4xl font-bold">{progressPercent}%</p>
+                <p className="text-xs text-[#a6aec2]">Complete</p>
+              </div>
+            </div>
+          </div>
+          <p className="mt-4 text-center text-lg font-semibold text-[#d3d8e4]">
+            Goal: {formatCurrency(annualGoal)}
+          </p>
+        </section>
+      </div>
 
-            <p className="mt-3 text-center text-xs text-[#8992a2]">
-              By confirming, you agree to the Squad Membership Terms and recurring weekly deductions.
-            </p>
-
-            {error ? <p className="mt-3 text-sm text-red-400">{error}</p> : null}
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1.4fr]">
+        <section className="rounded-3xl border border-[#2a303d] bg-linear-to-br from-[#1a1d24] via-[#151922] to-[#12161d] p-5">
+          <div className="mb-5 flex items-center justify-between">
+            <h3 className="text-3xl font-semibold">Leaderboard</h3>
+            <ChartNoAxesColumnIncreasing className="size-5 text-[#8ec7ff]" />
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-[#242932]">
-            <Image
-              src="/image/side-view-friends-with-smartphone.jpg"
-              alt="Squad members planning together"
-              width={680}
-              height={340}
-              className="h-44 w-full object-cover opacity-80"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-[#0d1118] via-transparent to-transparent" />
-            <span className="absolute bottom-3 left-3 rounded-full bg-[#4d3d1f]/90 px-3 py-1 text-[11px] font-semibold text-[#f2cc82]">
-              ESTABLISHED 2022
-            </span>
+          <ul className="space-y-4">
+            {leaderboard.map((entry, index) => (
+              <li
+                key={entry.name}
+                className="flex items-center justify-between rounded-2xl border border-[#2d3443] bg-[#121821]/80 px-3 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex size-7 items-center justify-center rounded-full bg-[#3a311f] text-sm font-semibold text-[#f1c66d]">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold">{entry.name}</p>
+                    <p className="text-xs text-[#a6aec2]">{entry.consistency}</p>
+                  </div>
+                </div>
+                <span className="text-sm font-semibold text-[#a2daf8]">{entry.amount}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-3xl border border-[#2a303d] bg-linear-to-br from-[#1a1d24] via-[#151922] to-[#12161d] p-5">
+          <h3 className="mb-4 text-3xl font-semibold">Squad Rules</h3>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-[#2d3443] bg-[#121821]/70 p-4">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#a8d8ff]">
+                <Users className="size-4" />
+                Weekly Contribution
+              </p>
+              <p className="mt-2 text-2xl font-semibold">{formatCurrency(weeklyContribution)} minimum</p>
+              <p className="mt-1 text-xs text-[#a6aec2]">Due every Sunday by 11:59 PM</p>
+            </div>
+
+            <div className="rounded-2xl border border-[#2d3443] bg-[#121821]/70 p-4">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#ffb2a8]">
+                <AlertTriangle className="size-4" />
+                Penalty Clause
+              </p>
+              <p className="mt-2 text-2xl font-semibold">5% Late Fee</p>
+              <p className="mt-1 text-xs text-[#a6aec2]">Redistributed to active members</p>
+            </div>
+
+            <div className="rounded-2xl border border-[#2d3443] bg-[#121821]/70 p-4">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#f5c476]">
+                <Shield className="size-4" />
+                Grace Period
+              </p>
+              <p className="mt-2 text-2xl font-semibold">2 Passes per Year</p>
+              <p className="mt-1 text-xs text-[#a6aec2]">Notification required 48hrs prior</p>
+            </div>
+
+            <div className="rounded-2xl border border-[#2d3443] bg-[#121821]/70 p-4">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#9fd5ff]">
+                <Users className="size-4" />
+                Membership
+              </p>
+              <p className="mt-2 text-2xl font-semibold">
+                {Math.max(1, Number(squad?.member_count || 0))}/15 Members
+              </p>
+              <p className="mt-1 text-xs text-[#a6aec2]">3 spots available currently</p>
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-[#2d3443] pt-4">
+            <p className="text-xs uppercase tracking-[0.08em] text-[#9aa3b8]">Member Activity</p>
+            <div className="mt-3 flex items-center">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <span
+                  key={idx}
+                  className="-mr-2 inline-flex size-9 items-center justify-center rounded-full border-2 border-[#0f141c] bg-linear-to-br from-[#2e3749] to-[#18222f] text-xs font-semibold text-[#e7ecf6]"
+                >
+                  {String.fromCharCode(65 + idx)}
+                </span>
+              ))}
+              <span className="ml-2 inline-flex rounded-full bg-[#223244] px-2 py-1 text-xs text-[#9ed8ff]">+7</span>
+            </div>
           </div>
         </section>
       </div>
+
+      <div className="mt-6 flex justify-center">
+        <Button
+          onClick={handleJoinSquad}
+          disabled={joining || !normalizedCode}
+          className="h-14 min-w-55 rounded-full bg-[#a9d7df] px-8 text-lg font-semibold text-[#10242b] hover:bg-[#96c6cf]"
+        >
+          {joining ? (
+            <span className="inline-flex items-center gap-2">
+              <Loader2 className="size-5 animate-spin" />
+              Joining Squad...
+            </span>
+          ) : (
+            "Join This Squad"
+          )}
+        </Button>
+      </div>
+
+      {error ? <p className="mt-4 text-center text-sm text-red-400">{error}</p> : null}
     </main>
   );
 }
