@@ -57,9 +57,9 @@ export default function SquadsPage() {
   }
 
   const currency = (value: number) =>
-    new Intl.NumberFormat("en-US", {
+    new Intl.NumberFormat("en-NG", {
       style: "currency",
-      currency: "USD",
+      currency: "NGN",
       maximumFractionDigits: 0,
     }).format(value || 0)
 
