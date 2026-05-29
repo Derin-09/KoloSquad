@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import AppInitializer from "@/components/app-initializer";
+import JoinSquadCodeModal from "@/components/squads/JoinSquadCodeModal";
 
 
 
@@ -26,6 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <Topbar />
         <main className="flex-1 min-w-0 p-3 md:p-6 lg:p-8">
           <AppInitializer />
+          <JoinSquadCodeModal />
           {children}
           </main>
       </div>
