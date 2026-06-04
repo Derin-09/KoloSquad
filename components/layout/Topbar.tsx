@@ -162,8 +162,8 @@ const breadcrumbs = segments.map((seg, idx) => {
 
             <button
               className="rounded-md p-2 hover:bg-[color:var(--muted)] transition"
-              aria-label="Notifications"
-              onClick={() => router.push("/notifications")}
+              aria-label="Activity"
+              onClick={() => router.push("/activity")}
             >
               <Bell size={18} />
             </button>

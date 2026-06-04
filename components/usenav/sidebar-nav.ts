@@ -1,4 +1,4 @@
-import { Banknote, LayoutDashboard, Medal, Settings, Users, Wallet } from "lucide-react";
+import { Banknote, Bell, LayoutDashboard, Medal, Settings, Users, Wallet } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type SidebarNavLeafItem = {
@@ -28,5 +28,6 @@ export const sidebarNavItems: SidebarNavItem[] = [
   { href: "/contribution-plans", label: "Contributions", icon: Wallet },
   { href: "/payouts", label: "Payouts", icon: Banknote },
   { href: "/leaderboard", label: "Leaderboard", icon: Medal },
+  { href: "/activity", label: "Activity", icon: Bell },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
