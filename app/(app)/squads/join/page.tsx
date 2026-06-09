@@ -168,7 +168,11 @@ export default function JoinSquadPage() {
         throw new Error(joinError.message || "Failed to join squad.");
       }
 
-      router.replace(squad?.id ? `/contributions?squadId=${encodeURIComponent(squad.id)}` : "/contributions");
+      const successUrl = squad?.id
+        ? `/squads/join/success?squadId=${encodeURIComponent(squad.id)}`
+        : `/squads/join/success?code=${encodeURIComponent(normalizedCode)}`;
+
+      router.replace(successUrl);
     } catch (joinError) {
       const message =
         joinError instanceof Error
