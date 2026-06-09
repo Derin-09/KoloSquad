@@ -6,7 +6,7 @@ A modern, full-stack web application built with Next.js and TypeScript for team 
 
 ## Overview
 
-KoloSquad is a sleek, responsive web application designed to help teams organize, collaborate, and manage squad activities. Built with cutting-edge web technologies, it provides a seamless user experience with real-time data synchronization and intuitive UI components.
+KoloSquad is a sleek, responsive web application designed to help teams save together. Built with cutting-edge web technologies, it provides a seamless user experience with real-time data synchronization and intuitive UI components.
 
 ## Screenshot
 ![Screenshot](./public/image/landingpage-image.png)
