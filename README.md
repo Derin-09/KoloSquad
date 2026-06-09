@@ -1,6 +1,6 @@
 # KoloSquad
 
-A modern, full-stack web application built with Next.js and TypeScript for team collaboration and squad management.
+A modern, full-stack web application built with Next.js and TypeScript for team collaboration and saving together.
 
 **Live Demo:** [kolosquad.vercel.app](https://kolosquad.vercel.app)
 
