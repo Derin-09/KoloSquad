@@ -4,11 +4,14 @@ A modern, full-stack web application built with Next.js and TypeScript for team 
 
 **Live Demo:** [kolosquad.vercel.app](https://kolosquad.vercel.app)
 
-## 🎯 Overview
+## Overview
 
 KoloSquad is a sleek, responsive web application designed to help teams organize, collaborate, and manage squad activities. Built with cutting-edge web technologies, it provides a seamless user experience with real-time data synchronization and intuitive UI components.
 
-## 🛠️ Tech Stack
+## Screenshot
+![Screenshot](./public/image/landingpage-image.png)
+
+## Tech Stack
 
 ### Frontend
 - **Framework:** [Next.js 16](https://nextjs.org) - React framework for production
@@ -40,7 +43,7 @@ KoloSquad is a sleek, responsive web application designed to help teams organize
   - [Class Variance Authority](https://cva.style/docs) - CSS-in-JS for component variants
 - **Icons:** [React Icons](https://react-icons.github.io/react-icons) - Popular icon library
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 KoloSquad/
@@ -59,7 +62,7 @@ KoloSquad/
 └── components.json         # shadcn/ui components configuration
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+ or Bun
@@ -105,7 +108,7 @@ KoloSquad/
 5. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
-## 📝 Available Scripts
+## Available Scripts
 
 - `npm run dev` - Start the development server
 - `npm run build` - Build the application for production
@@ -113,7 +116,7 @@ KoloSquad/
 - `npm run lint` - Run ESLint for code quality checks
 - `npm run typecheck` - Run TypeScript type checking
 
-## 🎨 Development
+## Development
 
 ### Code Quality
 
@@ -135,7 +138,7 @@ Components are built using:
 - **Global State:** Zustand for application-wide state
 - **Server State:** React Query for server-side data caching and synchronization
 
-## 🚀 Deployment
+## Deployment
 
 This project is configured for deployment on [Vercel](https://vercel.com), the creators of Next.js.
 
@@ -148,19 +151,7 @@ This project is configured for deployment on [Vercel](https://vercel.com), the c
 
 The application is currently deployed at [kolosquad.vercel.app](https://kolosquad.vercel.app)
 
-## 📚 Learn More
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [React Documentation](https://react.dev)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Supabase Documentation](https://supabase.com/docs)
-
-## 📄 License
-
-This project is open source. Feel free to use it as reference or for your own projects.
-
-## 👤 Author
+## Author
 
 Created by [Derin-09](https://github.com/Derin-09)
 
