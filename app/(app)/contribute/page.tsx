@@ -45,8 +45,15 @@ export default function ContributePage() {
 
       const { data, error: fetchError } = await supabase
         .from("squad_members")
-        .select("squad_id, squads ( id, name )")
-        .eq("user_id", user.id);
+        .select(`squad_id, squads ( id, name )`)
+        .eq("user_id", user.id)
+        .returns<SquadMemberRow[]>();
+
+      //  const { data, error: fetchError } = await supabase
+      //         .from("squads")
+      //         .select("name, id")
+      //         .eq("created_by", user.id)
+      //         .single()
 
       if (fetchError) {
         setError(fetchError.message);
@@ -56,7 +63,7 @@ export default function ContributePage() {
       const uniqueSquads: SquadOption[] = [];
       const seen = new Set<string>();
 
-      ((data || []) as SquadMemberRow[]).forEach((row) => {
+      ((data) as SquadMemberRow[]).forEach((row) => {
         if (!row.squads?.id || seen.has(row.squads.id)) return;
         seen.add(row.squads.id);
         uniqueSquads.push(row.squads);
@@ -70,6 +77,7 @@ export default function ContributePage() {
       } else if (uniqueSquads[0]?.id) {
         setSquadId(uniqueSquads[0].id);
       }
+
     }
 
     void fetchSetup();
