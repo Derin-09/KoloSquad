@@ -24,6 +24,7 @@ import Activity from "@/components/pages/dashboard/Activity";
 import { useSquadStore } from "@/stores/squad-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { useJoinSquadModalStore } from "@/stores/join-squad-modal-store";
 
 
 export default function DashboardPage() {
@@ -38,6 +39,7 @@ export default function DashboardPage() {
   const dashboardData = useDashboardStore((state) => state.dashboardData)
   const fetchDashboard = useDashboardStore((state) => state.fetchDashboard)
   const { isLoading, isError, refreshSquads, startRealtime, stopRealtime } = useSquadStore()
+  const openJoinSquadModal = useJoinSquadModalStore((state) => state.open)
 
   useEffect(() => {
     let isMounted = true;
@@ -133,7 +135,7 @@ export default function DashboardPage() {
             <PlusCircle />
             <p>Create Squad</p>
           </Button>
-          <Button variant={'secondary'} onClick={() => router.push('/squads/join')} className="flex items-center gap-2">
+          <Button variant={'secondary'} onClick={openJoinSquadModal} className="flex items-center gap-2">
             <Link2 />
             <p>Join Squad</p>
           </Button>

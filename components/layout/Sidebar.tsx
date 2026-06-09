@@ -7,6 +7,7 @@ import { clsx } from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { sidebarNavItems } from "@/components/usenav";
+import { useJoinSquadModalStore } from "@/stores/join-squad-modal-store";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -15,6 +16,7 @@ export default function Sidebar() {
     [pathname]
   );
   const [isSquadsOpen, setIsSquadsOpen] = useState(isSquadsOpenByDefault);
+  const openJoinSquadModal = useJoinSquadModalStore((state) => state.open);
 
   useEffect(() => {
     if (pathname?.startsWith("/squads")) {
@@ -38,7 +40,7 @@ export default function Sidebar() {
                   onClick={() => setIsSquadsOpen((prev) => !prev)}
                   className={clsx(
                     "w-full flex items-center justify-between rounded-md px-3 py-2",
-                    active ? "bg-[color:var(--muted)] text-foreground" : "hover:bg-[color:var(--muted)] hover:text-foreground"
+                    active ? "bg-muted text-foreground" : "hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -55,13 +57,31 @@ export default function Sidebar() {
                   <div className="ml-9 space-y-1">
                     {n.children.map((child) => {
                       const childActive = pathname === child.href || pathname?.startsWith(`${child.href}/`);
+                      const isJoinSquad = child.href === "/squads/join";
+
+                      if (isJoinSquad) {
+                        return (
+                          <button
+                            key={child.href}
+                            type="button"
+                            onClick={openJoinSquadModal}
+                            className={clsx(
+                              "block w-full rounded-md px-3 py-2 text-left text-sm",
+                              "hover:bg-muted hover:text-foreground"
+                            )}
+                          >
+                            {child.label}
+                          </button>
+                        );
+                      }
+
                       return (
                         <Link
                           key={child.href}
                           href={child.href}
                           className={clsx(
                             "block rounded-md px-3 py-2 text-sm",
-                            childActive ? "text-(--accent) text-foregrond" : "hover:bg-[color:var(--muted)] hover:text-foreground"
+                            childActive ? "text-accent" : "hover:bg-muted hover:text-foreground"
                           )}
                         >
                           {child.label}
@@ -80,7 +100,7 @@ export default function Sidebar() {
               href={n.href}
               className={clsx(
                 "flex items-center gap-2 rounded-md px-3 py-2",
-                active ? "bg-[color:var(--muted)] text-foreground" : "hover:bg-[color:var(--muted)] hover:text-foreground"
+                active ? "bg-muted text-foreground" : "hover:bg-muted hover:text-foreground"
               )}
             >
               <Icon size={18} />
