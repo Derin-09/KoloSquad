@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { ArrowRight, Medal, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
@@ -29,7 +29,8 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-export default function SquadBoardPage({ params }: { params: { id: string } }) {
+export default function SquadBoardPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [squad, setSquad] = useState<SquadDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +41,7 @@ export default function SquadBoardPage({ params }: { params: { id: string } }) {
         const { data, error } = await supabase
           .from("squads")
           .select("id, name, target_amount, member_count, contributions:contributions(amount,status)")
-          .eq("id", params.id)
+          .eq("id", id)
           .single();
 
         if (error || !data) {
@@ -62,7 +63,7 @@ export default function SquadBoardPage({ params }: { params: { id: string } }) {
     }
 
     void loadSquad();
-  }, [params.id]);
+  }, [id]);
 
   const saved = useMemo(() => {
     if (!squad) return 0;
