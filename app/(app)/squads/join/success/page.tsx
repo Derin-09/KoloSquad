@@ -143,7 +143,7 @@ export default function JoinSuccessPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[#7b9bc2]">Squad</p>
-                <h2 className="mt-3 text-2xl font-semibold text-white">{squad.name}</h2>
+                <h2 className="mt-3 text-2xl font-semibold text-white">{squad &&  squad.name}</h2>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full bg-[#0c1a2b] px-4 py-2 text-xs uppercase tracking-[0.24em] text-[#a3c4eb]">
                 <Users className="h-4 w-4" />
@@ -154,11 +154,11 @@ export default function JoinSuccessPage() {
             <div className="mt-8 space-y-4">
               <div className="rounded-3xl border border-[#18273a] bg-[#09141f] p-4">
                 <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[#7f9abb]">Active Members</p>
-                <p className="mt-3 text-3xl font-semibold text-white">{squad.member_count || 1}/15</p>
+                <p className="mt-3 text-3xl font-semibold text-white">{squad && squad.member_count || 1}/15</p>
               </div>
 
               <div className="flex items-center gap-3">
-                {Array.from({ length: Math.min(squad.member_count || 1, 4) }).map((_, index) => (
+                {Array.from({ length: Math.min(squad && squad.member_count || 1, 4) }).map((_, index) => (
                   <span
                     key={index}
                     className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#1b2a40] text-sm font-semibold text-[#d4e7ff]"
@@ -166,7 +166,7 @@ export default function JoinSuccessPage() {
                     {String.fromCharCode(65 + index)}
                   </span>
                 ))}
-                {squad.member_count > 4 && (
+                {squad && squad.member_count > 4 && (
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#0f1d2e] text-sm font-semibold text-[#9bbad6]">
                     +{Math.max(squad.member_count - 4, 0)}
                   </span>
@@ -176,7 +176,7 @@ export default function JoinSuccessPage() {
               <div className="rounded-3xl border border-[#18273a] bg-[#07101a] p-4">
                 <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[#7f9abb]">Invite Code</p>
                 <div className="mt-3 inline-flex items-center justify-between rounded-2xl bg-[#0f1b2d] px-4 py-3 text-sm font-semibold text-[#dbe8ff]">
-                  <span>{squad.invite_code}</span>
+                  <span>{squad && squad.invite_code}</span>
                   <span className="rounded-full bg-[#1f3b53] px-3 py-1 text-[0.70rem] uppercase tracking-[0.24em] text-[#8bbae8]">
                     Code
                   </span>
