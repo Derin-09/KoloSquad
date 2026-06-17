@@ -54,8 +54,8 @@ export const useDashboardStore = create<DashboardStoreType>((set) => ({
         const { data, error } = await supabase
             .from("user_badges")
             .select("*")
-            .eq("user_id", userId)
-            .returns<BadgeType[]>();
+            .eq("user_id", userId);
+            // .returns<BadgeType[]>();
 
         if (error) {
             console.error("fetchBadges failed:", error.message);
@@ -68,8 +68,8 @@ export const useDashboardStore = create<DashboardStoreType>((set) => ({
     fetchBadgesCatalog: async () => {
         const { data, error } = await supabase
             .from("badges_catalog")
-            .select("*")
-            .returns<BadgeCatalogType[]>();
+            .select("*");
+            // .returns<BadgeCatalogType[]>();
 
         if (error) {
             console.error("fetchBadgesCatalog failed:", error.message);

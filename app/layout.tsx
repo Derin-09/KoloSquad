@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Montserrat } from "next/font/google";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
@@ -62,6 +63,7 @@ export default function RootLayout({
             defaultTheme="system"
             storageKey="kolosquad-theme"
           >
+          <Toaster />
             <Suspense fallback={<Spinner />}>{children}</Suspense>
           </ThemeProvider>
         </QueryProvider>

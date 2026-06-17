@@ -16,7 +16,7 @@ import SquadList from "@/components/pages/dashboard/SquadList";
 import ContributionsSection from "@/components/pages/dashboard/ContributionsSection";
 import Badges from "@/components/pages/dashboard/Badges";
 import { Button } from "@/components/ui/button";
-import { Bolt, Link2, Plus, PlusCircle, Zap } from "lucide-react";
+import { Bolt, ChevronRight, Link2, Plus, PlusCircle, Zap } from "lucide-react";
 import { SiFlashforge, SiThunderstore } from "react-icons/si";
 import WeeklyChallenges from "@/components/pages/dashboard/WeeklyChallenges";
 import Leaderboard from "@/components/pages/dashboard/Leaderboard";
@@ -24,6 +24,7 @@ import Activity from "@/components/pages/dashboard/Activity";
 import { useSquadStore } from "@/stores/squad-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { useJoinSquadModalStore } from "@/stores/join-squad-modal-store";
 
 
 export default function DashboardPage() {
@@ -38,14 +39,33 @@ export default function DashboardPage() {
   const dashboardData = useDashboardStore((state) => state.dashboardData)
   const fetchDashboard = useDashboardStore((state) => state.fetchDashboard)
   const { isLoading, isError, refreshSquads, startRealtime, stopRealtime } = useSquadStore()
+  const openJoinSquadModal = useJoinSquadModalStore((state) => state.open)
 
   useEffect(() => {
-    void refreshSquads()
-    startRealtime()
+    let isMounted = true;
+    
+    const loadSquads = async () => {
+      // Set a reasonable timeout so spinner doesn't hang indefinitely
+      const timeoutId = setTimeout(() => {
+        if (isMounted) {
+          setError("Taking longer than expected to load squads. Please refresh.");
+        }
+      }, 8000);
+      
+      try {
+        await refreshSquads();
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+    
+    void loadSquads();
+    startRealtime();
 
     return () => {
-      stopRealtime()
-    }
+      isMounted = false;
+      stopRealtime();
+    };
   }, [refreshSquads, startRealtime, stopRealtime])
 
   useEffect(() => {
@@ -111,11 +131,11 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={() => router.push('/squads/new')} className="flex items-center gap-2">
+          <Button onClick={() => router.push('/squads/new/step-one')} className="flex items-center gap-2">
             <PlusCircle />
             <p>Create Squad</p>
           </Button>
-          <Button variant={'secondary'} onClick={() => router.push('/squads/join')} className="flex items-center gap-2">
+          <Button variant={'secondary'} onClick={openJoinSquadModal} className="flex items-center gap-2">
             <Link2 />
             <p>Join Squad</p>
           </Button>
@@ -149,7 +169,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-lg font-semibold">Your Squads</div>
-              <Link href="/squads" className="text-sm underline">See All</Link>
+              <Link href="/squads" className="text-sm underline"><ChevronRight /></Link>
             </div>
             <SquadList
               squads={squadsList.map((s) => ({

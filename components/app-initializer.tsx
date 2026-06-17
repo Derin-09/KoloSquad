@@ -26,29 +26,35 @@ export default function AppInitializer() {
 
   useEffect(() => {
     async function runForUser(userId: string) {
-      await Promise.all([
-        // fetchDashboard(user.id),
-        fetchSquads(userId),
-        fetchUser(),
-        // fetchActivities(user.id),
-      ]);
+      await fetchUser();
+      await fetchSquads(userId);
+      // fetchDashboard(user.id)
+      // fetchActivities(user.id)
     }
 
     async function init() {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (!user) return;
+      const userId = session?.user?.id;
 
-      await runForUser(user.id);
+      if (!userId) {
+        await fetchUser();
+        return;
+      }
+
+      await runForUser(userId);
     }
 
     init();
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const userId = session?.user?.id;
-      if (!userId) return;
+      if (!userId) {
+        await fetchUser();
+        return;
+      }
 
       await runForUser(userId);
     });

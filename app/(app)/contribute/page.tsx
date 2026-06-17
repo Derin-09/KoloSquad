@@ -1,38 +1,29 @@
-
-
-
-
-
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { Bolt, ShieldCheck, UsersRound } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
 
-// interface SquadMember {
-//   squads?: { id: string; name: string } | null;
-//   squad_id?: string | null;
-// }
-
-type SquadMember = {
-  squad_id: string;
-  squads: {
-    squads: {
-      id: string;
-      name: string;
-    }[];
-  }[];
+type SquadOption = {
+  id: string;
+  name: string;
 };
 
+type SquadMemberRow = {
+  squad_id: string;
+  squads: SquadOption | null;
+};
 
 export default function ContributePage() {
+  const params = useSearchParams();
+
   const [amount, setAmount] = useState<number>(1000);
   const [email, setEmail] = useState("");
-  const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
+  const [squads, setSquads] = useState<SquadOption[]>([]);
   const [squadId, setSquadId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const params = useSearchParams();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const appUrl = useMemo(
     () =>
@@ -43,529 +34,332 @@ export default function ContributePage() {
   );
 
   useEffect(() => {
-  async function fetchSquads() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    async function fetchSetup() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    const { data, error } = await supabase
-      .from("squad_members")
-      .select(`
-        squad_id,
-        squads ( id, name )
-      `)
-      .eq("user_id", user.id);
+      if (!user) return;
 
-    if (error) {
-      console.error(error);
+      setEmail(user.email || "");
+
+      const { data, error: fetchError } = await supabase
+        .from("squad_members")
+        .select(`squad_id, squads ( id, name )`)
+        .eq("user_id", user.id)
+        .returns<SquadMemberRow[]>();
+
+      //  const { data, error: fetchError } = await supabase
+      //         .from("squads")
+      //         .select("name, id")
+      //         .eq("created_by", user.id)
+      //         .single()
+
+      if (fetchError) {
+        setError(fetchError.message);
+        return;
+      }
+
+      const uniqueSquads: SquadOption[] = [];
+      const seen = new Set<string>();
+
+      ((data) as SquadMemberRow[]).forEach((row) => {
+        if (!row.squads?.id || seen.has(row.squads.id)) return;
+        seen.add(row.squads.id);
+        uniqueSquads.push(row.squads);
+      });
+
+      setSquads(uniqueSquads);
+
+      const preselected = params.get("squadId") || "";
+      if (preselected && uniqueSquads.some((s) => s.id === preselected)) {
+        setSquadId(preselected);
+      } else if (uniqueSquads[0]?.id) {
+        setSquadId(uniqueSquads[0].id);
+      }
+    }
+
+    void fetchSetup();
+  }, [params]);
+
+  async function startPayment() {
+    setError(null);
+
+    if (!email) {
+      setError("Email is required before payment.");
       return;
     }
 
-    // Flatten the nested array properly
-    const squads = data.map((m) => m.squads).flat();
-    setSquads(squads);
-  }
+    if (!squadId) {
+      setError("Select a squad to continue.");
+      return;
+    }
 
-  fetchSquads();
-}, []);
+    setIsRedirecting(true);
 
-
-//   useEffect(() => {
-//   async function fetchSquads() {
-//     const { data: { user } } = await supabase.auth.getUser();
-//     if (!user) return;
-
-//     const { data, error } = await supabase
-//       .from("squad_members")
-//       .select(`
-//         squad_id,
-//         squads ( id, name )
-//       `)
-//       .eq("user_id", user.id);
-
-//     if (error) console.error(error);
-//     else setSquads(data.map((m) => m.squads));
-//   }
-//   fetchSquads();
-// }, []);
-
-
-  // useEffect(() =>{
-  //   async function fetchData(){
-
-  //     const { data } = await supabase
-  //          .from("squad_members")
-  //          .select("squads:id(squads(id,name)), squad_id")
-  //          .limit(50);
-  //          console.log(data)
-  //   }
-  //   fetchData()
-  // }, [])
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const { data: auth } = await supabase.auth.getUser();
-  //       const em = auth?.user?.email || "";
-  //       setEmail(em);
-
-  //       const { data } = await supabase
-  //         .from("squad_members")
-  //         .select("squads:id(squads(id,name)), squad_id")
-  //         .limit(50);
-
-  //       const list: { id: string; name: string }[] = [];
-
-  //       (data || []).forEach((row: SquadMember) => {
-  //         if (row?.squads?.map((item) => item.squads.map((item)=> item.id)) && row.squads.name) {
-  //           list.push({ id: row.squads.id, name: row.squads.name });
-  //         } else if (row?.squad_id) {
-  //           list.push({ id: row.squad_id, name: row.squad_id });
-  //         }
-  //       });
-
-  //       setSquads(list);
-
-  //       const pre = params.get("squadId");
-  //       if (pre && list.some((s) => s.id === pre)) setSquadId(pre);
-  //       else if (list[0]?.id) setSquadId(list[0].id);
-  //     } catch {
-  //       // Silently ignore fetch/auth errors
-  //     }
-  //   })();
-  // }, [params]);
-
-  async function startPayment() {
-    setLoading(true);
     try {
-      if (!email) throw new Error("Email required");
-
       const reference = `KS_${Date.now()}`;
-      const callback_url = `${appUrl}/contribute/callback`;
+      const callbackParams = new URLSearchParams({ squadId });
+      const callbackUrl = `${appUrl}/contribute/callback?${callbackParams.toString()}`;
 
       const res = await fetch("/api/paystack/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, email, reference, callback_url }),
+        body: JSON.stringify({
+          amount,
+          email,
+          reference,
+          callback_url: callbackUrl,
+        }),
       });
 
-      const json: { message?: string; data?: { authorization_url: string }; status?: string } =
-        await res.json();
+      const json: {
+        message?: string;
+        data?: { authorization_url?: string };
+      } = await res.json();
 
-      if (!res.ok) throw new Error(json?.message || "Init failed");
-
-      // Optimistically insert contribution
-      try {
-        const { data: auth } = await supabase.auth.getUser();
-        await supabase.from("contributions").insert({
-          user_id: auth?.user?.id,
-          squad_id: squadId || null,
-          amount,
-          status: "pending",
-          reference,
-        });
-      } catch {
-        // ignore insert error silently
+      if (!res.ok) {
+        throw new Error(json.message || "Unable to initialize payment.");
       }
 
-      if (json.data?.authorization_url)
-        window.location.assign(json.data.authorization_url);
-      else throw new Error("Missing payment link");
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Payment init error";
-      alert(msg);
-    } finally {
-      setLoading(false);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      await supabase.from("contributions").insert({
+        user_id: user?.id || null,
+        squad_id: squadId,
+        amount,
+        status: "pending",
+        reference,
+      });
+
+      if (!json.data?.authorization_url) {
+        throw new Error("Missing payment authorization link.");
+      }
+
+      window.location.assign(json.data.authorization_url);
+    } catch (paymentError) {
+      const message =
+        paymentError instanceof Error
+          ? paymentError.message
+          : "Payment initialization failed.";
+      setError(message);
+      setIsRedirecting(false);
     }
   }
 
+  if (isRedirecting) {
+    return (
+      <main className="mx-auto flex min-h-[82vh] max-w-md flex-col items-center justify-center gap-6 rounded-[30px] border border-[#20242d] bg-[#06090f] p-6 text-white shadow-[0_0_90px_rgba(21,33,61,0.28)]">
+        <div className="relative grid size-32 place-items-center rounded-[30px] border border-[#2a303d] bg-linear-to-br from-[#171b24] to-[#10131b]">
+          <div className="size-20 rounded-full border-[6px] border-[#2e3542] border-t-[#abdde8] animate-spin" />
+          <span className="absolute -bottom-2 -right-2 inline-flex size-9 items-center justify-center rounded-full bg-[#a9d7df] text-[#0f242d] shadow-lg">
+            <Bolt className="size-5" />
+          </span>
+        </div>
+
+        <div className="space-y-2 text-center">
+          <h1 className="text-2xl font-semibold">Redirecting to payment...</h1>
+          <p className="text-sm leading-relaxed text-[#b6bfd1]">
+            Don&apos;t close this window, we&apos;re getting things ready for your streak.
+          </p>
+        </div>
+
+        <div className="w-full space-y-3">
+          <div className="rounded-3xl border border-[#2a303d] bg-[#131821] px-4 py-3">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#d9e7f3]">
+              <ShieldCheck className="size-4 text-[#9ed6e0]" />
+              Secure Connection
+            </p>
+            <p className="mt-1 text-sm text-[#b6bfd1]">Encrypted end-to-end processing</p>
+          </div>
+
+          <div className="rounded-3xl border border-[#2a303d] bg-[#131821] px-4 py-3 opacity-90">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#d9e7f3]">
+              <UsersRound className="size-4 text-[#9ed6e0]" />
+              Squad Verification
+            </p>
+            <p className="mt-1 text-sm text-[#b6bfd1]">Syncing contribution with your team</p>
+          </div>
+        </div>
+
+        <div className="rounded-full border border-[#33435b] bg-[#17202f] px-4 py-2 text-sm text-[#c9dff4] animate-pulse">
+          Verifying transaction gateway
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="max-w-md mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Contribute</h1>
-      <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium">Squad</label>
-          <select
-            value={squadId}
-            onChange={(e) => setSquadId(e.target.value)}
-            className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-          >
-            {squads.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
+    <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
+      <h1 className="text-3xl font-semibold text-white">Join the Squad</h1>
+      <p className="max-w-2xl text-sm text-[#9fb3cf]">
+        Review your commitment and confirm your entry into the financial circle.
+      </p>
 
-        <div>
-          <label className="block text-sm font-medium">Amount (₦)</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-          />
-        </div>
+      <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+        <section className="space-y-6 rounded-[28px] border border-[#252f42] bg-[#08101c]/80 p-6 shadow-[0_30px_120px_rgba(0,0,0,0.18)]">
+          <div className="rounded-3xl border border-[#18304b] bg-[#0e1620] p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-[#86afd4]">Alpha Growth Circle</p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">Active Squad • 8 members</h2>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-3xl bg-[#102639] px-4 py-3 text-sm text-[#cad8ed] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+                  <p className="text-[0.72rem] uppercase text-[#6a8fb6]">Weekly Contribution</p>
+                  <p className="mt-2 text-lg font-semibold text-white">$250.00</p>
+                </div>
+                <div className="rounded-3xl bg-[#102639] px-4 py-3 text-sm text-[#cad8ed] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+                  <p className="text-[0.72rem] uppercase text-[#6a8fb6]">Next Payout Date</p>
+                  <p className="mt-2 text-lg font-semibold text-white">Oct 14, 2023</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-          />
-        </div>
+          <div className="space-y-4 rounded-3xl border border-[#192b40] bg-[#08101b] p-6">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Squad Benefits</h3>
+            </div>
+            <ul className="space-y-4">
+              <li className="flex gap-3 text-sm text-[#c4d1e8]">
+                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#0f1d30] text-[#76c1e2]">
+                  <Bolt className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="font-semibold text-white">Guaranteed Rotational Payout</p>
+                  <p className="mt-1 text-sm text-[#8ba3c8]">Receive a lump sum of $2,000 when it’s your turn in the cycle.</p>
+                </div>
+              </li>
+              <li className="flex gap-3 text-sm text-[#c4d1e8]">
+                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#0f1d30] text-[#76c1e2]">
+                  <ShieldCheck className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="font-semibold text-white">Default Protection</p>
+                  <p className="mt-1 text-sm text-[#8ba3c8]">Squad members are vetted for consistency and financial discipline.</p>
+                </div>
+              </li>
+              <li className="flex gap-3 text-sm text-[#c4d1e8]">
+                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#0f1d30] text-[#76c1e2]">
+                  <UsersRound className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="font-semibold text-white">Credit Score Impact</p>
+                  <p className="mt-1 text-sm text-[#8ba3c8]">Consistent contributions are reported to boost your financial profile.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={startPayment}
-            disabled={loading || !amount || !email}
-            className="flex-1 rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 disabled:opacity-50"
-          >
-            {loading ? "Redirecting..." : "Pay with Paystack"}
-          </button>
+          <div className="relative overflow-hidden rounded-[28px] border border-[#21304a] bg-[#08101b] py-6 px-5">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(52,135,206,0.18),transparent_45%)]" />
+            <div className="relative flex h-52 flex-col justify-end gap-3 rounded-[22px] border border-[#1c2f45] bg-[radial-gradient(circle_at_top_left,rgba(58,142,190,0.18),transparent_45%)] p-5 text-white">
+              <div className="rounded-2xl bg-[#0b1727]/90 px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#8ab4df]">
+                Established 2022
+              </div>
+              <p className="text-lg font-semibold">Grow with a community built for steady returns and financial focus.</p>
+              <p className="text-sm leading-relaxed text-[#9bb3d5]">
+                Trusted members, verified payouts, and thoughtful onboarding make this your next best step.
+              </p>
+            </div>
+          </div>
+        </section>
 
-          <a
-            className="rounded-md border px-3 py-2 text-sm"
-            href={`mailto:${encodeURIComponent(
-              email
-            )}?subject=${encodeURIComponent(
-              "KoloSquad contribution reminder"
-            )}&body=${encodeURIComponent(
-              "Hi, this is your reminder to contribute ₦" +
-                amount +
-                " to your squad."
-            )}`}
-          >
-            Remind me
-          </a>
-        </div>
+        <section className="space-y-6 rounded-[28px] border border-[#243249] bg-[#081118]/90 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.12)]">
+          <div className="space-y-4 rounded-3xl border border-[#1d2a3f] bg-[#0d141e] p-5">
+            <p className="text-sm uppercase tracking-[0.2em] text-[#7aa0d6]">Payment Summary</p>
+            <div className="space-y-3 text-sm text-[#b7c5db]">
+              <div className="flex items-center justify-between">
+                <span>First Deposit</span>
+                <span className="font-semibold text-white">$250.00</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Platform Fee (1%)</span>
+                <span className="text-[#8ab4df]">$2.50</span>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between rounded-3xl bg-[#111b29] px-4 py-4 text-sm font-semibold text-white">
+              <span>Total Due</span>
+              <span>$252.50</span>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-[#1d2d40] bg-[#091118] p-5">
+            <div className="flex items-center justify-between text-sm text-[#c0d1e4]">
+              <div>
+                <p className="font-semibold text-white">Wallet Balance</p>
+                <p className="text-xs text-[#7d96b8]">Available funds</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#11253f] px-3 py-2 text-xs text-[#b7d1e3]">
+                <span className="block h-2.5 w-2.5 rounded-full bg-[#3ed596]" />
+                $1,420.00
+              </div>
+            </div>
+          </div>
+
+          {error ? <p className="rounded-3xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</p> : null}
+
+          <div className="space-y-4">
+            <div className="rounded-3xl border border-[#1d2d40] bg-[#081018] p-5">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#c8d7f0]">Choose Squad</label>
+                  <select
+                    value={squadId}
+                    onChange={(event) => setSquadId(event.target.value)}
+                    className="mt-2 h-11 w-full rounded-2xl border border-[#1f2c42] bg-[#0b1320] px-4 text-sm text-white outline-none transition focus:border-[#4c8dd9]"
+                  >
+                    {squads.length === 0 ? (
+                      <option value="">No squad available</option>
+                    ) : (
+                      squads.map((squad) => (
+                        <option key={squad.id} value={squad.id}>
+                          {squad.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#c8d7f0]">Amount (NGN)</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    min={100}
+                    onChange={(event) => setAmount(Number(event.target.value) || 0)}
+                    className="mt-2 h-11 w-full rounded-2xl border border-[#1f2c42] bg-[#0b1320] px-4 text-sm text-white outline-none transition focus:border-[#4c8dd9]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#c8d7f0]">Email</label>
+                  <input
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="mt-2 h-11 w-full rounded-2xl border border-[#1f2c42] bg-[#0b1320] px-4 text-sm text-white outline-none transition focus:border-[#4c8dd9]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={startPayment}
+              disabled={!amount || !email || !squadId}
+              className="inline-flex h-14 w-full items-center justify-center rounded-full bg-[#91d6e1] text-sm font-semibold text-[#0e2b33] transition hover:bg-[#7dc5ce] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Confirm & Pay First Deposit
+            </button>
+            <p className="text-center text-xs uppercase tracking-[0.2em] text-[#8397b4]">
+              By confirming, you agree to the Squad Membership Terms and recurring weekly deductions.
+            </p>
+          </div>
+        </section>
       </div>
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useEffect, useMemo, useState } from "react";
-// import { supabase } from "@/lib/supabase/client";
-// import { useSearchParams } from "next/navigation";
-
-// export default function ContributePage() {
-//   const [amount, setAmount] = useState<number>(1000);
-//   const [email, setEmail] = useState<string>("");
-//   const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
-//   const [squadId, setSquadId] = useState<string>("");
-//   const [loading, setLoading] = useState(false);
-//   const params = useSearchParams();
-//   const appUrl = useMemo(() => (typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000", []);
-
-//   useEffect(() => {
-//     (async () => {
-//       try {
-//         const { data: auth } = await supabase.auth.getUser();
-//         const em = auth?.user?.email || "";
-//         setEmail(em);
-//         const { data } = await supabase
-//           .from("squad_members")
-//           .select("squads:id(squads(id,name)), squad_id")
-//           .limit(50);
-//         const list: { id: string; name: string }[] = [];
-//         (data || []).forEach((row: any) => {
-//           if (row?.squads?.id) list.push({ id: row.squads.id, name: row.squads.name });
-//           else if (row?.squad_id) list.push({ id: row.squad_id, name: row.squad_id });
-//         });
-//         setSquads(list);
-//         const pre = params.get("squadId");
-//         if (pre && list.some((s) => s.id === pre)) setSquadId(pre);
-//         else if (list[0]?.id) setSquadId(list[0].id);
-//       } catch {}
-//     })();
-//   }, [params]);
-
-//   async function startPayment() {
-//     setLoading(true);
-//     try {
-//       if (!email) throw new Error("Email required");
-//       const reference = `KS_${Date.now()}`;
-//       const callback_url = `${appUrl}/contribute/callback`;
-//       const res = await fetch("/api/paystack/initialize", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ amount, email, reference, callback_url }),
-//       });
-//       const json = await res.json();
-//       if (!res.ok) throw new Error(json?.message || "Init failed");
-
-//       // Optimistically create a pending contribution (ignore schema errors)
-//       try {
-//         const { data: auth } = await supabase.auth.getUser();
-//         await supabase.from("contributions").insert({
-//           user_id: auth?.user?.id,
-//           squad_id: squadId || null,
-//           amount,
-//           status: "pending",
-//           reference,
-//         });
-//       } catch {}
-
-//       window.location.assign(json.data.authorization_url);
-//     } catch (e: any) {
-//       alert(e?.message || "Payment init error");
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-
-//   return (
-//     <main className="max-w-md mx-auto space-y-6">
-//       <h1 className="text-2xl font-bold">Contribute</h1>
-//       <div className="space-y-3">
-//         <div>
-//           <label className="block text-sm font-medium">Squad</label>
-//           <select value={squadId} onChange={(e) => setSquadId(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors">
-//             {squads.map((s) => (
-//               <option key={s.id} value={s.id}>{s.name}</option>
-//             ))}
-//           </select>
-//         </div>
-//         <div>
-//           <label className="block text-sm font-medium">Amount (₦)</label>
-//           <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" />
-//         </div>
-//         <div>
-//           <label className="block text-sm font-medium">Email</label>
-//           <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors" />
-//         </div>
-//         <div className="flex items-center gap-2">
-//           <button onClick={startPayment} disabled={loading || !amount || !email} className="flex-1 rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 disabled:opacity-50">
-//             {loading ? "Redirecting..." : "Pay with Paystack"}
-//           </button>
-//           <a
-//             className="rounded-md border px-3 py-2 text-sm"
-//             href={`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('KoloSquad contribution reminder')}&body=${encodeURIComponent('Hi, this is your reminder to contribute ₦' + amount + ' to your squad.')}`}
-//           >Remind me</a>
-//         </div>
-//       </div>
-//     </main>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useEffect, useMemo, useState } from "react";
-// import { supabase } from "@/lib/supabase/client";
-// import { useSearchParams } from "next/navigation";
-
-// type SquadMember = {
-//   squad_id: string;
-//   squads: {
-//     id: string;
-//     name: string;
-//   } | null;
-// };
-
-// export default function ContributePage() {
-//   const [amount, setAmount] = useState<number>(1000);
-//   const [email, setEmail] = useState<string>("");
-//   const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
-//   const [squadId, setSquadId] = useState<string>("");
-//   const [loading, setLoading] = useState(false);
-//   const params = useSearchParams();
-
-//   const appUrl = useMemo(
-//     () =>
-//       (typeof window !== "undefined"
-//         ? window.location.origin
-//         : process.env.NEXT_PUBLIC_APP_URL) || "http://localhost:3000",
-//     []
-//   );
-
-//   useEffect(() => {
-//     (async () => {
-//       try {
-//         const { data: auth } = await supabase.auth.getUser();
-//         const em = auth?.user?.email || "";
-//         setEmail(em);
-
-//         const { data, error } = await supabase
-//           .from("squad_members")
-//           .select("squad_id, squads(id, name)")
-//           .limit(50);
-
-//         if (error) throw error;
-
-//         const list: { id: string; name: string }[] = [];
-//         (data as SquadMember[] | null)?.forEach((row) => {
-//           if (row?.squads) {
-//             list.push({ id: row.squads.id, name: row.squads.name });
-//           } else if (row.squad_id) {
-//             list.push({ id: row.squad_id, name: row.squad_id });
-//           }
-//         });
-
-//         setSquads(list);
-
-//         const pre = params.get("squadId");
-//         if (pre && list.some((s) => s.id === pre)) setSquadId(pre);
-//         else if (list[0]?.id) setSquadId(list[0].id);
-//       } catch (err) {
-//         console.error("Error fetching squads:", err);
-//       }
-//     })();
-//   }, [params]);
-
-//   async function startPayment() {
-//     setLoading(true);
-//     try {
-//       if (!email) throw new Error("Email required");
-//       const reference = `KS_${Date.now()}`;
-//       const callback_url = `${appUrl}/contribute/callback`;
-
-//       const res = await fetch("/api/paystack/initialize", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ amount, email, reference, callback_url }),
-//       });
-
-//       const json = await res.json();
-//       if (!res.ok) throw new Error(json?.message || "Init failed");
-
-//       // Optimistic insert (ignore schema errors)
-//       try {
-//         const { data: auth } = await supabase.auth.getUser();
-//         await supabase.from("contributions").insert({
-//           user_id: auth?.user?.id,
-//           squad_id: squadId || null,
-//           amount,
-//           status: "pending",
-//           reference,
-//         });
-//       } catch (err) {
-//         console.warn("Contribution insert failed:", err);
-//       }
-
-//       window.location.assign(json.data.authorization_url);
-//     } catch (err) {
-//       const message = err instanceof Error ? err.message : "Payment init error";
-//       alert(message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-
-//   return (
-//     <main className="max-w-md mx-auto space-y-6">
-//       <h1 className="text-2xl font-bold">Contribute</h1>
-//       <div className="space-y-3">
-//         <div>
-//           <label className="block text-sm font-medium">Squad</label>
-//           <select
-//             value={squadId}
-//             onChange={(e) => setSquadId(e.target.value)}
-//             className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-//           >
-//             {squads.map((s) => (
-//               <option key={s.id} value={s.id}>
-//                 {s.name}
-//               </option>
-//             ))}
-//           </select>
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium">Amount (₦)</label>
-//           <input
-//             type="number"
-//             value={amount}
-//             onChange={(e) => setAmount(Number(e.target.value))}
-//             className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium">Email</label>
-//           <input
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             className="w-full rounded-md border border-[color:var(--accent-input)] focus:border-[color:var(--accent-input-focus)] outline-none px-3 py-2 transition-colors"
-//           />
-//         </div>
-
-//         <div className="flex items-center gap-2">
-//           <button
-//             onClick={startPayment}
-//             disabled={loading || !amount || !email}
-//             className="flex-1 rounded-md bg-[color:var(--accent-button)] text-[color:var(--accent-foreground)] px-3 py-2 disabled:opacity-50"
-//           >
-//             {loading ? "Redirecting..." : "Pay with Paystack"}
-//           </button>
-
-//           <a
-//             className="rounded-md border px-3 py-2 text-sm"
-//             href={`mailto:${encodeURIComponent(
-//               email
-//             )}?subject=${encodeURIComponent(
-//               "KoloSquad contribution reminder"
-//             )}&body=${encodeURIComponent(
-//               "Hi, this is your reminder to contribute ₦" +
-//                 amount +
-//                 " to your squad."
-//             )}`}
-//           >
-//             Remind me
-//           </a>
-//         </div>
-//       </div>
-//     </main>
-//   );
-// }
-
-
-
-
-
-
-
-

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchUser = useAuthStore((state) => state.fetchUser);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -15,6 +17,7 @@ export function LoginForm() {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log("[LOGIN] Sign in response:", { hasSession: !!data.session, userId: data.user?.id ?? "none", error: error?.message ?? "none" });
       if (error) {
         const msg = (error.message || "").toLowerCase();
         if (msg.includes("confirm") || msg.includes("not confirmed")) {
@@ -25,9 +28,22 @@ export function LoginForm() {
         }
         throw error;
       }
-      // Success
+      // Hydrate auth store before redirecting so user is ready when dashboard loads
+      console.log("[LOGIN] Calling fetchUser...");
+      try {
+        const fetchUserPromise = fetchUser();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("fetchUser timeout")), 3000)
+        );
+        await Promise.race([fetchUserPromise, timeoutPromise]);
+        console.log("[LOGIN] fetchUser completed, redirecting to dashboard");
+      } catch (fetchErr) {
+        console.warn("[LOGIN] fetchUser failed or timed out, redirecting anyway:", fetchErr);
+      }
+      // Success - redirect even if fetchUser had issues
       window.location.href = "/dashboard";
     } catch (e) {
+        console.error("[LOGIN] Error during sign in:", e);
         const err = e instanceof Error ? e.message :  "Sign in failed";
       setError(err);
     } finally {
