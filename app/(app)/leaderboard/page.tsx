@@ -58,22 +58,22 @@ export default function LeaderboardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 text-white">
-      <div className="rounded-4xl border border-[#1f2a3d] bg-[#08111b]/90 p-8 shadow-[0_40px_120px_rgba(0,0,0,0.35)]">
+      <div className="rounded-4xl border border-accent/20 bg-[#1d1333]/20  p-8 shadow-[0_40px_120px_rgba(0,0,0,0.35)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.24em] text-[#82c9f0]">Select a Squad</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-accent">Select a Squad</p>
             <h1 className="mt-3 text-4xl font-semibold">View payouts and rankings for your active groups.</h1>
           </div>
-          <div className="rounded-3xl border border-[#25344f] bg-[#0e1b2f] px-5 py-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
+          <div className="rounded-3xl boder border-accent/20 bg-accent/20  px-5 py-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-[#c8d7f0]">Featured</p>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7d9fc2]">Global Leaderboard</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-accent/90">Global Leaderboard</p>
               </div>
-              <div className="rounded-full bg-[#1f3a52] px-4 py-2 text-xs text-[#92c9eb]">1.5% APY Boost</div>
+              <div className="rounded-full bg-[#1d1333]/60  px-4 py-2 text-xs text-accent/90">1.5% APY Boost</div>
             </div>
-            <p className="mt-3 text-sm text-[#8da9cb]">Compete with all Kolosquad savers worldwide.</p>
-            <Link href="/leaderboard" className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#91d7ec] px-4 py-3 text-sm font-semibold text-[#10242b] transition hover:bg-[#7dc5ce]">
+            <p className="mt-3 text-sm text-accent/90">Compete with all Kolosquad savers worldwide.</p>
+            <Link href="/leaderboard" className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold text-[#10242b] transition hover:bg-[#7dc5ce]">
               View Rankings
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -88,30 +88,30 @@ export default function LeaderboardPage() {
             : Math.round((Number(squad.target_amount) * (squad.member_count || 1)) / 10);
           const progress = Math.min(100, Math.round((saved / Number(squad.target_amount || 1)) * 100));
           return (
-            <div key={squad.id} className="rounded-[28px] border border-[#1d2e44] bg-[#09111c] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.18)]">
+            <div key={squad.id} className="rounded-[28px] border border-accent/20 bg-[#1d1333]/20  p-6 shadow-[0_30px_90px_rgba(0,0,0,0.18)]">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.24em] text-[#7c9fc2]">Total Saved</p>
+                  <p className="text-sm uppercase tracking-[0.24em] text-accent">Total Saved</p>
                   <p className="mt-3 text-3xl font-semibold text-white">{formatCurrency(saved)}</p>
                 </div>
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#18324a] bg-[#0c1b2f] text-sm font-semibold text-[#91d7ec]">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-accent/20 bg-[#1d1333]/90  text-sm font-semibold text-accent">
                   {progress}%
                 </div>
               </div>
               <div className="mt-8 space-y-4">
                 <div>
-                  <p className="text-sm text-[#8ba3c8]">{squad.name}</p>
-                  <div className="mt-3 h-2 rounded-full bg-[#10223b]">
-                    <div className="h-full rounded-full bg-[#91d7ec]" style={{ width: `${progress}%` }} />
+                  <p className="text-sm text-accent/60">{squad.name}</p>
+                  <div className="mt-3 h-2 rounded-full bg-[#1d1333]/90 ">
+                    <div className="h-full rounded-full bg-accent" style={{ width: `${progress}%` }} />
                   </div>
                 </div>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#7c9fc2]">Current Cycle</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-accent">Current Cycle</p>
               </div>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href={`/leaderboard/${squad.id}`} className="inline-flex items-center justify-center rounded-full border border-[#2a3c58] bg-[#91d7ec] px-5 py-3 text-sm font-semibold text-[#10242b] transition hover:bg-[#7dc5ce]">
+                <Link href={`/leaderboard/${squad.id}`} className="inline-flex items-center justify-center rounded-full border border-accent/20 bg-accent px-5 py-3 text-sm font-semibold text-[#10242b] transition hover:bg-[#7dc5ce]">
                   Board
                 </Link>
-                <Link href="/payouts" className="inline-flex items-center justify-center rounded-full border border-[#2a3c58] bg-[#0e1c2f] px-5 py-3 text-sm font-semibold text-[#c6d7e9] transition hover:bg-[#13263b]">
+                <Link href="/payouts" className="inline-flex items-center justify-center rounded-full border border-accent/20 bg-[#1d1333]/20  px-5 py-3 text-sm font-semibold text-[#c6d7e9] transition hover:bg-[#13263b]">
                   Payouts
                 </Link>
               </div>
@@ -119,11 +119,11 @@ export default function LeaderboardPage() {
           );
         })}
 
-        <Link href="/squads/new" className="flex min-h-60 flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#2a3c58] bg-[#08111c] p-6 text-center text-[#9bb4d6] transition hover:border-[#4a6b9d] hover:bg-[#0b1725]">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#0f1d31] text-2xl text-[#91d7ec]">+</div>
+        <Link href="/squads/new" className="flex min-h-60 flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-accent/20 bg-[#1d1333]/20  p-6 text-center text-[#9bb4d6] transition hover:border-[#4a6b9d] hover:bg-[#0b1725]">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#1d1333]/90  text-2xl text-accent">+</div>
           <div>
             <p className="text-lg font-semibold text-white">Join New Squad</p>
-            <p className="mt-2 text-sm text-[#8ba3c8]">Start a new saving cycle with friends or community.</p>
+            <p className="mt-2 text-sm text-accent/60">Start a new saving cycle with friends or community.</p>
           </div>
         </Link>
       </div>
