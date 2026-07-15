@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/auth-store";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fetchUser = useAuthStore((state) => state.fetchUser);
+  const router = useRouter()
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,7 +43,8 @@ export function LoginForm() {
         console.warn("[LOGIN] fetchUser failed or timed out, redirecting anyway:", fetchErr);
       }
       // Success - redirect even if fetchUser had issues
-      window.location.href = "/dashboard";
+      // window.location.href = "/dashboard";
+      router.push("/dashboard")
     } catch (e) {
         console.error("[LOGIN] Error during sign in:", e);
         const err = e instanceof Error ? e.message :  "Sign in failed";

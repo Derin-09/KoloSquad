@@ -25,6 +25,7 @@ import { useSquadStore } from "@/stores/squad-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
 import { useJoinSquadModalStore } from "@/stores/join-squad-modal-store";
+import { SpinnerCircle } from "@/components/atoms";
 
 
 export default function DashboardPage() {
@@ -111,7 +112,7 @@ export default function DashboardPage() {
         {/* <Alert message="Contribution due tomorrow (Rent Squad)" /> */}
 
 
-        {isLoading && squadsList.length === 0 && <Spinner />}
+        {isLoading && squadsList.length === 0 && <SpinnerCircle />}
         {error && <Alert message={error} />}
 
         {/* Contribution Overview Section */}
