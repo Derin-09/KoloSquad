@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Bolt, ShieldCheck, UsersRound } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { useSquadStore } from "@/stores/squad-store";
+import { Squad } from "@/types/types";
 
 type SquadOption = {
   id: string;
@@ -21,9 +23,12 @@ export default function ContributePage() {
   const [amount, setAmount] = useState<number>(1000);
   const [email, setEmail] = useState("");
   const [squads, setSquads] = useState<SquadOption[]>([]);
+  const [selectedSquads, setSelectedSquads] = useState<Squad | null>();
   const [squadId, setSquadId] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchSingleSquad = useSquadStore((state) => state.fetchSingleSquad)
+
 
   const appUrl = useMemo(
     () =>
@@ -77,6 +82,11 @@ export default function ContributePage() {
       } else if (uniqueSquads[0]?.id) {
         setSquadId(uniqueSquads[0].id);
       }
+
+      const squadData = await (await fetchSingleSquad(preselected)).squad
+
+      setSelectedSquads(squadData)
+
     }
 
     void fetchSetup();
@@ -151,7 +161,7 @@ export default function ContributePage() {
 
   if (isRedirecting) {
     return (
-      <main className="mx-auto flex min-h-[82vh] max-w-md flex-col items-center justify-center gap-6 rounded-[30px] border border-[#20242d] bg-[#06090f] p-6  shadow-[0_0_90px_rgba(21,33,61,0.28)]">
+      <main className="mx-auto flex min-h-[82vh] max-w-md flex-col items-center justify-center gap-6 rounded-[30px] border border-[#20242d] bg-background p-6  shadow-[0_0_90px_rgba(21,33,61,0.28)]">
         <div className="relative grid size-32 place-items-center rounded-[30px] border border-[#2a303d] bg-linear-to-br from-[#171b24] to-[#10131b]">
           <div className="size-20 rounded-full border-[6px] border-[#2e3542] border-t-[#abdde8] animate-spin" />
           <span className="absolute -bottom-2 -right-2 inline-flex size-9 items-center justify-center rounded-full bg-[#a9d7df] text-[#0f242d] shadow-lg">
@@ -192,34 +202,35 @@ export default function ContributePage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
+    <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 bg-background">
       <h1 className="text-3xl font-semibold ">Contribute</h1>
       <p className="max-w-2xl text-sm text-muted-foreground">
         Review your commitment and confirm your entry into the financial circle.
       </p>
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <section className="space-y-6 rounded-[28px] border border-accent/20 bg-[#1d1333]/20 p-6">
-          <div className="rounded-3xl borer border-[#18304b] bg-[#1d1333]/40 p-6">
+        <section className="space-y-6 rounded-[28px] bg-surface border border-border p-6">
+          <div className="rounded-3xl bg-muted p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-accent">Alpha Growth Circle</p>
-                <h2 className="mt-2 text-2xl font-semibold ">Active Squad • 8 members</h2>
+                {/* <p className="text-sm uppercase tracking-[0.24em] text-accent">Alpha Growth Circle</p> */}
+                <p className="text-sm uppercase tracking-[0.24em] text-accent">{selectedSquads?.name}</p>
+                <h2 className="mt-2 text-2xl font-semibold ">Active Squad • {selectedSquads?.members?.length} members</h2>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-3xl bg-accent/60 px-4 py-3 text-sm text-[#cad8ed] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
                   <p className="text-[0.72rem] uppercase text-[#1d1333]">Weekly Contribution</p>
                   <p className="mt-2 text-lg font-semibold ">$250.00</p>
                 </div>
-                <div className="rounded-3xl bg-accent/60 px-4 py-3 text-sm text-[#cad8ed] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+                <div className="rounded-3xl bg-accent/60 border border-warning px-4 py-3 text-sm text-[#cad8ed] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
                   <p className="text-[0.72rem] uppercase text-[#1d1333]">Next Payout Date</p>
-                  <p className="mt-2 text-lg font-semibold ">Oct 14, 2023</p>
+                  <p className="mt-2 text-lg font-semibold text-warning">Oct 14, 2023</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4 rounded-3xl bg-[#1d1333]/40 p-6">
+          <div className="space-y-4 rounded-3xl bg-muted p-6">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-lg font-semibold ">Squad Benefits</h3>
             </div>
@@ -234,8 +245,8 @@ export default function ContributePage() {
                 </div>
               </li>
               <li className="flex gap-3 text-sm text-[#c4d1e8]">
-                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/20 text-accent">
-                  <ShieldCheck className="h-4 w-4" />
+                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/20 text-accent border border-warning">
+                  <ShieldCheck className="h-4 w-4 text-warning" />
                 </span>
                 <div>
                   <p className="font-semibold ">Default Protection</p>
@@ -243,8 +254,8 @@ export default function ContributePage() {
                 </div>
               </li>
               <li className="flex gap-3 text-sm text-[#c4d1e8]">
-                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/20 text-accent">
-                  <UsersRound className="h-4 w-4" />
+                <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/20 text-accent border border-warning">
+                  <UsersRound className="h-4 w-4 text-warning" />
                 </span>
                 <div>
                   <p className="font-semibold ">Credit Score Impact</p>
@@ -254,9 +265,9 @@ export default function ContributePage() {
             </ul>
           </div>
 
-          <div className="relative overflow-hidden rounded-[28px] flex h-52 flex-col justify-end gap-3 borer border-[#21304a] bg-[#1d1333]/40 py-6 px-5">
+          <div className="relative overflow-hidden rounded-[28px] flex h-52 flex-col justify-end gap-3 bg-muted py-6 px-5">
             {/* <div className="relative  rounded-[22px] borde border-[#1c2f45] bg-[radial-gradient(circle_at_top_left,rgba(58,142,190,0.18),transparent_45%)] p-5 "> */}
-            <div className="rounded-2xl bg-accent/20 px-3 py-1 text-xs uppercase tracking-[0.2em] text-accent">
+            <div className="rounded-2xl bg-warning px-3 py-1 text-xs uppercase tracking-[0.2em] text-warning-foreground font-bold">
               Established 2022
             </div>
             <p className="text-lg font-semibold">Grow with a community built for steady returns and financial focus.</p>
@@ -267,8 +278,8 @@ export default function ContributePage() {
           </div>
         </section>
 
-        <section className="space-y-6 rounded-[28px] border border-accent/20 bg-[#1d1333]/20 p-6">
-          <div className="space-y-4 rounded-3xl border border-accent/20 bg-[#1d1333]/40 p-5">
+        <section className="space-y-6 rounded-[28px] bg-surface border border-border p-6">
+          <div className="space-y-4 rounded-3xl bg-muted p-5">
             <p className="text-sm uppercase tracking-[0.2em] text-accent">Payment Summary</p>
             <div className="space-y-3 text-sm text-[#b7c5db]">
               <div className="flex items-center justify-between">
@@ -280,13 +291,13 @@ export default function ContributePage() {
                 <span className="text-accent">$2.50</span>
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between rounded-3xl bg-[#1d1333]/80 px-4 py-4 text-sm font-semibold ">
+            <div className="mt-4 flex items-center justify-between rounded-3xl bg-accent/60 px-4 py-4 text-sm font-semibold ">
               <span>Total Due</span>
               <span>$252.50</span>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-accent/20 bg-[#1d1333]/40 p-5">
+          <div className="rounded-3xl bg-muted p-5">
             <div className="flex items-center justify-between text-sm text-[#c0d1e4]">
               <div>
                 <p className="font-semibold ">Wallet Balance</p>
@@ -302,14 +313,14 @@ export default function ContributePage() {
           {error ? <p className="rounded-3xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</p> : null}
 
           <div className="space-y-4">
-            <div className="rounded-3xl border border-accent/20 bg-[#1d1333]/40 p-5">
+            <div className="rounded-3xl bg-muted p-5">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-[#c8d7f0]">Choose Squad</label>
                   <select
                     value={squadId}
                     onChange={(event) => setSquadId(event.target.value)}
-                    className="mt-2 h-11 w-full rounded-2xl border border-accent/20 bg-[#1d1333]/60 px-4 text-sm  outline-none transition focus:border-[#4c8dd9]"
+                    className="mt-2 h-11 w-full rounded-2xl border border-accent/20 bg-accent/60 px-4 text-sm  outline-none transition focus:border-[#4c8dd9]"
                   >
                     {squads.length === 0 ? (
                       <option value="">No squad available</option>
@@ -330,7 +341,7 @@ export default function ContributePage() {
                     value={amount}
                     min={100}
                     onChange={(event) => setAmount(Number(event.target.value) || 0)}
-                    className="mt-2 h-11 w-full rounded-2xl border border-accent/20 bg-[#1d1333]/60 px-4 text-sm  outline-none transition focus:border-[#4c8dd9]"
+                    className="mt-2 h-11 w-full rounded-2xl border border-accent/20 bg-accent/60 px-4 text-sm  outline-none transition focus:border-[#4c8dd9]"
                   />
                 </div>
 
@@ -339,7 +350,7 @@ export default function ContributePage() {
                   <input
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    className="mt-2 h-11 w-full rounded-2xl border border-accent/20 bg-[#1d1333]/60 px-4 text-sm  outline-none transition focus:border-[#4c8dd9]"
+                    className="mt-2 h-11 w-full rounded-2xl border border-accent/20 bg-accent/60 px-4 text-sm  outline-none transition focus:border-[#4c8dd9]"
                   />
                 </div>
               </div>
@@ -349,7 +360,7 @@ export default function ContributePage() {
               type="button"
               onClick={startPayment}
               disabled={!amount || !email || !squadId}
-              className="inline-flex h-14 w-full items-center justify-center rounded-full bg-accent/80 text-sm font-semibold text-primary transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-14 w-full items-center justify-center rounded-full bg-accent/80 text-sm font-semibold text-primary transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60 text-warning-foreground"
             >
               Confirm & Pay First Deposit
             </button>

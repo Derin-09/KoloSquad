@@ -17,6 +17,8 @@
   --accent-input-focus: color-mix(in oklab, var(--accent) 55%, white);
   --accent-button: color-mix(in oklab, var(--accent) 85%, white);
   --success: #10b981;
+  --warning: #f8d47a; /* Warm gold undertone */
+  --warning-foreground: #2d1e00;
 }
 
 /* Dark theme (Matches your Settings Page exactly) */
@@ -32,6 +34,8 @@
   --accent-input-focus: color-mix(in oklab, var(--accent) 65%, #050a11);
   --accent-button: color-mix(in oklab, var(--accent) 85%, #050a11);
   --success: #34d399;
+  --warning: #f8d47a; /* Warm gold undertone */
+  --warning-foreground: #2d1e00;
 }
 
 /* System preference fallback */
@@ -48,6 +52,8 @@
     --accent-input-focus: color-mix(in oklab, var(--accent) 65%, #050a11);
     --accent-button: color-mix(in oklab, var(--accent) 85%, #050a11);
     --success: #34d399;
+    --warning: #f8d47a; /* Warm gold undertone */
+  --warning-foreground: #2d1e00;
   }
 }
 
@@ -65,6 +71,8 @@ html.dark .logo--dark { display: inline-block; }
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --font-sans: var(--font-montserrat);
   --font-mono: var(--font-montserrat);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -211,6 +219,8 @@ html {
   --sidebar-accent-foreground: oklch(0.25 0.05 240);
   --sidebar-border: oklch(0.90 0.02 240);
   --sidebar-ring: oklch(0.82 0.06 220);
+  --warning: oklch(0.88 0.13 85); /* #f8d47a - Gold */
+  --warning-foreground: oklch(0.18 0.04 85);
 }
 
 .dark {
@@ -245,6 +255,8 @@ html {
   --sidebar-accent-foreground: oklch(0.85 0.08 220);
   --sidebar-border: oklch(0.24 0.03 245);
   --sidebar-ring: oklch(0.85 0.08 220);
+  --warning: oklch(0.88 0.13 85); /* #f8d47a - Dark Gold */
+  --warning-foreground: oklch(0.18 0.04 85);
 }
 
 @layer base {

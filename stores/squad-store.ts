@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { Contribution, Member, Squad } from "@/types/types";
+import { Contribution, Member, MemberType, Squad } from "@/types/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { create } from 'zustand'
 
@@ -13,6 +13,19 @@ type SquadStats = {
     invite_code: string;
     contributions: Contribution[] | null;
     members: Member[] | null;
+}
+
+type ContribType = {
+    amount: number,
+    status: string,
+    created_at: string
+}
+
+type SingleSquad= {
+    members: MemberType[], 
+    squad: Squad | null, 
+    contributions: ContribType[] | null, 
+    totalSaved: number
 }
 
 type SquadStore = {
@@ -32,6 +45,7 @@ type SquadStore = {
         penalties: string[];
     }) => Promise<{ id: string; name: string; target_amount: number; invite_code: string; created_by: string }>;
     fetchSquad: (userId: string) => Promise<void>
+    fetchSingleSquad: (squadId: string) => Promise<SingleSquad>
     refreshSquads: () => Promise<void>
     startRealtime: () => void
     stopRealtime: () => void
@@ -166,6 +180,62 @@ export const useSquadStore = create<SquadStore>((set, get) => ({
             set({ isLoading: false });
         }
     },
+
+    fetchSingleSquad: async (squadId: string) => {
+        let sorted: MemberType[] = []
+        const { data: squadData, error: squadError } = await supabase
+            .from("squads")
+            .select("id, name, target_amount, invite_code, created_by")
+            .eq("id", squadId)
+            .maybeSingle();
+
+        if (squadError) console.error("Squad fetch error:", squadError);
+        // else setSquad(squadData);
+
+        const { data: memberData, error: memberError } = await supabase
+            .from("squad_member_contributions")
+            // .from("contributions")
+            .select("*")
+            .eq("squad_id", squadId);
+
+
+        if (memberError) {
+            console.error("Member fetch error:", memberError);
+        } else {
+            const mapped: MemberType[] = (memberData || []).map((m) => ({
+                user_id: m.user_id,
+                role: m.role,
+                profiles: {
+                    full_name: m.full_name,
+                    avatar_url: m.avatar_url,
+                },
+                total_contributed: m.total_contributed,
+            }));
+
+            sorted = mapped.sort((a, b) =>
+                a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0
+            );
+
+        }
+
+        // Fetch contributions
+        const { data: contribData } = await supabase
+            .from("contributions")
+            .select("amount, status, created_at")
+            .eq("squad_id", squadId)
+            .order("created_at", { ascending: false });
+
+        const total =
+            contribData
+                ?.filter((c) => c.status === "successful")
+                .reduce((sum, c) => sum + c.amount, 0) || 0;
+
+        
+            const result: SingleSquad = { members: sorted, squad: squadData, contributions: contribData, totalSaved: total}
+
+            return result
+    },
+
     refreshSquads: async () => {
         const { data, error } = await supabase.auth.getUser();
         if (error || !data.user) {

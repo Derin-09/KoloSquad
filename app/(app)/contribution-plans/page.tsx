@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Squad } from "@/types/types";
+import Spinner from "@/app/loading";
 
 
 
@@ -29,7 +30,7 @@ export default function ContributionPlansPage() {
     fetchSquads();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading squads...</p>;
+  if (loading) return <Spinner />;
 
   if (squads.length === 0)
     return <p className="text-center mt-10">No squads yet. Create one first.</p>;
